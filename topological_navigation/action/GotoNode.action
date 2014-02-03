@@ -1,0 +1,8 @@
+#goal definition
+string target
+---
+#result definition
+bool success
+---
+#feedback
+string route
