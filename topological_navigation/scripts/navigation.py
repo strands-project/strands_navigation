@@ -6,8 +6,10 @@ import pymongo
 import json
 import sys
 
-
+from time import sleep
+from datetime import datetime
 from topological_navigation.topological_node import *
+from topological_navigation.navigation_stats import *
 from actionlib_msgs.msg import *
 from move_base_msgs.msg import *
 from std_msgs.msg import String
@@ -23,16 +25,22 @@ class TopologicalNavServer(object):
     _feedback = topological_navigation.msg.GotoNodeFeedback()
     _result   = topological_navigation.msg.GotoNodeResult()
 
-    def __init__(self, name, filename) :
+
+    def __init__(self, name, filename, mode) :
+        self.node_by_node = False
         self.cancelled = False
         self.current_node = "Unknown"
+        self.closest_node = "Unknown"
         self.actions_needed=[]
+        self.navigation_activated=False
         
         self._action_name = name
         rospy.loginfo("Loading file from map %s", filename)
         self.lnodes = self.loadMap(filename)
         rospy.loginfo(" ...done")
 
+        if mode == "Node_by_Node" :
+            self.node_by_node = True
        
         rospy.loginfo("Creating action server.")
         self._as = actionlib.SimpleActionServer(self._action_name, topological_navigation.msg.GotoNodeAction, execute_cb = self.executeCallback, auto_start = False)
@@ -55,8 +63,9 @@ class TopologicalNavServer(object):
             self.rampClient.wait_for_server()
             rospy.loginfo(" ...done")
         
-        rospy.loginfo("Subscribing to Topic")
-        rospy.Subscriber('/closest_node', String, self.NodeCallback)
+        rospy.loginfo("Subscribing to Topics")
+        rospy.Subscriber('/closest_node', String, self.closestNodeCallback)
+        rospy.Subscriber('/current_node', String, self.currentNodeCallback)
         rospy.loginfo(" ...done")
         
 
@@ -67,9 +76,12 @@ class TopologicalNavServer(object):
         self.cancelled = False
         self._feedback.route = 'Starting...'
         self._as.publish_feedback(self._feedback)
-        rospy.loginfo('%s: Navigating From %s to %s', self._action_name, self.current_node, goal.target)
-        Onode = get_node(self.current_node, self.lnodes)
-        Gnode = get_node(goal.target, self.lnodes)
+        rospy.loginfo('%s: Navigating From %s to %s', self._action_name, self.closest_node, goal.target)
+        self.navigate(goal.target)
+        
+    def navigate(self, target):
+        Onode = get_node(self.closest_node, self.lnodes)
+        Gnode = get_node(target, self.lnodes)
         if (Gnode is not None) and (Onode is not None) and (Gnode != Onode) :
             exp_index=0
             to_expand=[Onode]
@@ -77,7 +89,7 @@ class TopologicalNavServer(object):
             children=to_expand[exp_index]._get_Children()
             not_goal=True
             while not_goal :
-                pos=findInList(goal.target, children)
+                pos=findInList(target, children)
                 if pos>=0 :
                     print "Goal found in Pos %d" %pos
                     not_goal=False
@@ -98,8 +110,8 @@ class TopologicalNavServer(object):
             print "fixing Father %s for goal %s" %(to_expand[exp_index].name,Gnode.name)
             Gnode._set_Father(to_expand[exp_index].name)
             print "Father for Gnode %s" %(Gnode.father)
-            route=[Gnode]
             #del route[:]
+            route=[Gnode]
             print "Current Route %d" %len(route)
             rindex=0
             print route[rindex].father
@@ -123,17 +135,39 @@ class TopologicalNavServer(object):
             
         if not self.cancelled :
             self._result.success = result
-            self._feedback.route = goal.target
+            self._feedback.route = target
             self._as.publish_feedback(self._feedback)
             self._as.set_succeeded(self._result)
-
+        else :
+            self._result.success = result
+            self._feedback.route = self.current_node
+            self._as.publish_feedback(self._feedback)
+            self._as.set_aborted(self._result)
     
-    def NodeCallback(self, msg):
-        self.current_node=msg.data
+    def closestNodeCallback(self, msg):
+        self.closest_node=msg.data
 
+
+    def currentNodeCallback(self, msg):
+        if self.current_node != msg.data and msg.data != 'none' :
+            self.current_node = msg.data
+            print "new node reached %s" %self.current_node
+            if self.navigation_activated :
+                self.stat.set_at_node()
+                if self.current_node != self.stat.target and self.node_by_node :
+                    self.baseClient.cancel_all_goals()
+                    self.cancelled = True
+                  
 
     def followRoute(self, route):
-        rospy.loginfo("%d Nodes on route" %len(route))
+        nnodes=len(route)
+        Orig = route[0].name
+        Targ = route[nnodes-1].name
+        self.stat=nav_stats(Orig, Targ)
+        dt_text=self.stat.get_start_time_str()
+        rospy.loginfo("%d Nodes on route" %nnodes)
+        rospy.loginfo("navigation started on %s" %dt_text)
+        self.navigation_activated=True
         #movegoal = MoveBaseGoal()
         rindex=0
         nav_ok=True
@@ -157,7 +191,32 @@ class TopologicalNavServer(object):
                 if self.rampClient.get_state() != GoalStatus.SUCCEEDED:
                     nav_ok=False
             rindex=rindex+1
+        if self.cancelled :
+            nav_ok=False
+            nodewp = get_node(self.current_node, self.lnodes)
+            not_fatal=self.move_base_to_waypoint(nodewp.waypoint)
+
+        self.stat.set_ended(self.current_node)
+        dt_text=self.stat.get_finish_time_str()
+        operation_time = self.stat.operation_time
+        time_to_wp = self.stat.time_to_wp
         result=nav_ok
+      
+        if nav_ok :
+            self.stat.status= "success"
+            rospy.loginfo("navigation finished on %s (%d/%d)" %(dt_text,operation_time,time_to_wp))
+        else :
+            if not_fatal :
+                rospy.loginfo("navigation failed on %s (%d/%d)" %(dt_text,operation_time,time_to_wp))
+                self.stat.status= "failed"
+            else :
+                rospy.loginfo("Fatal fail on %s (%d/%d)" %(dt_text,operation_time,time_to_wp))
+                self.stat.status= "fatal"
+        
+        val=self.stat.__dict__#json.loads(vala)
+        print val
+        self._stats_collection.insert(val)
+        self.navigation_activated=False
         return result
 
     def move_base_to_waypoint(self, inf):
@@ -173,7 +232,7 @@ class TopologicalNavServer(object):
         movegoal.target_pose.pose.orientation.w = float(inf[6])
         self.baseClient.cancel_all_goals()
         rospy.sleep(rospy.Duration.from_sec(1))
-        print movegoal
+        #print movegoal
         self.baseClient.send_goal(movegoal)
         self.baseClient.wait_for_result()
         if self.baseClient.get_state() != GoalStatus.SUCCEEDED:
@@ -192,9 +251,12 @@ class TopologicalNavServer(object):
         host = rospy.get_param("datacentre_host")
         port = rospy.get_param("datacentre_port")
         print "Using datacentre  ",host,":", port
-        client = pymongo.MongoClient(host, port)
-        db=client.autonomous_patrolling
+        self.mongo_client = pymongo.MongoClient(host, port)
+        db=self.mongo_client.autonomous_patrolling
         points_db=db["waypoints"]
+        
+        self._stats_collection = db.nav_stats
+        
         available = points_db.find().distinct("meta.pointset")
         #print available
         
@@ -223,5 +285,9 @@ class TopologicalNavServer(object):
 
 if __name__ == '__main__':
     filename=str(sys.argv[1])
+    mode="normal"
+    if len(sys.argv) > 2:
+        if sys.argv[2] == "true":
+            mode="Node_by_Node"
     rospy.init_node('topological_navigation')
-    server = TopologicalNavServer(rospy.get_name(),filename)
+    server = TopologicalNavServer(rospy.get_name(),filename,mode)
