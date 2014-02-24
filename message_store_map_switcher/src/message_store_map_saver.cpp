@@ -17,6 +17,9 @@ using namespace ros_datacentre;
 #define USAGE "\nUSAGE: message_store_map_saver <map.yaml>\n" \
               "  map.yaml: map description file\n"
 
+/**
+ 	Load a map from a yaml description. Code copied from main.cc in map_server.
+*/
 void loadMapFromFile(ros::NodeHandle & private_nh, 
 						const std::string & fname, 
 						nav_msgs::GetMap::Response & mapResponse) {
@@ -123,15 +126,23 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "message_store_map_saver");
 	ros::NodeHandle private_nh("~");
 
-	//structure to store map contents in
+	//structure to store map contents in, as required by map_server::loadMapFromFile
     nav_msgs::GetMap::Response mapResponse;
  	
-    // Code copied from main.cc in map_server -- it loads a map from a yaml file
-
+ 	//file name of the yaml file
 	std::string fname(argv[1]);   
 	
+	//load map into mapResponse
 	loadMapFromFile(private_nh, fname, mapResponse);
 
+	//object to store the map in the db	
+	MessageStoreProxy messageStore(private_nh);
+
+	unsigned pos = fname.find(".");
+	std::string mapName = fname.substr(0,pos);
+	ROS_INFO("Saving to message store as \"%s\"", mapName.c_str());
+
+	messageStore.insertNamed(mapName, mapResponse.map);
 
 	return 0;
 }
