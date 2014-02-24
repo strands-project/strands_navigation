@@ -14,7 +14,7 @@ class MessageStoreMapServer:
     def __init__(self):
         self.msg_store = MessageStoreProxy()
         self.map_publisher = rospy.Publisher('/map', OccupancyGrid, latch=True)
-        self.publish_map_serv = rospy.Service('/publish_map', SwitchMap, self.serve_map_srv)
+        self.publish_map_serv = rospy.Service('/switch_map', SwitchMap, self.serve_map_srv)
 
     def serve_map_srv(self, req):
         return self.serve_map(req.map_name)         
