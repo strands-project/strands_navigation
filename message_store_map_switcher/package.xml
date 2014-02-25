@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>message_store_map_switcher</name>
+  <version>0.0.0</version>
+  <description>A package for manipulating and serving maps from the ros_datacentre.</description>
+
+  <maintainer email="n.a.hawes@cs.bham.ac.uk">Nick Hawes</maintainer>
+
+  <license>MIT</license>
+
+  <author email="n.a.hawes@cs.bham.ac.uk">Nick Hawes</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>map_server</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>ros_datacentre_cpp_client</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <run_depend>map_server</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>ros_datacentre</run_depend>
+  <run_depend>ros_datacentre_cpp_client</run_depend>
+
+</package>
