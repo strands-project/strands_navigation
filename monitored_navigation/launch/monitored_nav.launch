@@ -1,0 +1,26 @@
+<launch>
+
+
+
+     <!--   <include file="$(find ros_mary_tts)/launch/ros_mary.launch"/> -->
+    
+    
+    <arg name="map"/>
+    <arg name="with_camera" default="false" />
+    
+    <include file="$(find scitos_2d_navigation)/launch/scitos_2d_nav.launch">
+        <arg name="with_camera" value="$(arg with_camera)" />
+        <arg name="map"  value="$(arg map)" />    
+    </include>
+    
+    
+    
+    
+    <node name="nav_monitor" pkg="monitored_navigation" type="nav_monitor.py" output="screen"/>
+
+    <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen">
+    </node>
+
+  <!--  <node name="log_services" pkg="waypoint_patroller" type="log_services.py"/> -->
+
+</launch>
