@@ -1,0 +1,5 @@
+# Service used to switch the map server to a new map
+
+string map_name
+---
+bool result
