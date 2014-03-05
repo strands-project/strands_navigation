@@ -2,7 +2,6 @@
 
 
 
-     <!--   <include file="$(find ros_mary_tts)/launch/ros_mary.launch"/> -->
     
     
     <arg name="map"/>
@@ -14,7 +13,11 @@
     </include>
     
     
+    <node name="human_help_manager" pkg="human_help_manager" type="help_manager.py" output="screen"/>
     
+    <include file="$(find nav_help_speech)/launch/help_speech.launch"/>
+    <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
+  
     
     <node name="nav_monitor" pkg="monitored_navigation" type="nav_monitor.py" output="screen"/>
 

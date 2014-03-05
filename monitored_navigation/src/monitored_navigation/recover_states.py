@@ -45,7 +45,7 @@ class RecoverMoveBase(smach.State):
         self.enable_motors= rospy.ServiceProxy('enable_motors',
                                                   EnableMotors)
                                                   
-        self.ask_help=rospy.ServiceProxy('monitored_navigation/ask_help', AskHelp)
+        self.ask_help=rospy.ServiceProxy('/monitored_navigation/human_help/manager', AskHelp)
         self.service_msg=AskHelpRequest()
         self.service_msg.failed_component=AskHelpRequest.NAVIGATION
                                                   
@@ -164,7 +164,7 @@ class RecoverBumper(smach.State):
                                               MotorStatus,
                                               self.bumper_monitor_cb)
         
-        self.ask_help=rospy.ServiceProxy('monitored_navigation/ask_help', AskHelp)
+        self.ask_help=rospy.ServiceProxy('/monitored_navigation/human_help/manager', AskHelp)
         self.service_msg=AskHelpRequest()
         self.service_msg.failed_component=AskHelpRequest.BUMPER
         
