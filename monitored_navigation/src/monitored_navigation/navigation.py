@@ -108,8 +108,8 @@ class RecoverableMoveBase(smach.StateMachine):
             
         return outcome
         
-    def set_patroller_thresholds(self, max_move_base_recovery_attempts):
-        self._recover_move_base.set_patroller_thresholds(max_move_base_recovery_attempts)         
+    def set_nav_thresholds(self, max_move_base_recovery_attempts):
+        self._recover_move_base.set_nav_thresholds(max_move_base_recovery_attempts)         
             
 """
 
@@ -180,8 +180,8 @@ class MonitoredRecoverableMoveBase(smach.Concurrence):
     """ 
     Set the battery level thresholds.
     """
-    def set_patroller_thresholds(self,max_bumper_recovery_attempts,max_move_base_recovery_attempts):
-        self._recoverable_move_base.set_patroller_thresholds(max_move_base_recovery_attempts)
+    def set_nav_thresholds(self,max_bumper_recovery_attempts,max_move_base_recovery_attempts):
+        self._recoverable_move_base.set_nav_thresholds(max_move_base_recovery_attempts)
     
 
 
@@ -203,6 +203,7 @@ class HighLevelMoveBase(smach.StateMachine):
     def __init__(self):
         smach.StateMachine.__init__(self, outcomes=['succeeded',
                                                     'move_base_failure',
+                                                    'bumper_failure',
                                                     'preempted'],
                                           input_keys=['goal_pose'])
         self._monitored_recoverable_move_base = MonitoredRecoverableMoveBase()
@@ -218,7 +219,8 @@ class HighLevelMoveBase(smach.StateMachine):
                                                 'stuck_on_carpet':'RECOVER_STUCK_ON_CARPET'})
             smach.StateMachine.add('RECOVER_BUMPER',
                                    self._recover_bumper,
-                                   transitions={'succeeded': 'MONITORED_MOVE_BASE'})
+                                   transitions={'succeeded': 'MONITORED_MOVE_BASE',
+                                                'failure':'bumper_failure'})
             smach.StateMachine.add('RECOVER_STUCK_ON_CARPET',
                                    self._recover_carpet,
                                    transitions={'succeeded': 'MONITORED_MOVE_BASE',
@@ -228,7 +230,7 @@ class HighLevelMoveBase(smach.StateMachine):
     """ 
     Set the battery level thresholds.
     """
-    def set_patroller_thresholds(self, max_bumper_recovery_attempts,max_move_base_recovery_attempts):
-        self._monitored_recoverable_move_base.set_patroller_thresholds(max_bumper_recovery_attempts,max_move_base_recovery_attempts)
-        self._recover_bumper.set_patroller_thresholds(max_bumper_recovery_attempts)
+    def set_nav_thresholds(self, max_bumper_recovery_attempts,max_move_base_recovery_attempts):
+        self._monitored_recoverable_move_base.set_nav_thresholds(max_bumper_recovery_attempts,max_move_base_recovery_attempts)
+        self._recover_bumper.set_nav_thresholds(max_bumper_recovery_attempts)
     

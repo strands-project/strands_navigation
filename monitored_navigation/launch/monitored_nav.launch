@@ -1,9 +1,6 @@
 <launch>
 
 
-
-    
-    
     <arg name="map"/>
     <arg name="with_camera" default="false" />
     <arg name="human_help" default="true" />

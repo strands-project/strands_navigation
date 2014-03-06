@@ -4,9 +4,6 @@ import rospy
 
 
 from strands_navigation_msgs.srv import AskHelp
-
-
-
 from strands_navigation_msgs.srv import Register
     
 class HelpManager(object):
@@ -22,17 +19,14 @@ class HelpManager(object):
         
     def registration_callback(self,req):
         self.registered_helpers[req.id]=rospy.ServiceProxy(req.service_name, AskHelp)
-        print("REGISTER! " + str(self.registered_helpers))
         return []
         
     def unregistration_callback(self,req):
         del(self.registered_helpers[req.id])
-        print("UNREGISTER!" + str(self.registered_helpers))       
         return []
         
         
     def forward_callback(self,req):
-        print ("CONA!" + str(self.registered_helpers))   
         for key in self.registered_helpers:
             rospy.logwarn(key)
             self.registered_helpers[key](req)

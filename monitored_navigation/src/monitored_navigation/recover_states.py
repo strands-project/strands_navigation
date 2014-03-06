@@ -1,4 +1,3 @@
-# TODO: Add speaking back in here
 import rospy
 
 import smach
@@ -16,7 +15,6 @@ from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
 
 #from logger import Loggable
 
-#import marathon_touch_gui.client
 
 
 # this file has the recovery states that will be used when some failures are
@@ -39,7 +37,7 @@ class RecoverMoveBase(smach.State):
         #self.vel_pub = rospy.Publisher('/cmd_vel', Twist)
         #self._vel_cmd = Twist()
         #self._vel_cmd.linear.x = -0.1
-        self.set_patroller_thresholds(max_move_base_recovery_attempts)
+        self.set_nav_thresholds(max_move_base_recovery_attempts)
         
 
         self.enable_motors= rospy.ServiceProxy('enable_motors',
@@ -51,9 +49,7 @@ class RecoverMoveBase(smach.State):
                                                   
         #self.clear_costmap
                                                   
-        #self.speaker=actionlib.SimpleActionClient('/speak', maryttsAction)
-        #self.speak_goal= maryttsGoal()
-        #self.speaker.wait_for_server()
+
         
         self.being_helped=False
         self.help_finished=False      
@@ -143,7 +139,7 @@ class RecoverMoveBase(smach.State):
 
 
             
-    def set_patroller_thresholds(self, max_move_base_recovery_attempts):
+    def set_nav_thresholds(self, max_move_base_recovery_attempts):
         if max_move_base_recovery_attempts is not None:
             self.MAX_MOVE_BASE_RECOVERY_ATTEMPTS = max_move_base_recovery_attempts        
             
@@ -152,7 +148,7 @@ class RecoverMoveBase(smach.State):
 class RecoverBumper(smach.State):
     def __init__(self,max_bumper_recovery_attempts=5):
         smach.State.__init__(self,
-                             outcomes=['succeeded']
+                             outcomes=['succeeded', 'failure']
                              )
         self.reset_motorstop = rospy.ServiceProxy('reset_motorstop',
                                                   ResetMotorStop)
@@ -169,12 +165,8 @@ class RecoverBumper(smach.State):
         self.service_msg.failed_component=AskHelpRequest.BUMPER
         
         
-        #self.speaker=actionlib.SimpleActionClient('/speak', maryttsAction)
-        #self.speak_goal= maryttsGoal()
-        #self.speaker.wait_for_server()
         
-        
-        self.set_patroller_thresholds(max_bumper_recovery_attempts)
+        self.set_nav_thresholds(max_bumper_recovery_attempts)
         
         
         
@@ -198,7 +190,6 @@ class RecoverBumper(smach.State):
     def execute(self, userdata):
         help_offered_monitor=rospy.Service('/monitored_navigation/help_offered', Empty, self.help_offered)
         help_done_monitor=rospy.Service('/monitored_navigation/help_finished', Empty, self.bumper_recovered)
-        #displayNo = rospy.get_param("~display", 0)
         n_tries=1
         while True:
             if self.being_helped:
@@ -227,13 +218,9 @@ class RecoverBumper(smach.State):
                 rospy.sleep(0.1)
                 if self.isRecovered:
                    # self.get_logger().log_helped("bumper")
-                    #self.speak_goal.text='Thank you! I will be on my way.'
-                    #self.speaker.send_goal(self.speak_goal)
-                    #self.speaker.wait_for_result()
                     help_done_monitor.shutdown()
                     help_offered_monitor.shutdown()
                     #self.get_logger().log_bump_count(n_tries)
-                    #marathon_touch_gui.client.display_main_page(displayNo)
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FINISHED
                     self.service_msg.interaction_service='none'
                     try:
@@ -242,12 +229,6 @@ class RecoverBumper(smach.State):
                         rospy.logwarn("No means of asking for human help available.")
                     return 'succeeded' 
                 else:
-                    #self.speak_goal.text='Something is still wrong. Are you sure I am in a clear area?'
-                    #self.speaker.send_goal(self.speak_goal)
-                    #self.speaker.wait_for_result()
-                    #on_completion = 'help_offered'
-                    #service_prefix = '/patroller'
-                    #marathon_touch_gui.client.bumper_stuck(displayNo, service_prefix, on_completion)
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FAILED
                     self.service_msg.interaction_service='none'
                     try:
@@ -273,19 +254,13 @@ class RecoverBumper(smach.State):
                             rospy.logwarn("No means of asking for human help available.")
                         return 'succeeded' 
                     rospy.sleep(1)
-                    #if n_tries>self.MAX_BUMPER_RECOVERY_ATTEMPTS:
-                    #send email
+                    if n_tries>self.MAX_BUMPER_RECOVERY_ATTEMPTS:
+                        return 'failure'
                 n_tries += 1
             
-                #if n_tries==2:
-                    #on_completion = 'help_offered'
-                    #service_prefix = '/patroller'
-                    #marathon_touch_gui.client.bumper_stuck(displayNo, service_prefix, on_completion)            
+       
             
                 if n_tries>1:
-                    #self.speak_goal.text='My bumper is being pressed. Please release it so I can move on!'
-                    #self.speaker.send_goal(self.speak_goal)
-                    #self.speaker.wait_for_result()
                     self.service_msg.interaction_status=AskHelpRequest.ASKING_HELP
                     self.service_msg.interaction_service='/monitored_navigation/help_offered'
                     try:
@@ -298,7 +273,7 @@ class RecoverBumper(smach.State):
    
             
             
-    def set_patroller_thresholds(self, max_bumper_recovery_attempts):
+    def set_nav_thresholds(self, max_bumper_recovery_attempts):
         if max_bumper_recovery_attempts is not None:
             self.MAX_BUMPER_RECOVERY_ATTEMPTS = max_bumper_recovery_attempts
                 
@@ -325,7 +300,6 @@ class RecoverStuckOnCarpet(smach.State):
    #             self.service_preempt()
    #             return 'preempted'
             rospy.sleep(0.2)
-   #     os.system("rosservice call /ros_mary 'Recovering carpet stuck'")
         self._vel_cmd.linear.x=0.0
         self._vel_cmd.angular.z=0.0
         self.vel_pub.publish(self._vel_cmd)
