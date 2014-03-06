@@ -6,18 +6,18 @@
     
     <arg name="map"/>
     <arg name="with_camera" default="false" />
+    <arg name="human_help" default="true" />
     
     <include file="$(find scitos_2d_navigation)/launch/scitos_2d_nav.launch">
         <arg name="with_camera" value="$(arg with_camera)" />
         <arg name="map"  value="$(arg map)" />    
     </include>
     
-    
-    <node name="human_help_manager" pkg="human_help_manager" type="help_manager.py" output="screen"/>
-    
-    <include file="$(find nav_help_speech)/launch/help_speech.launch"/>
-    <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
-  
+    <group if="$(arg human_help)">
+        <node name="human_help_manager" pkg="human_help_manager" type="help_manager.py" output="screen"/>    
+        <include file="$(find nav_help_speech)/launch/help_speech.launch"/>
+        <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
+    </group>
     
     <node name="nav_monitor" pkg="monitored_navigation" type="nav_monitor.py" output="screen"/>
 
