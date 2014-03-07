@@ -106,8 +106,6 @@ class NavActionState(smach.State):
             userdata.n_nav_fails = userdata.n_nav_fails + 1
             return 'aborted'
         
-
-                
                  
 
 """
