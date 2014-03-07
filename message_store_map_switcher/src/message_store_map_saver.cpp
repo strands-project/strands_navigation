@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 	std::string mapName = fname.substr(0,pos);
 	ROS_INFO("Saving to message store as \"%s\"", mapName.c_str());
 
-	messageStore.insertNamed(mapName, mapResponse.map);
+	messageStore.updateNamed(mapName, mapResponse.map, true);
 
 	return 0;
 }
