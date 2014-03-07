@@ -23,21 +23,21 @@ from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
 
 
 
-class RecoverMoveBase(smach.State):
-    def __init__(self,max_move_base_recovery_attempts=5):
+class RecoverNav(smach.State):
+    def __init__(self,max_nav_recovery_attempts=5):
         smach.State.__init__(self,
                              # we need the number of move_base fails as
                              # incoming data from the move_base action state,
                              # because it is not possible for this recovery
                              # behaviour to check if it was succeeded
                              outcomes=['succeeded', 'failure', 'preempted'],
-                             input_keys=['n_move_base_fails'],
-                             output_keys=['n_move_base_fails'],
+                             input_keys=['goal','n_nav_fails'],
+                             output_keys=['goal','n_nav_fails'],
                              )
         #self.vel_pub = rospy.Publisher('/cmd_vel', Twist)
         #self._vel_cmd = Twist()
         #self._vel_cmd.linear.x = -0.1
-        self.set_nav_thresholds(max_move_base_recovery_attempts)
+        self.set_nav_thresholds(max_nav_recovery_attempts)
         
 
         self.enable_motors= rospy.ServiceProxy('enable_motors',
@@ -84,7 +84,7 @@ class RecoverMoveBase(smach.State):
         # since there is no way to check if the recovery behaviour was
         # successful, we always go back to the move_base action state with
         # 'succeeded' until the number of failures treshold is reached
-        if userdata.n_move_base_fails < self.MAX_MOVE_BASE_RECOVERY_ATTEMPTS:
+        if userdata.n_nav_fails < self.MAX_NAV_RECOVERY_ATTEMPTS:
             #self.get_logger().log_navigation_recovery_attempt(success=True,
              #                                                 attempts=userdata.n_move_base_fails)
                                                               
@@ -103,6 +103,11 @@ class RecoverMoveBase(smach.State):
                 rospy.logwarn("No means of asking for human help available.")
             
             for i in range(0,40):
+                if self.preempt_requested():
+                    help_offered_monitor.shutdown()
+                    help_done_monitor.shutdown()
+                    self.service_preempt()
+                    return 'preempted'
                 if self.being_helped:
                     self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
                     self.service_msg.interaction_service='/monitored_navigation/help_finished'
@@ -116,6 +121,11 @@ class RecoverMoveBase(smach.State):
             if self.being_helped:
                 self.being_helped=False
                 for i in range(0,60):
+                    if self.preempt_requested():
+                        help_offered_monitor.shutdown()
+                        help_done_monitor.shutdown()
+                        self.service_preempt()
+                        return 'preempted'
                     if self.help_finished:
                         #self.get_logger().log_helped("navigation")
                         self.help_finished=False
@@ -132,16 +142,16 @@ class RecoverMoveBase(smach.State):
             help_done_monitor.shutdown()
             return 'succeeded'
         else:
-            userdata.n_move_base_fails=0
+            userdata.n_nav_fails=0
            # self.get_logger().log_navigation_recovery_attempt(success=False,
             #                                                  attempts=userdata.n_move_base_fails)
             return 'failure'
 
 
             
-    def set_nav_thresholds(self, max_move_base_recovery_attempts):
-        if max_move_base_recovery_attempts is not None:
-            self.MAX_MOVE_BASE_RECOVERY_ATTEMPTS = max_move_base_recovery_attempts        
+    def set_nav_thresholds(self, max_nav_recovery_attempts):
+        if max_nav_recovery_attempts is not None:
+            self.MAX_NAV_RECOVERY_ATTEMPTS = max_nav_recovery_attempts        
             
             
             
