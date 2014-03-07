@@ -1,14 +1,9 @@
 <launch>
 
 
-    <arg name="map"/>
-    <arg name="with_camera" default="false" />
     <arg name="human_help" default="true" />
     
-    <include file="$(find scitos_2d_navigation)/launch/scitos_2d_nav.launch">
-        <arg name="with_camera" value="$(arg with_camera)" />
-        <arg name="map"  value="$(arg map)" />    
-    </include>
+
     
     <group if="$(arg human_help)">
         <node name="human_help_manager" pkg="human_help_manager" type="help_manager.py" output="screen"/>    
