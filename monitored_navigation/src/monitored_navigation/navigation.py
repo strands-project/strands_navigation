@@ -72,9 +72,10 @@ output keys:	n_move_base_fails	- see input.
 class NavActionState(smach.State):
        
     def __init__(self):
+        
         smach.State.__init__(self,
                              outcomes=['succeeded', 'aborted', 'preempted'],
-                             input_keys=['goal','n_nav_fails'],
+                             input_keys=['goal','n_nav_fails',],
                              output_keys=['goal','n_nav_fails'],
                              )
 
@@ -82,21 +83,17 @@ class NavActionState(smach.State):
                                                   
     def execute(self, userdata):
         action_server_name=userdata.goal.action_server
-       # del(userdata.goal.action_server)
         action_client= actionlib.SimpleActionClient(action_server_name, MoveBaseAction)
-      #  userdata.goal.action_server.action_server=action_server_name
         action_client.wait_for_server()
         action_client.send_goal(userdata.goal)
-        #action_client.wait_for_result()
         status= action_client.get_state()
-        while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:
+        while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:   
             status= action_client.get_state()
             if self.preempt_requested():
                 action_client.cancel_goal()
                 self.service_preempt()
-            rospy.sleep(0.1)
-            
-        action_result=action_client.get_result() #to add as action output        
+            action_client.wait_for_result(rospy.Duration(0.2))
+        
         if status == GoalStatus.SUCCEEDED:
             userdata.n_nav_fails = 0
             return 'succeeded'
@@ -107,6 +104,7 @@ class NavActionState(smach.State):
             return 'aborted'
         
                  
+
 
 """
 Move the robot to a goal location, with some basic recovery attempts on failure.

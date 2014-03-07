@@ -19,12 +19,7 @@ from  monitored_navigation.navigation import HighLevelNav
     
     
 class MonitoredNavigation(object):
-    """
-    Constructor.
-    :param waypoints_name: str, name of waypoints as appears in the datacentre
-    :param is_random: bool, should the waypoints be visited in random order
-    :param n_iterations: int, how many times to visit all the waypoints
-    """
+
     def __init__(self):
     
         # Create the main state machine
@@ -34,7 +29,7 @@ class MonitoredNavigation(object):
         #logger =  PatrollLogger("autonomous_patrolling")
         #self.long_term_patrol_sm.set_logger(logger)
         
-        # dynamic reconfiguration of battery tresholds
+        # dynamic reconfiguration of failure tresholds
         self.srv = Server(NavFailTresholdsConfig, self.reconfigure_callback)
     
 
@@ -45,13 +40,11 @@ class MonitoredNavigation(object):
         return config
     
     
-    """ The Main start point for Long Term Patroller """
     def main(self):
         asw = ActionServerWrapper(
                         'monitored_navigation', MonitoredNavigationAction, self.nav_sm,
-                        ['succeeded'], ['move_base_failure'], ['preempted'],
+                        ['succeeded'], ['move_base_failure', 'bumper_failure'], ['preempted'],
                         goal_key = 'goal',
-                        result_key = 'move_result'
                         )
         
         # Run the server in a background thread
