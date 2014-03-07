@@ -14,15 +14,6 @@ from monitored_navigation.cfg import NavFailTresholdsConfig
 from  monitored_navigation.navigation import HighLevelMoveBase
 
 
-
-
-
-#import strands_datacentre.util
-#got_pymongo = strands_datacentre.util.check_for_pymongo()
-#if got_pymongo:
-    #import pymongo
-    
-    
 #import marathon_touch_gui.client
     
     
@@ -43,17 +34,15 @@ class MonitoredNavigation(object):
         #self.long_term_patrol_sm.set_logger(logger)
         
         # dynamic reconfiguration of battery tresholds
-        #self.srv = Server(NavFailTresholdsConfig, self.reconfigure_callback)
+        self.srv = Server(NavFailTresholdsConfig, self.reconfigure_callback)
     
-        pass
-        
-    """ Dyanmic reconfigure callback for the battery tresholds """
-    #def reconfigure_callback(self, config, level):
-        #self.nav_sm.set_patroller_thresholds(
-       #                                                 config.max_bumper_recovery_attempts,
-        #                                                config.max_move_base_recovery_attempts)
-        #return config
 
+     
+     
+    def reconfigure_callback(self, config, level):
+        self.nav_sm.set_nav_thresholds(config.max_bumper_recovery_attempts,config.max_move_base_recovery_attempts)
+        return config
+    
     
     """ The Main start point for Long Term Patroller """
     def main(self):

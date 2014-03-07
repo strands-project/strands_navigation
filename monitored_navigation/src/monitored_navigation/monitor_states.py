@@ -2,14 +2,13 @@ import rospy
 
 import smach
 import smach_ros
-from smach import *
-from smach_ros import *
+
 
 from scitos_msgs.msg import MotorStatus
 from strands_navigation_msgs.msg import NavStatus
 
 
-
+#from logger import Loggable
 
 
 
