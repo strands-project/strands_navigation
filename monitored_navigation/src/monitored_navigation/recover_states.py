@@ -96,7 +96,7 @@ class RecoverNav(smach.State):
             
             
             self.service_msg.interaction_status=AskHelpRequest.ASKING_HELP
-            self.service_msg.interaction_service='/monitored_navigation/help_offered'
+            self.service_msg.interaction_service='help_offered'
             try:
                 self.ask_help(self.service_msg)
             except rospy.ServiceException, e:
@@ -108,7 +108,7 @@ class RecoverNav(smach.State):
                     return 'preempted'
                 if self.being_helped:
                     self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
-                    self.service_msg.interaction_service='/monitored_navigation/help_finished'
+                    self.service_msg.interaction_service='help_finished'
                     try:
                         self.ask_help(self.service_msg)
                     except rospy.ServiceException, e:
@@ -164,7 +164,7 @@ class RecoverNav(smach.State):
 class RecoverBumper(smach.State):
     def __init__(self,max_bumper_recovery_attempts=5):
         smach.State.__init__(self,
-                             outcomes=['succeeded', 'failure']
+                             outcomes=['succeeded', 'failure', 'preempted']
                              )
         self.reset_motorstop = rospy.ServiceProxy('reset_motorstop',
                                                   ResetMotorStop)
@@ -214,8 +214,8 @@ class RecoverBumper(smach.State):
                 return 'preempted'
             if self.being_helped:
                 #ver se isto ta bem
-                self.service_msg.interaction_status=AskHelpRequest.ASKING_HELP
-                self.service_msg.interaction_service='/monitored_navigation/help_offered'
+                self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
+                self.service_msg.interaction_service='help_finished'
                 try:
                     self.ask_help(self.service_msg)
                 except rospy.ServiceException, e:
@@ -229,8 +229,8 @@ class RecoverBumper(smach.State):
                     rospy.sleep(1)
                 if not self.help_finished:
                     self.being_helped=False
-                    self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
-                    self.service_msg.interaction_service='/monitored_navigation/help_finished'
+                    self.service_msg.interaction_status=AskHelpRequest.ASKING_HELP
+                    self.service_msg.interaction_service='help_offered'
                     try:
                         self.ask_help(self.service_msg) 
                     except rospy.ServiceException, e:
@@ -253,7 +253,7 @@ class RecoverBumper(smach.State):
                     return 'succeeded' 
                 else:
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FAILED
-                    self.service_msg.interaction_service='none'
+                    self.service_msg.interaction_service='help_offered'
                     try:
                         self.ask_help(self.service_msg)
                     except rospy.ServiceException, e:
@@ -285,7 +285,7 @@ class RecoverBumper(smach.State):
             
                 if n_tries>1:
                     self.service_msg.interaction_status=AskHelpRequest.ASKING_HELP
-                    self.service_msg.interaction_service='/monitored_navigation/help_offered'
+                    self.service_msg.interaction_service='help_offered'
                     try:
                         self.ask_help(self.service_msg)
                     except rospy.ServiceException, e:
