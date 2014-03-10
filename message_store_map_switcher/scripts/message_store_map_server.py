@@ -21,12 +21,12 @@ class MessageStoreMapServer:
 
     def serve_map(self, name):
         try:
-            map = self.msg_store.query_named(name, OccupancyGrid._type)
-            if map is None:
+            query_result = self.msg_store.query_named(name, OccupancyGrid._type, single=True)
+            if query_result[0] is None:
                 rospy.logwarn("No map found with name \"%s\"", name)
                 return False
             else:
-                self.map_publisher.publish(map)
+                self.map_publisher.publish(query_result[0])
                 return True
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
