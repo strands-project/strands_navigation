@@ -12,7 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system thread program_options filesystem)
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -114,7 +115,9 @@ target_link_libraries(message_store_map_saver
     SDL
     SDL_image
     yaml-cpp
+    mongoclient
   ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
 )
 
 #############
