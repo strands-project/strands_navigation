@@ -115,9 +115,9 @@ target_link_libraries(message_store_map_saver
     SDL
     SDL_image
     yaml-cpp
+    mongoclient
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
-  mongoclient
 )
 
 #############
