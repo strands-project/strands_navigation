@@ -258,6 +258,7 @@ class HighLevelNav(smach.StateMachine):
             smach.StateMachine.add('RECOVER_BUMPER',
                                    self._recover_bumper,
                                    transitions={'succeeded': 'MONITORED_NAV',
+                                                'preempted':'preempted',
                                                 'failure':'bumper_failure'})
             smach.StateMachine.add('RECOVER_STUCK_ON_CARPET',
                                    self._recover_carpet,
