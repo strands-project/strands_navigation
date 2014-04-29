@@ -161,6 +161,7 @@ class TopologicalMapVis(object):
     
         query_meta = {}
         query_meta["pointset"] = point_set
+        query_meta["stored_type"]="strands_navigation_msgs/TopologicalNode"
         available = len(msg_store.query(TopologicalNode._type, {}, query_meta)) > 0
 
         print available
