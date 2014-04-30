@@ -9,7 +9,7 @@ from move_base_msgs.msg import MoveBaseAction
 
 
 from monitor_states import BumperMonitor, StuckOnCarpetMonitor, NavPreemptMonitor
-from recover_states import RecoverNav,  RecoverBumper, RecoverStuckOnCarpet
+from recover_states import RecoverNavHelp, RecoverNavBacktrack,  RecoverBumper, RecoverStuckOnCarpet
 
 #from logger import Loggable
 
@@ -126,16 +126,22 @@ class RecoverableNav(smach.StateMachine):
 
         self.userdata.n_nav_fails = 0
         self._nav_action = NavActionState()
-        self._recover_nav =  RecoverNav()
+        self._recover_nav_backtrack =  RecoverNavBacktrack()
+        self._recover_nav_help = RecoverNavHelp()
         with self:
             smach.StateMachine.add('NAVIGATION',
                                    self._nav_action, 
                                    transitions={'succeeded': 'succeeded',
-                                                'aborted':  'RECOVER_NAVIGATION',
+                                                'aborted':  'RECOVER_NAVIGATION_BACKTRACK',
                                                 'preempted': 'preempted'}
                                    )
-            smach.StateMachine.add('RECOVER_NAVIGATION',
-                                   self._recover_nav,  
+            smach.StateMachine.add('RECOVER_NAVIGATION_BACKTRACK',
+                                   self._recover_nav_backtrack,  
+                                   transitions={'succeeded': 'NAVIGATION',
+                                                'failure': 'RECOVER_NAVIGATION_HELP',
+                                                'preempted':'preempted'})
+            smach.StateMachine.add('RECOVER_NAVIGATION_HELP',
+                                   self._recover_nav_help,  
                                    transitions={'succeeded': 'NAVIGATION',
                                                 'failure': 'failure',
                                                 'preempted':'preempted'} )
@@ -147,7 +153,7 @@ class RecoverableNav(smach.StateMachine):
         return outcome
         
     def set_nav_thresholds(self, max_nav_recovery_attempts):
-        self._recover_nav.set_nav_thresholds(max_nav_recovery_attempts)         
+        self._recover_nav_help.set_nav_thresholds(max_nav_recovery_attempts)         
             
 """
 

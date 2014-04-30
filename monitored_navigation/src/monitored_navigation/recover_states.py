@@ -21,9 +21,44 @@ from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
 # detected. There is a recovery behaviour for move_base and another for when the
 # bumper is pressed
 
+class RecoverNavBacktrack(smach.State):
+    def __init__(self):
+        smach.State.__init__(self,
+                             outcomes=['succeeded', 'failure', 'preempted'],
+                             input_keys=['goal','n_nav_fails'],
+                             output_keys=['goal','n_nav_fails'],
+                             )
+
+        #self.ptu_action_client=bla
+        #self.move_base_action_client=bla
+        #self.move_base_reconfig_client=bla
+               
+                                                  
+    def execute(self, userdata):
+
+        if userdata.n_nav_fails<1:
+            #back track in elegant fashion
+            
+            #put this in properly - Bruno will do it later
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
+                
+             #if backtrack works, return succeeded. If Nils can see that it failed, he should return 'failure'   
+            return 'succeeded'
+        else:
+            return 'failure'
+        
+      
+            
+    
+    def service_preempt(self):
+        #check if preemption is working
+        smach.State.service_preempt(self)
 
 
-class RecoverNav(smach.State):
+
+class RecoverNavHelp(smach.State):
     def __init__(self,max_nav_recovery_attempts=5):
         smach.State.__init__(self,
                              # we need the number of move_base fails as
@@ -34,9 +69,7 @@ class RecoverNav(smach.State):
                              input_keys=['goal','n_nav_fails'],
                              output_keys=['goal','n_nav_fails'],
                              )
-        #self.vel_pub = rospy.Publisher('/cmd_vel', Twist)
-        #self._vel_cmd = Twist()
-        #self._vel_cmd.linear.x = -0.1
+
         self.set_nav_thresholds(max_nav_recovery_attempts)
         
 
@@ -68,14 +101,7 @@ class RecoverNav(smach.State):
         
                                                   
     def execute(self, userdata):
-        # move slowly backwards a bit. A better option might be to save the
-        # latest messages received in cmd_vel and reverse them
-        #for i in range(0, 20):
-            #self.vel_pub.publish(self._vel_cmd)
-            #if self.preempt_requested():
-                #self.service_preempt()
-                #return 'preempted'
-            #rospy.sleep(0.2)
+
         
         self.isRecovered=False
             
