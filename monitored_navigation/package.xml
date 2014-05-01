@@ -50,6 +50,7 @@
   <build_depend>std_srvs</build_depend>
   <build_depend>scitos_msgs</build_depend>
   <build_depend>strands_navigation_msgs</build_depend>
+  <build_depend>flir_pantilt_d46</build_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>actionlib_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
@@ -60,6 +61,7 @@
   <run_depend>std_srvs</run_depend>
   <run_depend>scitos_msgs</run_depend>
   <run_depend>strands_navigation_msgs</run_depend>
+  <run_depend>flir_pantilt_d46</run_depend>
   
   
 

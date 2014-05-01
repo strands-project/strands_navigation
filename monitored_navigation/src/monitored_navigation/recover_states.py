@@ -9,6 +9,13 @@ from std_srvs.srv import Empty
 from scitos_msgs.msg import MotorStatus
 from geometry_msgs.msg import Twist
 
+from move_base_msgs.msg import *
+import dynamic_reconfigure.client
+from flir_pantilt_d46.msg import *
+from previous_positions_service.srv import PreviousPosition
+from republish_pointcloud_service.srv import RepublishPointcloud
+from actionlib_msgs.msg import *
+
 import actionlib
 
 from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
@@ -29,15 +36,80 @@ class RecoverNavBacktrack(smach.State):
                              output_keys=['goal','n_nav_fails'],
                              )
 
-        #self.ptu_action_client=bla
-        #self.move_base_action_client=bla
-        #self.move_base_reconfig_client=bla
+        self.ptu_action_client = actionlib.SimpleActionClient('/SetPTUState', PtuGotoAction)
+        self.move_base_action_client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
+        self.move_base_reconfig_client = dynamic_reconfigure.client.Client('/move_base/DWAPlannerROS')
                
                                                   
     def execute(self, userdata):
 
-        if userdata.n_nav_fails<1:
+        print "Failures: ", userdata.n_nav_fails
+        if userdata.n_nav_fails < 2:
             #back track in elegant fashion
+            
+            try:
+                previous_position = rospy.ServiceProxy('previous_position', PreviousPosition)
+                meter_back = previous_position(1.0)
+            except rospy.ServiceException, e:
+                rospy.logwarn("Couldn't get previous position service, returning failure.")
+                return 'failure'
+                
+            print "Got the previous position: ", meter_back.previous_pose.pose.position.x, ", ", meter_back.previous_pose.pose.position.y, ", ",  meter_back.previous_pose.pose.position.z
+                
+            try:
+                republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
+                republish_pointcloud(True, '/head_xtion/depth/points', '/move_base/head_subsampled', 0.05)
+            except rospy.ServiceException, e:
+                rospy.logwarn("Couldn't get republish pointcloud service, returning failure.")
+                return 'failure'
+                
+            print "Managed to republish pointcloud."
+            
+            
+            params = { 'max_vel_x' : -0.1, 'min_vel_x' : -0.9 }
+            config = self.move_base_reconfig_client.update_configuration(params)
+            
+            ptu_goal = PtuGotoGoal();
+            ptu_goal.pan = -179
+            ptu_goal.tilt = 50
+            ptu_goal.pan_vel = 1
+            ptu_goal.tilt_vel = 1
+            self.ptu_action_client.send_goal(ptu_goal)
+            self.ptu_action_client.wait_for_result()
+            
+            move_goal = MoveBaseGoal()
+            move_goal.target_pose.pose = meter_back.previous_pose.pose
+            move_goal.target_pose.header.frame_id = meter_back.previous_pose.header.frame_id
+            self.move_base_action_client.cancel_all_goals()
+            rospy.sleep(rospy.Duration.from_sec(1))
+            #print movegoal
+            self.move_base_action_client.send_goal(move_goal)
+            self.move_base_action_client.wait_for_result()
+            
+            params = { 'max_vel_x' : 0.9, 'min_vel_x' : 0.1 }
+            config = self.move_base_reconfig_client.update_configuration(params)
+            
+            ptu_goal = PtuGotoGoal();
+            ptu_goal.pan = 0
+            ptu_goal.tilt = 0
+            ptu_goal.pan_vel = 1
+            ptu_goal.tilt_vel = 1
+            self.ptu_action_client.send_goal(ptu_goal)
+            self.ptu_action_client.wait_for_result()
+            
+            try:
+                republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
+                republish_pointcloud(False, '', '', 0.0)
+            except rospy.ServiceException, e:
+                rospy.logwarn("Couldn't stop republish pointcloud service, returning failure.")
+                return 'failure'
+                
+            print "Reset PTU, move_base parameters and stopped republishing pointcloud."
+                
+            if self.move_base_action_client.get_state() != GoalStatus.SUCCEEDED: #set the previous goal again
+                return 'failure'
+            else:
+                return 'succeeded'
             
             #put this in properly - Bruno will do it later
             if self.preempt_requested():
