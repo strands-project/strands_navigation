@@ -64,8 +64,7 @@ class RecoverNavBacktrack(smach.State):
                 return 'failure'
                 
             print "Managed to republish pointcloud."
-            
-            
+                      
             params = { 'max_vel_x' : -0.1, 'min_vel_x' : -0.9 }
             config = self.move_base_reconfig_client.update_configuration(params)
             
@@ -77,6 +76,10 @@ class RecoverNavBacktrack(smach.State):
             self.ptu_action_client.send_goal(ptu_goal)
             self.ptu_action_client.wait_for_result()
             
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
+            
             move_goal = MoveBaseGoal()
             move_goal.target_pose.pose = meter_back.previous_pose.pose
             move_goal.target_pose.header.frame_id = meter_back.previous_pose.header.frame_id
@@ -85,6 +88,10 @@ class RecoverNavBacktrack(smach.State):
             #print movegoal
             self.move_base_action_client.send_goal(move_goal)
             self.move_base_action_client.wait_for_result()
+            
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
             
             params = { 'max_vel_x' : 0.9, 'min_vel_x' : 0.1 }
             config = self.move_base_reconfig_client.update_configuration(params)
@@ -96,6 +103,10 @@ class RecoverNavBacktrack(smach.State):
             ptu_goal.tilt_vel = 1
             self.ptu_action_client.send_goal(ptu_goal)
             self.ptu_action_client.wait_for_result()
+            
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
             
             try:
                 republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
@@ -110,14 +121,6 @@ class RecoverNavBacktrack(smach.State):
                 return 'failure'
             else:
                 return 'succeeded'
-            
-            #put this in properly - Bruno will do it later
-            if self.preempt_requested():
-                self.service_preempt()
-                return 'preempted'
-                
-             #if backtrack works, return succeeded. If Nils can see that it failed, he should return 'failure'   
-            return 'succeeded'
         else:
             return 'failure'
         
