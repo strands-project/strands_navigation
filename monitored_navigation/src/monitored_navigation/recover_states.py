@@ -9,6 +9,13 @@ from std_srvs.srv import Empty
 from scitos_msgs.msg import MotorStatus
 from geometry_msgs.msg import Twist
 
+from move_base_msgs.msg import *
+import dynamic_reconfigure.client
+from flir_pantilt_d46.msg import *
+from previous_positions_service.srv import PreviousPosition
+from republish_pointcloud_service.srv import RepublishPointcloud
+from actionlib_msgs.msg import *
+
 import actionlib
 
 from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
@@ -21,9 +28,112 @@ from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
 # detected. There is a recovery behaviour for move_base and another for when the
 # bumper is pressed
 
+class RecoverNavBacktrack(smach.State):
+    def __init__(self):
+        smach.State.__init__(self,
+                             outcomes=['succeeded', 'failure', 'preempted'],
+                             input_keys=['goal','n_nav_fails'],
+                             output_keys=['goal','n_nav_fails'],
+                             )
+
+        self.ptu_action_client = actionlib.SimpleActionClient('/SetPTUState', PtuGotoAction)
+        self.move_base_action_client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
+        self.move_base_reconfig_client = dynamic_reconfigure.client.Client('/move_base/DWAPlannerROS')
+               
+                                                  
+    def execute(self, userdata):
+
+        print "Failures: ", userdata.n_nav_fails
+        if userdata.n_nav_fails < 2:
+            #back track in elegant fashion
+            
+            try:
+                previous_position = rospy.ServiceProxy('previous_position', PreviousPosition)
+                meter_back = previous_position(1.0)
+            except rospy.ServiceException, e:
+                rospy.logwarn("Couldn't get previous position service, returning failure.")
+                return 'failure'
+                
+            print "Got the previous position: ", meter_back.previous_pose.pose.position.x, ", ", meter_back.previous_pose.pose.position.y, ", ",  meter_back.previous_pose.pose.position.z
+                
+            try:
+                republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
+                republish_pointcloud(True, '/head_xtion/depth/points', '/move_base/head_subsampled', 0.05)
+            except rospy.ServiceException, e:
+                rospy.logwarn("Couldn't get republish pointcloud service, returning failure.")
+                return 'failure'
+                
+            print "Managed to republish pointcloud."
+                      
+            params = { 'max_vel_x' : -0.1, 'min_vel_x' : -0.9 }
+            config = self.move_base_reconfig_client.update_configuration(params)
+            
+            ptu_goal = PtuGotoGoal();
+            ptu_goal.pan = -179
+            ptu_goal.tilt = 50
+            ptu_goal.pan_vel = 1
+            ptu_goal.tilt_vel = 1
+            self.ptu_action_client.send_goal(ptu_goal)
+            self.ptu_action_client.wait_for_result()
+            
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
+            
+            move_goal = MoveBaseGoal()
+            move_goal.target_pose.pose = meter_back.previous_pose.pose
+            move_goal.target_pose.header.frame_id = meter_back.previous_pose.header.frame_id
+            self.move_base_action_client.cancel_all_goals()
+            rospy.sleep(rospy.Duration.from_sec(1))
+            #print movegoal
+            self.move_base_action_client.send_goal(move_goal)
+            self.move_base_action_client.wait_for_result()
+            
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
+            
+            params = { 'max_vel_x' : 0.9, 'min_vel_x' : 0.1 }
+            config = self.move_base_reconfig_client.update_configuration(params)
+            
+            ptu_goal = PtuGotoGoal();
+            ptu_goal.pan = 0
+            ptu_goal.tilt = 0
+            ptu_goal.pan_vel = 1
+            ptu_goal.tilt_vel = 1
+            self.ptu_action_client.send_goal(ptu_goal)
+            self.ptu_action_client.wait_for_result()
+            
+            if self.preempt_requested():
+                self.service_preempt()
+                return 'preempted'
+            
+            try:
+                republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
+                republish_pointcloud(False, '', '', 0.0)
+            except rospy.ServiceException, e:
+                rospy.logwarn("Couldn't stop republish pointcloud service, returning failure.")
+                return 'failure'
+                
+            print "Reset PTU, move_base parameters and stopped republishing pointcloud."
+                
+            if self.move_base_action_client.get_state() != GoalStatus.SUCCEEDED: #set the previous goal again
+                return 'failure'
+            else:
+                return 'succeeded'
+        else:
+            return 'failure'
+        
+      
+            
+    
+    def service_preempt(self):
+        #check if preemption is working
+        smach.State.service_preempt(self)
 
 
-class RecoverNav(smach.State):
+
+class RecoverNavHelp(smach.State):
     def __init__(self,max_nav_recovery_attempts=5):
         smach.State.__init__(self,
                              # we need the number of move_base fails as
@@ -34,9 +144,7 @@ class RecoverNav(smach.State):
                              input_keys=['goal','n_nav_fails'],
                              output_keys=['goal','n_nav_fails'],
                              )
-        #self.vel_pub = rospy.Publisher('/cmd_vel', Twist)
-        #self._vel_cmd = Twist()
-        #self._vel_cmd.linear.x = -0.1
+
         self.set_nav_thresholds(max_nav_recovery_attempts)
         
 
@@ -68,14 +176,7 @@ class RecoverNav(smach.State):
         
                                                   
     def execute(self, userdata):
-        # move slowly backwards a bit. A better option might be to save the
-        # latest messages received in cmd_vel and reverse them
-        #for i in range(0, 20):
-            #self.vel_pub.publish(self._vel_cmd)
-            #if self.preempt_requested():
-                #self.service_preempt()
-                #return 'preempted'
-            #rospy.sleep(0.2)
+
         
         self.isRecovered=False
             

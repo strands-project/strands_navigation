@@ -43,8 +43,8 @@ class MonitoredNavigation(object):
     def main(self):
         asw = ActionServerWrapper(
                         'monitored_navigation', MonitoredNavigationAction, self.nav_sm,
-                        ['succeeded'], ['move_base_failure', 'bumper_failure'], ['preempted'],
-                        goal_key = 'goal',
+                        ['succeeded'], ['nav_local_plan_failure','nav_global_plan_failure', 'bumper_failure'], ['preempted'],
+                        goal_key = 'goal', result_key='result'
                         )
         
         # Run the server in a background thread
