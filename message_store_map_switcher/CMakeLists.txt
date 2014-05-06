@@ -103,6 +103,9 @@ include_directories(
 #   src/${PROJECT_NAME}/message_store_map_switcher.cpp
 # )
 
+add_definitions(-std=c++0x)
+
+
 # Declare a cpp executable
 add_executable(message_store_map_saver src/message_store_map_saver.cpp)
 
