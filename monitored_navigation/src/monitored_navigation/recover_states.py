@@ -11,7 +11,7 @@ from geometry_msgs.msg import Twist
 
 from move_base_msgs.msg import *
 import dynamic_reconfigure.client
-from flir_pantilt_d46.msg import *
+from scitos_ptu.msg import *
 from previous_positions_service.srv import PreviousPosition
 from republish_pointcloud_service.srv import RepublishPointcloud
 from actionlib_msgs.msg import *
