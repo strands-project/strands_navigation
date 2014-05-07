@@ -50,6 +50,11 @@
   <build_depend>std_srvs</build_depend>
   <build_depend>scitos_msgs</build_depend>
   <build_depend>strands_navigation_msgs</build_depend>
+  <build_depend>scitos_ptu</build_depend>
+  <build_depend>move_base_msgs</build_depend>
+  <build_depend>previous_positions_service</build_depend>
+  <build_depend>republish_pointcloud_service</build_depend>
+  
   <run_depend>actionlib</run_depend>
   <run_depend>actionlib_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
@@ -60,6 +65,10 @@
   <run_depend>std_srvs</run_depend>
   <run_depend>scitos_msgs</run_depend>
   <run_depend>strands_navigation_msgs</run_depend>
+  <run_depend>scitos_ptu</run_depend>
+  <run_depend>move_base_msgs</run_depend>
+  <run_depend>previous_positions_service</run_depend>
+  <run_depend>republish_pointcloud_service</run_depend>
   
   
 
