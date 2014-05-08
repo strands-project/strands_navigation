@@ -66,9 +66,9 @@ class NavActionState(smach.State):
             return 'succeeded'
         elif status==GoalStatus.PREEMPTED:
             return 'preempted'
-        else:
-            
+        else:            
             if (rospy.get_rostime()-self.last_global_plan_time < rospy.Duration.from_sec(1)) and (self.global_plan.poses == []):
+                userdata.n_nav_fails = 0
                 return 'global_plan_failure'
             else:
                 userdata.n_nav_fails = userdata.n_nav_fails + 1
@@ -257,6 +257,8 @@ class HighLevelNav(smach.StateMachine):
         userdata.result=MonitoredNavigationResult()
         if outcome=='succeeded':
             userdata.result.sm_outcome=MonitoredNavigationResult().SUCCEEDED
+        if outcome=='bumper_failure':
+            userdata.result.sm_outcome=MonitoredNavigationResult().BUMPER_FAILURE
         if outcome=='nav_local_plan_failure':
             userdata.result.sm_outcome=MonitoredNavigationResult().LOCAL_PLANNER_FAILURE
         if outcome=='nav_global_plan_failure':
