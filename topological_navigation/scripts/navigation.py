@@ -160,11 +160,12 @@ class TopologicalNavServer(object):
             self._as.publish_feedback(self._feedback)
             self._as.set_succeeded(self._result)
         else :
+            #if self.preempted == False :
             if self.preempted == False :
                 self._result.success = result
                 self._feedback.route = self.current_node
                 self._as.publish_feedback(self._feedback)
-                self._as.set_succeeded(self._result)                    
+                #self._as.set_succeeded(self._result)
                 self._as.set_aborted(self._result)
             else :
                 if self.nav_mode == 'Node_to_IZ' :
@@ -191,9 +192,9 @@ class TopologicalNavServer(object):
                 self.stat.set_at_node()
                 if self.nav_mode != 'Normal' :
                     if self.current_node != self._target or self.nav_mode == 'Node_to_IZ':
-                        self.monNavClient.cancel_all_goals()
                         self.cancelled = True
-
+                        if self.nav_mode != 'Node_to_IZ':
+                            self.monNavClient.cancel_all_goals()
                   
 
     def followRoute(self, route):
@@ -246,11 +247,11 @@ class TopologicalNavServer(object):
                     nodewp = get_node(self.current_node, self.lnodes)          
                     not_fatal = self.monitored_navigation(nodewp.waypoint, 'move_base')
                 if self.nav_mode == 'Node_to_IZ' :
+                    not_fatal = False
                     if self.current_node != self._target :
                         nav_ok=False
                     else :
                         nav_ok=True
-                    
             else :
                 not_fatal=nav_ok            
 
@@ -322,8 +323,13 @@ class TopologicalNavServer(object):
         goal.target_pose.pose.orientation.w = float(inf[6])
         
         self.monNavClient.send_goal(goal)
-        self.monNavClient.wait_for_result()
+                #        self.monNavClient.wait_for_result()
         status=self.monNavClient.get_state()
+        while (status == GoalStatus.ACTIVE or status == GoalStatus.PENDING) and not self.cancelled :
+            status=self.monNavClient.get_state()
+        
+        #rospy.loginfo(str(status))
+        #print status
         if status != GoalStatus.SUCCEEDED:
             result = False
             if status is GoalStatus.PREEMPTED:
@@ -336,7 +342,7 @@ class TopologicalNavServer(object):
         self.cancelled = True
         self.preempted = True
         self._result.success = False
-        self.monNavClient.cancel_all_goals()
+        #self.monNavClient.cancel_all_goals()
         self._as.set_preempted(self._result)
 
         
