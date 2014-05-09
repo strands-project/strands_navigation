@@ -35,8 +35,8 @@ class NavActionState(smach.State):
                              )
         
         self.global_plan=None
-        self.last_global_plan_time=rospy.Duration.from_sec(0)
-        self.last_action_cancel_time=rospy.Duration.from_sec(0)
+        self.last_global_plan_time=rospy.Time(0)
+        self.last_action_cancel_time=rospy.Time(0)
         
         rospy.Subscriber("/move_base/NavfnROS/plan" , Path, self.global_planner_checker_cb)
         rospy.Subscriber("/monitored_navigation/cancel" , GoalID, self.cancel_checker_cb)
@@ -61,7 +61,7 @@ class NavActionState(smach.State):
         while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:   
             status= action_client.get_state()
             if self.preempt_requested():
-                if rospy.get_rostime()-self.last_action_cancel_time< rospy.Duration.from_sec(1):
+                if rospy.get_rostime()-self.last_action_cancel_time< rospy.Duration(1):
                     action_client.cancel_goal()
                 self.service_preempt()
                 return 'preempted'
@@ -73,7 +73,7 @@ class NavActionState(smach.State):
         elif status==GoalStatus.PREEMPTED:
             return 'preempted'
         else:            
-            if (rospy.get_rostime()-self.last_global_plan_time < rospy.Duration.from_sec(1)) and (self.global_plan.poses == []):
+            if (rospy.get_rostime()-self.last_global_plan_time < rospy.Duration(1)) and (self.global_plan.poses == []):
                 userdata.n_nav_fails = 0
                 return 'global_plan_failure'
             else:
