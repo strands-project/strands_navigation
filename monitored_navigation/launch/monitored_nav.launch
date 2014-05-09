@@ -11,6 +11,9 @@
         <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
     </group>
     
+    <node name="previous_positions" pkg="previous_positions_service" type="previous_positions" output="screen"/>
+    <node name="republish_pointcloud" pkg="republish_pointcloud_service" type="republish_pointcloud" output="screen"/>
+    
     <node name="nav_monitor" pkg="monitored_navigation" type="nav_monitor.py" output="screen"/>
 
     <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen">

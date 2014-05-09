@@ -12,7 +12,7 @@ from strands_navigation_msgs.msg import MonitoredNavigationResult
 from nav_msgs.msg import Path
 
 from monitor_states import BumperMonitor, StuckOnCarpetMonitor, NavPreemptMonitor
-from recover_states import RecoverNavHelp, RecoverNavBacktrack,  RecoverBumper, RecoverStuckOnCarpet
+from recover_states import RecoverNavHelp, RecoverNavBacktrack,  RecoverBumper, RecoverStuckOnCarpet, RecoverLookAround
 
 #from logger import Loggable
 
