@@ -39,12 +39,14 @@ class RecoverNavBacktrack(smach.State):
         self.ptu_action_client = actionlib.SimpleActionClient('/SetPTUState', PtuGotoAction)
         self.move_base_action_client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
         self.move_base_reconfig_client = dynamic_reconfigure.client.Client('/move_base/DWAPlannerROS')
+        
+        self.BACKTRACK_TRIES=0 #will turn into parameter later
                
                                                   
     def execute(self, userdata):
 
         print "Failures: ", userdata.n_nav_fails
-        if userdata.n_nav_fails < 2:
+        if userdata.n_nav_fails < self.BACKTRACK_TRIES:
             #back track in elegant fashion
             
             try:
