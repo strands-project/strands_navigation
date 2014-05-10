@@ -1,8 +1,9 @@
 <launch>
-
-
     <arg name="human_help" default="true" />
-    
+	<arg name="machine" default="localhost" />
+	<arg name="user" default="" />
+
+	<machine name="$(arg machine)" address="$(arg machine)" env-loader="/opt/strands/strands_catkin_ws/devel/env.sh" user="$(arg user)" default="true"/>    
 
     
     <group if="$(arg human_help)">
