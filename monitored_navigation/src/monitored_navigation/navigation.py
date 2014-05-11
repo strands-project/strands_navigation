@@ -61,9 +61,10 @@ class NavActionState(smach.State):
         action_client.wait_for_server()
         action_client.send_goal(userdata.goal)
         status= action_client.get_state()
+        finishing_previous_task=False
         while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:   
             status= action_client.get_state()
-            if self.preempt_requested():
+            if self.preempt_requested() and not finishing_previous_task:
                 if rospy.get_rostime()-self.last_new_action_time> rospy.Duration(1):
                     action_client.cancel_goal()
                     self.service_preempt()
@@ -71,6 +72,8 @@ class NavActionState(smach.State):
                 elif action_server_name == self.last_new_action_server_name:
                     self.service_preempt()
                     return 'preempted'
+                else:
+                    finishing_previous_task=True
             action_client.wait_for_result(rospy.Duration(0.2))
         
         
