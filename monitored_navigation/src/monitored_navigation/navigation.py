@@ -8,6 +8,7 @@ from actionlib_msgs.msg import GoalStatus, GoalID
 from move_base_msgs.msg import MoveBaseAction
 
 from strands_navigation_msgs.msg import MonitoredNavigationResult
+import strands_navigation_msgs.msg
 
 from nav_msgs.msg import Path
 
@@ -36,10 +37,11 @@ class NavActionState(smach.State):
         
         self.global_plan=None
         self.last_global_plan_time=rospy.Time(0)
-        self.last_action_cancel_time=rospy.Time(0)
+        self.last_new_action_time=rospy.Time(0)
+        self.last_new_action_server_name=''
         
         rospy.Subscriber("/move_base/NavfnROS/plan" , Path, self.global_planner_checker_cb)
-        rospy.Subscriber("/monitored_navigation/cancel" , GoalID, self.cancel_checker_cb)
+        rospy.Subscriber("/monitored_navigation/goal" ,strands_navigation_msgs.msg.MonitoredNavigationActionGoal, self.new_goal_checker_cb)
         
         
         
@@ -48,8 +50,9 @@ class NavActionState(smach.State):
         self.last_global_plan_time=rospy.get_rostime()
         
         
-    def cancel_checker_cb(self,msg):
-        self.last_action_cancel_time=rospy.get_rostime()    
+    def new_goal_checker_cb(self,msg):
+        self.last_new_action_time=rospy.get_rostime()
+        self.last_new_action_server_name=msg.goal.action_server
         
                                                   
     def execute(self, userdata):
@@ -58,14 +61,21 @@ class NavActionState(smach.State):
         action_client.wait_for_server()
         action_client.send_goal(userdata.goal)
         status= action_client.get_state()
+        finishing_previous_task=False
         while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:   
             status= action_client.get_state()
-            if self.preempt_requested():
-                if rospy.get_rostime()-self.last_action_cancel_time< rospy.Duration(1):
+            if self.preempt_requested() and not finishing_previous_task:
+                if rospy.get_rostime()-self.last_new_action_time> rospy.Duration(1):
                     action_client.cancel_goal()
-                self.service_preempt()
-                return 'preempted'
+                    self.service_preempt()
+                    return 'preempted'
+                elif action_server_name == self.last_new_action_server_name:
+                    self.service_preempt()
+                    return 'preempted'
+                else:
+                    finishing_previous_task=True
             action_client.wait_for_result(rospy.Duration(0.2))
+        
         
         if status == GoalStatus.SUCCEEDED:
             userdata.n_nav_fails = 0
