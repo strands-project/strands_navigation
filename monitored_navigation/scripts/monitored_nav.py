@@ -11,19 +11,17 @@ from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavi
 from dynamic_reconfigure.server import Server
 from monitored_navigation.cfg import NavFailTresholdsConfig
 
-
 from  monitored_navigation.navigation import HighLevelNav
 
-
-#import marathon_touch_gui.client
-    
-    
+   
 class MonitoredNavigation(ActionServerWrapper):
 
     def __init__(self):
         
         # Create the main state machine
         self.nav_sm = HighLevelNav()
+        self.mon_nav_sm=self.nav_sm.get_children()["MONITORED_NAV"]
+        self.low_nav_sm=self.mon_nav_sm.get_children()["NAV_SM"]
         
         ActionServerWrapper.__init__(self,
                         'monitored_navigation', MonitoredNavigationAction, self.nav_sm,
@@ -43,19 +41,30 @@ class MonitoredNavigation(ActionServerWrapper):
         
         rospy.Subscriber("/monitored_navigation/goal" , MonitoredNavigationActionGoal, self.new_goal_checker_cb)
         
+        
+        
+    def check_nav_executing(self):
+        if "MONITORED_NAV" not in  self.nav_sm.get_active_states() or "NAV_SM" not in self.mon_nav_sm.get_active_states() or "NAVIGATION" not in self.low_nav_sm.get_active_states():
+            return False
+        else:
+            return True
+        
     def new_goal_checker_cb(self,msg):
         self.last_new_action_time=rospy.get_rostime()
         self.new_action=msg.goal.action_server    
 
     def preempt_cb(self):
+        wait_time=0
         if rospy.get_rostime()-self.last_new_action_time < rospy.Duration(1) and not self.current_action == self.new_action:
-            while self.nav_sm.is_running():
-                rospy.sleep(0.3)
+            while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < 150:
+                rospy.sleep(0.1)
+                wait_time=wait_time+1
         ActionServerWrapper.preempt_cb(self)
     
     def execute_cb(self,goal):
         self.current_action=goal.action_server
         ActionServerWrapper.execute_cb(self,goal)
+        
 
      
      
@@ -77,8 +86,6 @@ class MonitoredNavigation(ActionServerWrapper):
 
 if __name__ == '__main__':
     rospy.init_node('monitored_navigation')
-    
-
-        
+ 
     mon_nav =  MonitoredNavigation()
     mon_nav.main()

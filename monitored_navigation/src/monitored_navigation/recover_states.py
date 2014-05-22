@@ -20,7 +20,11 @@ import actionlib
 
 from strands_navigation_msgs.srv import AskHelp, AskHelpRequest
 
-#from logger import Loggable
+
+import monitored_navigation.mongo_logger
+from strands_navigation_msgs.msg import MonitoredNavEvent
+from geometry_msgs.msg import Pose
+from actionlib_msgs.msg import GoalID, GoalStatusArray
 
 
 
@@ -40,20 +44,35 @@ class RecoverNavBacktrack(smach.State):
         self.move_base_action_client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
         self.move_base_reconfig_client = dynamic_reconfigure.client.Client('/move_base/DWAPlannerROS')
         
+        self.nav_stat=MonitoredNavEvent()
+        self.nav_stat.recover_mechanism='backtrack_recovery'
+
+        
         self.BACKTRACK_TRIES=0 #will turn into parameter later
                
                                                   
     def execute(self, userdata):
+        
+        if self.preempt_requested(): 
+            self.service_preempt()
+            return 'preempted'
 
         print "Failures: ", userdata.n_nav_fails
         if userdata.n_nav_fails < self.BACKTRACK_TRIES:
-            #back track in elegant fashion
-            
+            self.nav_stat.event_start_time=rospy.get_rostime()
+            self.nav_stat.event_start_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            status_msg=rospy.wait_for_message("/monitored_navigation/status", GoalStatusArray , timeout=10.0)
+            self.nav_stat.goal_id=status_msg.status_list[0].goal_id
+            self.nav_stat.was_helped=False
+            self.nav_stat.n_help_requests=userdata.n_nav_fails
             try:
                 previous_position = rospy.ServiceProxy('previous_position', PreviousPosition)
                 meter_back = previous_position(1.0)
             except rospy.ServiceException, e:
                 rospy.logwarn("Couldn't get previous position service, returning failure.")
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat)
                 return 'failure'
                 
             print "Got the previous position: ", meter_back.previous_pose.pose.position.x, ", ", meter_back.previous_pose.pose.position.y, ", ",  meter_back.previous_pose.pose.position.z
@@ -63,6 +82,9 @@ class RecoverNavBacktrack(smach.State):
                 republish_pointcloud(True, '/head_xtion/depth/points', '/move_base/head_subsampled', 0.05)
             except rospy.ServiceException, e:
                 rospy.logwarn("Couldn't get republish pointcloud service, returning failure.")
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat)   
                 return 'failure'
                 
             print "Managed to republish pointcloud."
@@ -79,6 +101,9 @@ class RecoverNavBacktrack(smach.State):
             self.ptu_action_client.wait_for_result()
             
             if self.preempt_requested():
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat)   
                 self.service_preempt()
                 return 'preempted'
             
@@ -92,6 +117,9 @@ class RecoverNavBacktrack(smach.State):
             self.move_base_action_client.wait_for_result()
             
             if self.preempt_requested():
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat)                 
                 self.service_preempt()
                 return 'preempted'
             
@@ -107,6 +135,9 @@ class RecoverNavBacktrack(smach.State):
             self.ptu_action_client.wait_for_result()
             
             if self.preempt_requested():
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat) 
                 self.service_preempt()
                 return 'preempted'
             
@@ -114,16 +145,28 @@ class RecoverNavBacktrack(smach.State):
                 republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
                 republish_pointcloud(False, '', '', 0.0)
             except rospy.ServiceException, e:
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat) 
                 rospy.logwarn("Couldn't stop republish pointcloud service, returning failure.")
                 return 'failure'
                 
             print "Reset PTU, move_base parameters and stopped republishing pointcloud."
                 
             if self.move_base_action_client.get_state() != GoalStatus.SUCCEEDED: #set the previous goal again
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat) 
                 return 'failure'
             else:
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                monitored_navigation.mongo_logger.add_event(self.nav_stat) 
                 return 'succeeded'
         else:
+            self.nav_stat.event_end_time=rospy.get_rostime()
+            self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            monitored_navigation.mongo_logger.add_event(self.nav_stat) 
             return 'failure'
         
       
@@ -162,7 +205,12 @@ class RecoverNavHelp(smach.State):
 
         
         self.being_helped=False
-        self.help_finished=False      
+        self.help_finished=False     
+        
+        self.nav_stat=MonitoredNavEvent()
+        self.nav_stat.recover_mechanism='nav_help_recovery'
+
+        
                                                   
 
    
@@ -179,6 +227,11 @@ class RecoverNavHelp(smach.State):
                                                   
     def execute(self, userdata):
 
+       
+        if self.preempt_requested(): 
+            self.service_preempt()
+            return 'preempted'
+
         
         self.isRecovered=False
             
@@ -191,7 +244,14 @@ class RecoverNavHelp(smach.State):
             #self.get_logger().log_navigation_recovery_attempt(success=True,
              #                                                 attempts=userdata.n_move_base_fails)
                                                               
-                                                              
+            
+            self.nav_stat.was_helped=False
+            self.nav_stat.event_start_time=rospy.get_rostime()
+            self.nav_stat.event_start_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            status_msg=rospy.wait_for_message("/monitored_navigation/status", GoalStatusArray , timeout=10.0)
+            self.nav_stat.goal_id=status_msg.status_list[0].goal_id
+            self.nav_stat.n_help_requests=userdata.n_nav_fails
+        
             self.help_offered_monitor=rospy.Service('/monitored_navigation/help_offered', Empty, self.help_offered)
             self.help_done_monitor=rospy.Service('/monitored_navigation/help_finished', Empty, self.nav_recovered)            
             
@@ -207,9 +267,14 @@ class RecoverNavHelp(smach.State):
             
             for i in range(0,40):
                 if self.preempt_requested():
+                    self.nav_stat.event_end_time=rospy.get_rostime()
+                    self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                    
+                    monitored_navigation.mongo_logger.add_event(self.nav_stat)
                     self.service_preempt()
                     return 'preempted'
                 if self.being_helped:
+                    self.nav_stat.was_helped=True
                     self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
                     self.service_msg.interaction_service='help_finished'
                     try:
@@ -223,6 +288,9 @@ class RecoverNavHelp(smach.State):
                 self.being_helped=False
                 for i in range(0,60):
                     if self.preempt_requested():
+                        self.nav_stat.event_end_time=rospy.get_rostime()
+                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
                         self.service_preempt()
                         return 'preempted'
                     if self.help_finished:
@@ -239,11 +307,15 @@ class RecoverNavHelp(smach.State):
                 rospy.logwarn("No means of asking for human help available.")
             self.help_offered_monitor.shutdown()
             self.help_done_monitor.shutdown()
+            self.nav_stat.event_end_time=rospy.get_rostime()
+            self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            monitored_navigation.mongo_logger.add_event(self.nav_stat)
             return 'succeeded'
         else:
             userdata.n_nav_fails=0
-           # self.get_logger().log_navigation_recovery_attempt(success=False,
-            #                                                  attempts=userdata.n_move_base_fails)
+            self.nav_stat.event_end_time=rospy.get_rostime()
+            self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            monitored_navigation.mongo_logger.add_event(self.nav_stat)
             return 'failure'
 
 
@@ -283,7 +355,11 @@ class RecoverBumper(smach.State):
         self.service_msg=AskHelpRequest()
         self.service_msg.failed_component=AskHelpRequest.BUMPER
         
+
         
+        self.nav_stat=MonitoredNavEvent()
+        self.nav_stat.recover_mechanism='bumper_recovery'
+ 
         
         self.set_nav_thresholds(max_bumper_recovery_attempts)
         
@@ -307,16 +383,33 @@ class RecoverBumper(smach.State):
     # Between each failure the waiting time to try and restart the motors
     # again increases. This state can check its own success
     def execute(self, userdata):
+        
+        if self.preempt_requested(): 
+            self.service_preempt()
+            return 'preempted'
+        
+        
         self.help_offered_monitor=rospy.Service('/monitored_navigation/help_offered', Empty, self.help_offered)
         self.help_done_monitor=rospy.Service('/monitored_navigation/help_finished', Empty, self.bumper_recovered)
+        
+        self.nav_stat.event_start_time=rospy.get_rostime()
+        self.nav_stat.event_start_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+        status_msg=rospy.wait_for_message("/monitored_navigation/status", GoalStatusArray , timeout=10.0)
+        self.nav_stat.goal_id=status_msg.status_list[0].goal_id
+        self.nav_stat.was_helped=False
+        
         n_tries=1
         while True:
             
             if self.preempt_requested():
+                self.nav_stat.event_end_time=rospy.get_rostime()
+                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                self.nav_stat.n_help_requests=n_tries
+                monitored_navigation.mongo_logger.add_event(self.nav_stat)
                 self.service_preempt()
                 return 'preempted'
             if self.being_helped:
-                #ver se isto ta bem
+                self.nav_stat.was_helped=True
                 self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
                 self.service_msg.interaction_service='help_finished'
                 try:
@@ -325,6 +418,10 @@ class RecoverBumper(smach.State):
                     rospy.logwarn("No means of asking for human help available.")
                 for i in range(0,60):
                     if self.preempt_requested():
+                        self.nav_stat.event_end_time=rospy.get_rostime()
+                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        self.nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
                         self.service_preempt()
                         return 'preempted'
                     if self.help_finished:
@@ -343,16 +440,18 @@ class RecoverBumper(smach.State):
                 self.reset_motorstop()    
                 rospy.sleep(0.1)
                 if self.isRecovered:
-                   # self.get_logger().log_helped("bumper")
                     self.help_done_monitor.shutdown()
                     self.help_offered_monitor.shutdown()
-                    #self.get_logger().log_bump_count(n_tries)
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FINISHED
                     self.service_msg.interaction_service='none'
                     try:
                         self.ask_help(self.service_msg)
                     except rospy.ServiceException, e:
                         rospy.logwarn("No means of asking for human help available.")
+                        self.nav_stat.event_end_time=rospy.get_rostime()
+                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        self.nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
                     return 'succeeded' 
                 else:
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FAILED
@@ -378,9 +477,17 @@ class RecoverBumper(smach.State):
                             self.ask_help(self.service_msg)
                         except rospy.ServiceException, e:
                             rospy.logwarn("No means of asking for human help available.")
+                        self.nav_stat.event_end_time=rospy.get_rostime()
+                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        self.nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
                         return 'succeeded' 
                     rospy.sleep(1)
                     if n_tries>self.MAX_BUMPER_RECOVERY_ATTEMPTS:
+                        self.nav_stat.event_end_time=rospy.get_rostime()
+                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        self.nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(self.nav_stat)                        
                         return 'failure'
                 n_tries += 1
             
@@ -422,7 +529,7 @@ class RecoverBumper(smach.State):
 class RecoverStuckOnCarpet(smach.State):
     def __init__(self):
         smach.State.__init__(self,
-            outcomes    = ['succeeded','failure'])
+            outcomes    = ['succeeded','failure', 'preempted'])
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist)
         self._vel_cmd = Twist()
         
@@ -430,6 +537,10 @@ class RecoverStuckOnCarpet(smach.State):
 
 
     def execute(self,userdata):
+        if self.preempt_requested(): 
+            self.service_preempt()
+            return 'preempted'
+        
         #small forward vel to unstuck robot
         self._vel_cmd.linear.x=0.8
         self._vel_cmd.angular.z=0.4
