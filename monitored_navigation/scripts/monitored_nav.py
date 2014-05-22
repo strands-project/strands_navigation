@@ -56,7 +56,7 @@ class MonitoredNavigation(ActionServerWrapper):
     def preempt_cb(self):
         wait_time=0
         if rospy.get_rostime()-self.last_new_action_time < rospy.Duration(1) and not self.current_action == self.new_action:
-            while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < 150:
+            while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < 1000:
                 rospy.sleep(0.1)
                 wait_time=wait_time+1
         ActionServerWrapper.preempt_cb(self)
