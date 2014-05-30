@@ -65,7 +65,7 @@ class NavActionState(smach.State):
             status= action_client.get_state()
             if self.preempt_requested():
                 if rospy.get_rostime()-self.last_new_action_time> rospy.Duration(1):
-                    action_client.cancel_goal()
+                    action_client.cancel_all_goals()
                     self.service_preempt()
                     return 'preempted'
                 elif action_server_name == self.last_new_action_server_name:

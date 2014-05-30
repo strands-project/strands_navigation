@@ -2,16 +2,16 @@
 
 import sys
 import rospy
-
-
-from smach_ros import ActionServerWrapper
-#from move_base_msgs.msg import MoveBaseAction
-from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavigationActionGoal
+import actionlib
 
 from dynamic_reconfigure.server import Server
 from monitored_navigation.cfg import NavFailTresholdsConfig
 
+from smach_ros import ActionServerWrapper
+from move_base_msgs.msg import MoveBaseAction
+
 from  monitored_navigation.navigation import HighLevelNav
+from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavigationActionGoal
 
    
 class MonitoredNavigation(ActionServerWrapper):
@@ -32,11 +32,10 @@ class MonitoredNavigation(ActionServerWrapper):
         self.current_action=''
         self.new_action=''
         
-        ## Create a logger
-        #logger =  PatrollLogger("autonomous_patrolling")
-        #self.long_term_patrol_sm.set_logger(logger)
+        self.action_timeout=2000
         
-        # dynamic reconfiguration of failure tresholds
+        
+
         self.srv = Server(NavFailTresholdsConfig, self.reconfigure_callback)
         
         rospy.Subscriber("/monitored_navigation/goal" , MonitoredNavigationActionGoal, self.new_goal_checker_cb)
@@ -51,15 +50,20 @@ class MonitoredNavigation(ActionServerWrapper):
         
     def new_goal_checker_cb(self,msg):
         self.last_new_action_time=rospy.get_rostime()
-        self.new_action=msg.goal.action_server    
+        self.new_action=msg.goal.action_server
+        
 
     def preempt_cb(self):
         wait_time=0
         if rospy.get_rostime()-self.last_new_action_time < rospy.Duration(1) and not self.current_action == self.new_action:
-            while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < 1000:
+            while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < self.action_timeout:
                 rospy.sleep(0.1)
                 wait_time=wait_time+1
+            action_client=actionlib.SimpleActionClient(self.current_action, MoveBaseAction)
+            action_client.cancel_all_goals()
         ActionServerWrapper.preempt_cb(self)
+        
+        
     
     def execute_cb(self,goal):
         self.current_action=goal.action_server
