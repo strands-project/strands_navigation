@@ -63,6 +63,21 @@ class MonitoredNavigation(ActionServerWrapper):
             action_client.cancel_all_goals()
         ActionServerWrapper.preempt_cb(self)
         
+    #def preempt_cb(self):
+        #wait_time=0
+        #overwrite_goals=False
+        #if rospy.get_rostime()-self.last_new_action_time < rospy.Duration(1) and not self.current_action == self.new_action:
+            #while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < self.action_timeout:
+                #if self.current_action == self.new_action:
+                    #overwrite_goals = True
+                    #break
+                #rospy.sleep(0.1)
+                #wait_time=wait_time+1
+            #if not overwrite_goals:
+                #action_client=actionlib.SimpleActionClient(self.current_action, MoveBaseAction)
+                #action_client.cancel_all_goals()
+        #ActionServerWrapper.preempt_cb(self)
+        
         
     
     def execute_cb(self,goal):
