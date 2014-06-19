@@ -1,0 +1,8 @@
+# Define the goal
+float32 meters_back  # Specify which dishwasher we want to use
+---
+# Define the result
+string status
+---
+# Define a feedback message
+string status

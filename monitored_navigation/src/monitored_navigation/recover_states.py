@@ -9,12 +9,14 @@ from std_srvs.srv import Empty
 from scitos_msgs.msg import MotorStatus
 from geometry_msgs.msg import Twist
 
-from move_base_msgs.msg import *
-import dynamic_reconfigure.client
-from scitos_ptu.msg import *
-from previous_positions_service.srv import PreviousPosition
-from republish_pointcloud_service.srv import RepublishPointcloud
+#from move_base_msgs.msg import *
+#import dynamic_reconfigure.client
+#from scitos_ptu.msg import *
+#from previous_positions_service.srv import PreviousPosition
+#from republish_pointcloud_service.srv import RepublishPointcloud
 from actionlib_msgs.msg import *
+
+from backtrack_behaviour.msg import *
 
 import actionlib
 
@@ -36,104 +38,33 @@ class RecoverNavBacktrack(smach.State):
                              output_keys=['goal','n_nav_fails'],
                              )
 
-        self.ptu_action_client = actionlib.SimpleActionClient('/SetPTUState', PtuGotoAction)
-        self.move_base_action_client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
-        self.move_base_reconfig_client = dynamic_reconfigure.client.Client('/move_base/DWAPlannerROS')
-        
-        self.BACKTRACK_TRIES=0 #will turn into parameter later
-               
+        self.backtrack_client = actionlib.SimpleActionClient('/do_backtrack', BacktrackAction)
+        self.BACKTRACK_TRIES = 0 #will turn into parameter later
                                                   
     def execute(self, userdata):
-
         print "Failures: ", userdata.n_nav_fails
-        if userdata.n_nav_fails < self.BACKTRACK_TRIES:
-            #back track in elegant fashion
-            
-            try:
-                previous_position = rospy.ServiceProxy('previous_position', PreviousPosition)
-                meter_back = previous_position(1.0)
-            except rospy.ServiceException, e:
-                rospy.logwarn("Couldn't get previous position service, returning failure.")
-                return 'failure'
-                
-            print "Got the previous position: ", meter_back.previous_pose.pose.position.x, ", ", meter_back.previous_pose.pose.position.y, ", ",  meter_back.previous_pose.pose.position.z
-                
-            try:
-                republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
-                republish_pointcloud(True, '/head_xtion/depth/points', '/move_base/head_subsampled', 0.05)
-            except rospy.ServiceException, e:
-                rospy.logwarn("Couldn't get republish pointcloud service, returning failure.")
-                return 'failure'
-                
-            print "Managed to republish pointcloud."
-                      
-            params = { 'max_vel_x' : -0.1, 'min_vel_x' : -0.9 }
-            config = self.move_base_reconfig_client.update_configuration(params)
-            
-            ptu_goal = PtuGotoGoal();
-            ptu_goal.pan = -179
-            ptu_goal.tilt = 50
-            ptu_goal.pan_vel = 1
-            ptu_goal.tilt_vel = 1
-            self.ptu_action_client.send_goal(ptu_goal)
-            self.ptu_action_client.wait_for_result()
-            
-            if self.preempt_requested():
-                self.service_preempt()
-                return 'preempted'
-            
-            move_goal = MoveBaseGoal()
-            move_goal.target_pose.pose = meter_back.previous_pose.pose
-            move_goal.target_pose.header.frame_id = meter_back.previous_pose.header.frame_id
-            self.move_base_action_client.cancel_all_goals()
-            rospy.sleep(rospy.Duration.from_sec(1))
-            #print movegoal
-            self.move_base_action_client.send_goal(move_goal)
-            self.move_base_action_client.wait_for_result()
-            
-            if self.preempt_requested():
-                self.service_preempt()
-                return 'preempted'
-            
-            params = { 'max_vel_x' : 0.9, 'min_vel_x' : 0.1 }
-            config = self.move_base_reconfig_client.update_configuration(params)
-            
-            ptu_goal = PtuGotoGoal();
-            ptu_goal.pan = 0
-            ptu_goal.tilt = 0
-            ptu_goal.pan_vel = 1
-            ptu_goal.tilt_vel = 1
-            self.ptu_action_client.send_goal(ptu_goal)
-            self.ptu_action_client.wait_for_result()
-            
-            if self.preempt_requested():
-                self.service_preempt()
-                return 'preempted'
-            
-            try:
-                republish_pointcloud = rospy.ServiceProxy('republish_pointcloud', RepublishPointcloud)
-                republish_pointcloud(False, '', '', 0.0)
-            except rospy.ServiceException, e:
-                rospy.logwarn("Couldn't stop republish pointcloud service, returning failure.")
-                return 'failure'
-                
-            print "Reset PTU, move_base parameters and stopped republishing pointcloud."
-                
-            if self.move_base_action_client.get_state() != GoalStatus.SUCCEEDED: #set the previous goal again
-                return 'failure'
-            else:
-                return 'succeeded'
-        else:
+        if userdata.n_nav_fails > self.BACKTRACK_TRIES:
             return 'failure'
         
-      
-            
+        backtrack_goal = BacktrackGoal();
+        backtrack_goal.meters_back = 0.8;
+        #self.backtrack_client.cancel_all_goals()
+        self.backtrack_client.send_goal(backtrack_goal)
+        status = self.backtrack_client.get_state()
+        while status == GoalStatus.PENDING or status == GoalStatus.ACTIVE:
+            status = self.backtrack_client.get_state()
+            if self.preempt_requested():
+                self.backtrack_client.cancel_goal()
+                self.service_preempt()
+                return 'preempted'
+            self.backtrack_client.wait_for_result(rospy.Duration(0.2))
+        if status == GoalStatus.SUCCEEDED:
+            return 'succeeded'
+        return 'failure'
     
     def service_preempt(self):
         #check if preemption is working
         smach.State.service_preempt(self)
-
-
 
 class RecoverNavHelp(smach.State):
     def __init__(self,max_nav_recovery_attempts=5):

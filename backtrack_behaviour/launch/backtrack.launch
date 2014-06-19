@@ -1,0 +1,7 @@
+<launch>
+ 
+    <node name="previous_positions" pkg="previous_positions_service" type="previous_positions" output="screen"/>
+    <node name="republish_pointcloud" pkg="republish_pointcloud_service" type="republish_pointcloud" output="screen"/>
+    <node name="backtrack_server" pkg="backtrack_behaviour" type="backtrack_server.py" output="screen"/>
+    
+</launch>
