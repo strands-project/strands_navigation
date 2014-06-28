@@ -24,6 +24,7 @@ class edges_std_marker(object):
     def __init__(self, map_name) :
         self.map_name = map_name
         self.route_nodes = NavRoute()
+        self.updating=True
         self.update_map(map_name)
         
 
@@ -61,6 +62,7 @@ class edges_std_marker(object):
         for m in self.map_edges.markers:
             m.id = idn
             idn += 1
+        self.updating=False
 
 
     def create_edge(self, point1, point2, val):
@@ -108,4 +110,5 @@ class edges_std_marker(object):
         self.update_map(self.topo_map)
     
     def clear(self):
+        self.updating=True
         del self.map_edges
