@@ -33,9 +33,14 @@ class edges_std_marker(object):
         
         self.map_edges = MarkerArray()
 
-        self.maxval= numpy.nanmax(self.route_nodes.prob)
-        self.minval= numpy.min(self.route_nodes.prob)
+        total = len(self.route_nodes.source)
         
+        if total > 0:  
+            self.maxval= numpy.nanmax(self.route_nodes.prob)
+            self.minval= numpy.min(self.route_nodes.prob)
+        else :
+            self.maxval= 0
+            self.minval= 0
         counter=0
         total = len(self.route_nodes.source)
         
