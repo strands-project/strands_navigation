@@ -54,7 +54,7 @@ class edges_marker(object):
                 V1= (node._get_pose()).position
                 V2= (nodes.nodes[ind]._get_pose()).position
                 marker.scale.x = 0.1
-                marker.color.a = 0.8
+                marker.color.a = 0.7
                 marker.color.r = 0.2
                 marker.color.g = 0.8
                 marker.color.b = 0.2

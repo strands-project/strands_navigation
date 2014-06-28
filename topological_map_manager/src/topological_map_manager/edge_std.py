@@ -62,9 +62,12 @@ class edges_std_marker(object):
         marker.type = marker.ARROW
         pose = Pose()
         
-        pose.position.x = (point1.x+point2.x)/2
-        pose.position.y = (point1.y+point2.y)/2
-        pose.position.z = (point1.z+point2.z)/2
+#        pose.position.x = (point1.x+point2.x)/2
+#        pose.position.y = (point1.y+point2.y)/2
+#        pose.position.z = (point1.z+point2.z)/2
+        pose.position.x = point1.x
+        pose.position.y = point1.y
+        pose.position.z = point1.z
         angle = math.atan2((point2.y-point1.y),(point2.x-point1.x))
         qat = tf.transformations.quaternion_from_euler(0, 0, angle)
         pose.orientation.w = qat[3]
@@ -72,8 +75,8 @@ class edges_std_marker(object):
         pose.orientation.y = qat[1]
         pose.orientation.z = qat[2]                
         
-        marker.scale.x = 0.8
-        marker.scale.y = 0.25
+        marker.scale.x = 1.0
+        marker.scale.y = 0.15
         marker.scale.z = 0.15
                 
         #val = float(counter)/float(total)
