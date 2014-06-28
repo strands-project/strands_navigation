@@ -22,7 +22,15 @@ class waypoint_controllers(object):
         self.topo_map = topological_map(map_name)
         self._marker_server = InteractiveMarkerServer(map_name+"_markers")
         for i in self.topo_map.nodes :
-            self._create_marker(i.name, i._get_pose(), i.name)        
+            self._create_marker(i.name, i._get_pose(), i.name)   
+
+    
+    def update_map(self, map_name) :
+        self.topo_map = topological_map(map_name)
+        self._marker_server.clear()
+        
+        for i in self.topo_map.nodes :
+            self._create_marker(i.name, i._get_pose(), i.name)
 
     def _create_marker(self, marker_name, pose, marker_description="waypoint marker") :
         # create an interactive marker for our server
@@ -98,3 +106,10 @@ class waypoint_controllers(object):
         
     def reset_update(self) :
         self.update_needed=False
+
+    def clear():
+        self._marker_server.clear()
+        self._marker_server.applyChanges()
+
+    def __del__(self):
+        del self._marker_server

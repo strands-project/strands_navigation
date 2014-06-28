@@ -17,7 +17,7 @@ from geometry_msgs.msg import Point
 from ros_datacentre.message_store import MessageStoreProxy
 
 from interactive_markers.interactive_marker_server import *
-from interactive_markers.menu_handler import *
+#from interactive_markers.menu_handler import *
 from visualization_msgs.msg import *
 
 from strands_navigation_msgs.msg import TopologicalNode
@@ -26,7 +26,7 @@ from topological_map_manager.marker_arrays import *
 from topological_map_manager.node_controller import *
 from topological_map_manager.edge_controller import *
 from topological_map_manager.vertex_controller import *
-
+from topological_map_manager.edge_std import *
 
 class TopologicalMapVis(object):
     _killall_timers=False
@@ -41,8 +41,14 @@ class TopologicalMapVis(object):
         self.map_pub = rospy.Publisher('/topological_nodes_array', MarkerArray)
         self.map_zone_pub = rospy.Publisher('/topological_node_zones_array', MarkerArray)
         self.map_edge_pub = rospy.Publisher('/topological_edges_array', MarkerArray)
+        self.map_edge_std_pub = rospy.Publisher('/topological_edges_deviation', MarkerArray)
 
-        self.menu_handler = MenuHandler()
+        #self.menu_handler = MenuHandler()
+        self.edge_cont = edge_controllers(self._point_set)
+        self.vert_cont = vertex_controllers(self._point_set)
+        self.node_cont = waypoint_controllers(self._point_set)
+        self.edge_std = edges_std_marker(self._point_set)
+        
         self._update_everything()
       
         t = Timer(1.0, self.timer_callback)
@@ -56,12 +62,17 @@ class TopologicalMapVis(object):
         print "loading file from map %s" %self._point_set
         self.topo_map = topological_map(self._point_set)
         print "Done"
-        self.node_cont = waypoint_controllers(self._point_set)
-        self.edge_cont = edge_controllers(self._point_set)
-        self.vert_cont = vertex_controllers(self._point_set)
+        
+        self.node_cont.update_map(self._point_set)
+        self.edge_cont.update_map(self._point_set)
+        self.vert_cont.update_map(self._point_set)
+        
+
         self.wayp_marker = waypoints_markers(self.topo_map)
         self.map_edges = edges_marker(self.topo_map)
         self.node_zone = vertices_marker(self.topo_map)
+        self.edge_std.update_map(self._point_set)
+        
         self.reset_update()
 
         
@@ -69,12 +80,10 @@ class TopologicalMapVis(object):
         print "deleting"
         self.reset_feedback()
         self.reset_update()
-        del self.node_cont
-        del self.edge_cont
-        del self.vert_cont
         del self.map_edges
         del self.wayp_marker
         del self.node_zone
+        #del self.edge_std
         del self.topo_map
         
         
@@ -121,6 +130,7 @@ class TopologicalMapVis(object):
             self.map_pub.publish(self.wayp_marker.map_nodes)
             self.map_edge_pub.publish(self.map_edges.map_edges)
             self.map_zone_pub.publish(self.node_zone.node_zone)
+            self.map_edge_std_pub.publish(self.edge_std.map_edges)
         
         if not self._killall_timers :
             t = Timer(2.0, self.timer_callback)

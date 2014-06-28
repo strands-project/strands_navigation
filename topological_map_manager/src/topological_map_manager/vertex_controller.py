@@ -21,6 +21,14 @@ class vertex_controllers(object):
         self.topo_map = topological_map(map_name)
         self._vertex_server = InteractiveMarkerServer(map_name+"_zones")
         
+
+
+
+    def update_map(self, map_name) :
+
+        self.topo_map = topological_map(map_name)
+        self._vertex_server.clear()
+        
         for node in self.topo_map.nodes :
             node._get_coords()
             count=0
@@ -100,3 +108,6 @@ class vertex_controllers(object):
     def reset_update(self) :
         self.update_needed=False
 
+    def clear():
+        self._vertex_server.clear()
+        self._vertex_server.applyChanges()

@@ -23,9 +23,15 @@ class edge_controllers(object):
         print "init_controller"
         self.in_feedback=False
         #self.update_needed=False
-        self.topo_map = topological_map(map_name)
+        #self.topo_map = topological_map(map_name)
         self._edge_server = InteractiveMarkerServer(map_name+"_edges")
+        #self.update_map(map_name)
 
+    def update_map(self, map_name) :
+
+        self.topo_map = topological_map(map_name)
+        self._edge_server.clear()
+        
         for node in self.topo_map.nodes :
             for i in node.edges :
                 ind = self.topo_map._get_node_index(i['node'])
@@ -34,8 +40,7 @@ class edge_controllers(object):
                 V1= (node._get_pose()).position
                 V2= (self.topo_map.nodes[ind]._get_pose()).position
                 edge_name=node.name+"_"+self.topo_map.nodes[ind].name
-                self._edge_marker(edge_name, V1, V2, edge_name)        
-    
+                self._edge_marker(edge_name, V1, V2, edge_name)
     
     def makeEmptyMarker(self, dummyBox=True ):
         int_marker = InteractiveMarker()
@@ -97,17 +102,24 @@ class edge_controllers(object):
     def reset_update(self) :
         self.reset_feedback()
         self.update_needed=False
-        print "1"
+
 
     def reset_feedback(self) :
         self.in_feedback=False
-        print "2"
+
 
     def feedback_cb(self, feedback):
-        print "3"
         if not self.in_feedback and not self.update_needed :
-            print "4"
             self.in_feedback=True
             self.topo_map.remove_edge(feedback.marker_name)
+            self._edge_server.erase(feedback.marker_name)
+            self._edge_server.applyChanges()
             self.update_needed=True
-                        
+    
+    def clear():
+        self._edge_server.clear()
+        self._edge_server.applyChanges()
+
+        
+    def __del__(self):
+        del self._edge_server

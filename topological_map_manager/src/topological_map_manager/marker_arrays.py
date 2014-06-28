@@ -70,7 +70,6 @@ class edges_marker(object):
             idn += 1            
 
 
-
 class vertices_marker(object):
 
     def __init__(self, nodes) :
