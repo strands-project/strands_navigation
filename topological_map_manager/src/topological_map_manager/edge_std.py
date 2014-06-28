@@ -31,6 +31,13 @@ class edges_std_marker(object):
         self.topo_map = topological_map(self.map_name)
         
         self.map_edges = MarkerArray()
+
+        maxval=0.0
+        for i in self.route_nodes.prob:
+            if not math.isnan(i):
+                if i > maxval:
+                    maxval=i
+
         counter=0
         total = len(self.route_nodes.source)
         
@@ -42,6 +49,7 @@ class edges_std_marker(object):
             point1= (self.topo_map.nodes[inds]._get_pose()).position
             point2= (self.topo_map.nodes[indt]._get_pose()).position
             val = self.route_nodes.prob[counter]
+            val = val/maxval
             if not math.isnan(val) :
                 self.create_edge(point1, point2, val)
             counter+=1
