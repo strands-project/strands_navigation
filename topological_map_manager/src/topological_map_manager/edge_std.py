@@ -54,7 +54,7 @@ class edges_std_marker(object):
 
     def create_edge(self, point1, point2, val):
         norm = mpl.colors.Normalize(vmin=0.0, vmax=1.0)
-        cmap = cm.jet
+        cmap = cm.autumn
         m = cm.ScalarMappable(norm=norm, cmap=cmap)   
 
         marker = Marker()
@@ -69,18 +69,20 @@ class edges_std_marker(object):
         pose.position.y = point1.y
         pose.position.z = point1.z
         angle = math.atan2((point2.y-point1.y),(point2.x-point1.x))
+        
         qat = tf.transformations.quaternion_from_euler(0, 0, angle)
         pose.orientation.w = qat[3]
         pose.orientation.x = qat[0]
         pose.orientation.y = qat[1]
         pose.orientation.z = qat[2]                
         
-        marker.scale.x = 1.0
-        marker.scale.y = 0.15
-        marker.scale.z = 0.15
+        r = math.hypot((point2.y-point1.y),(point2.x-point1.x))/3.0
+        marker.scale.x = r
+        marker.scale.y = 0.1
+        marker.scale.z = 0.1
                 
         #val = float(counter)/float(total)
-        v = m.to_rgba(val)
+        v = m.to_rgba(1.0-val)
         marker.color.a = v[3]
         marker.color.r = v[0]
         marker.color.g = v[1]
