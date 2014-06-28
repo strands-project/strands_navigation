@@ -37,8 +37,8 @@ class edges_std_marker(object):
         total = len(self.route_nodes.source)
         
         if total > 0:  
-            self.maxval= numpy.nanmax(self.route_nodes.prob)
-            self.minval= numpy.min(self.route_nodes.prob)
+            self.maxval= numpy.nanmax(self.route_nodes.prob)+0.000001
+            #self.minval= numpy.min(self.route_nodes.prob)-0.000001
         else :
             self.maxval= 0
             self.minval= 0
@@ -66,7 +66,7 @@ class edges_std_marker(object):
 
 
     def create_edge(self, point1, point2, val):
-        norm = mpl.colors.Normalize(vmin=self.minval, vmax=self.maxval)
+        norm = mpl.colors.Normalize(vmin=0.0, vmax=self.maxval)
         cmap = cm.YlOrRd
         m = cm.ScalarMappable(norm=norm, cmap=cmap)   
 
