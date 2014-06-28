@@ -131,7 +131,8 @@ class TopologicalMapVis(object):
             self.map_pub.publish(self.wayp_marker.map_nodes)
             self.map_edge_pub.publish(self.map_edges.map_edges)
             self.map_zone_pub.publish(self.node_zone.node_zone)
-            self.map_edge_std_pub.publish(self.edge_std.map_edges)
+            if not self.edge_std.updating :
+                self.map_edge_std_pub.publish(self.edge_std.map_edges)
         
         if not self._killall_timers :
             t = Timer(2.0, self.timer_callback)
