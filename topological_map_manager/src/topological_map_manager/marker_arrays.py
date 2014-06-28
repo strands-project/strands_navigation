@@ -20,10 +20,11 @@ class waypoints_markers(object):
             marker = Marker()
             marker.header.frame_id = "/map"
             #marker.header.stamp = rospy.now()
-            marker.type = marker.ARROW
-            marker.scale.x = 0.3
-            marker.scale.y = 0.15
-            marker.scale.z = 0.1
+            #marker.type = marker.ARROW
+            marker.type = Marker.SPHERE
+            marker.scale.x = 0.2
+            marker.scale.y = 0.2
+            marker.scale.z = 0.2
             marker.color.a = 1.0
             marker.color.r = 0.2
             marker.color.g = 0.2
