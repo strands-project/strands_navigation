@@ -22,7 +22,6 @@ class edges_std_marker(object):
     
     def __init__(self, map_name) :
         self.map_name = map_name
-        self.subs = rospy.Subscriber("/top_nodes_std", NavRoute, self.callback)
         self.route_nodes = NavRoute()
         self.update_map(map_name)
         
@@ -44,7 +43,7 @@ class edges_std_marker(object):
             point2= (self.topo_map.nodes[indt]._get_pose()).position
             val = self.route_nodes.prob[counter]
             if not math.isnan(val) :
-                create_edge(point1, point2, val)
+                self.create_edge(point1, point2, val)
             counter+=1
 
         idn = 0
@@ -77,7 +76,7 @@ class edges_std_marker(object):
         marker.scale.y = 0.25
         marker.scale.z = 0.15
                 
-        val = float(counter)/float(total)
+        #val = float(counter)/float(total)
         v = m.to_rgba(val)
         marker.color.a = v[3]
         marker.color.r = v[0]
@@ -87,8 +86,8 @@ class edges_std_marker(object):
         self.map_edges.markers.append(marker)
 
 
-    def callback(self, msg):
-        self.route_nodes = msg
+    def received_route(self, route):
+        self.route_nodes = route
         self.clear()
         self.update_map(self.topo_map)
     
