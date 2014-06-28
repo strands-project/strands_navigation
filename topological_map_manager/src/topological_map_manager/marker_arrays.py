@@ -8,7 +8,6 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 
 from visualization_msgs.msg import *
-
 from strands_navigation_msgs.msg import TopologicalNode
 from topological_navigation.topological_map import *
 
@@ -34,12 +33,11 @@ class waypoints_markers(object):
             marker.pose.position.z = marker.pose.position.z+0.1
             self.map_nodes.markers.append(marker)
 
+
         idn = 0
         for m in self.map_nodes.markers:
             m.id = idn
             idn += 1
-
-
 
 class edges_marker(object):
     
