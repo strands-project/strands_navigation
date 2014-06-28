@@ -27,6 +27,7 @@ from topological_map_manager.node_controller import *
 from topological_map_manager.edge_controller import *
 from topological_map_manager.vertex_controller import *
 from topological_map_manager.edge_std import *
+from strands_navigation_msgs.msg import NavRoute
 
 class TopologicalMapVis(object):
     _killall_timers=False
@@ -42,7 +43,8 @@ class TopologicalMapVis(object):
         self.map_zone_pub = rospy.Publisher('/topological_node_zones_array', MarkerArray)
         self.map_edge_pub = rospy.Publisher('/topological_edges_array', MarkerArray)
         self.map_edge_std_pub = rospy.Publisher('/topological_edges_deviation', MarkerArray)
-
+        self.subs = rospy.Subscriber("/top_nodes_std", NavRoute, self.route_callback)
+        
         #self.menu_handler = MenuHandler()
         self.edge_cont = edge_controllers(self._point_set)
         self.vert_cont = vertex_controllers(self._point_set)
@@ -54,7 +56,6 @@ class TopologicalMapVis(object):
         t = Timer(1.0, self.timer_callback)
         t.start()
         rospy.loginfo("All Done ...")
-        rospy.spin()
 
 
     def _update_everything(self) :
@@ -136,7 +137,10 @@ class TopologicalMapVis(object):
             t = Timer(2.0, self.timer_callback)
             t.start()
 
-
+    def route_callback(self, msg) :
+        self.edge_std.received_route(msg)
+        
+        
     def _on_node_shutdown(self):
         self._killall_timers=True
         #sleep(2)
@@ -146,3 +150,4 @@ if __name__ == '__main__':
     mapname=str(sys.argv[1])
     rospy.init_node('topological_visualisation')
     server = TopologicalMapVis(rospy.get_name(),mapname)
+    rospy.spin()
