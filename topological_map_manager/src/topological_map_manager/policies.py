@@ -85,6 +85,7 @@ class policies_marker(object):
     def received_route(self, route):
         print "Route Received"
         if not self.updating :
+            print "Updating Route"
             self.route_nodes = route
             self.clear()
             self.update_map(self.topo_map)
