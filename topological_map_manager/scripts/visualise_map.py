@@ -46,7 +46,7 @@ class TopologicalMapVis(object):
         self.map_edge_std_pub = rospy.Publisher('/topological_edges_deviation', MarkerArray)
         self.policies_pub = rospy.Publisher('/topological_edges_policies', MarkerArray)
         self.subs = rospy.Subscriber("/top_nodes_std", NavRoute, self.route_callback)
-        self.subs = rospy.Subscriber("/mdp_plan_exec/current_policy_mode", NavRoute, self.policies_callback)
+        self.subs3 = rospy.Subscriber("/mdp_plan_exec/current_policy_mode", NavRoute, self.policies_callback)
         
         #self.menu_handler = MenuHandler()
         self.edge_cont = edge_controllers(self._point_set)
