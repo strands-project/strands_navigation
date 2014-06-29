@@ -29,12 +29,9 @@ class policies_marker(object):
         
 
     def update_map(self,map_name) :
-        
         self.topo_map = topological_map(self.map_name)
-        
         self.map_edges = MarkerArray()
-
-
+                
         counter=0
         total = len(self.route_nodes.source)
         
@@ -45,13 +42,14 @@ class policies_marker(object):
             point2=Point()
             point1= (self.topo_map.nodes[inds]._get_pose()).position
             point2= (self.topo_map.nodes[indt]._get_pose()).position
-            val = self.route_nodes.prob[counter]
-            self.create_edge(point1, point2, val)
+            #val = self.route_nodes.prob[counter]
+            self.create_edge(point1, point2)
 
         idn = 0
         for m in self.map_edges.markers:
             m.id = idn
             idn += 1
+
         self.updating=False
 
 
@@ -61,9 +59,6 @@ class policies_marker(object):
         marker.type = marker.ARROW
         pose = Pose()
         
-#        pose.position.x = (point1.x+point2.x)/2
-#        pose.position.y = (point1.y+point2.y)/2
-#        pose.position.z = (point1.z+point2.z)/2
         pose.position.x = point1.x
         pose.position.y = point1.y
         pose.position.z = point1.z
@@ -79,7 +74,6 @@ class policies_marker(object):
         marker.scale.x = r
         marker.scale.y = 0.2
         marker.scale.z = 0.2
-                
         marker.color.a = 0.6
         marker.color.r = 0.1
         marker.color.g = 0.1
@@ -94,5 +88,6 @@ class policies_marker(object):
         self.update_map(self.topo_map)
     
     def clear(self):
-        self.updating=True
-        del self.map_edges
+        if not self.updating :
+            self.updating=True
+            del self.map_edges
