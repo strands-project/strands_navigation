@@ -27,6 +27,7 @@ from topological_map_manager.node_controller import *
 from topological_map_manager.edge_controller import *
 from topological_map_manager.vertex_controller import *
 from topological_map_manager.edge_std import *
+from topological_map_manager.policies import *
 from strands_navigation_msgs.msg import NavRoute
 
 class TopologicalMapVis(object):
@@ -43,13 +44,16 @@ class TopologicalMapVis(object):
         self.map_zone_pub = rospy.Publisher('/topological_node_zones_array', MarkerArray)
         self.map_edge_pub = rospy.Publisher('/topological_edges_array', MarkerArray)
         self.map_edge_std_pub = rospy.Publisher('/topological_edges_deviation', MarkerArray)
+        self.policies_pub = rospy.Publisher('/topological_edges_policies', MarkerArray)
         self.subs = rospy.Subscriber("/top_nodes_std", NavRoute, self.route_callback)
+        self.subs3 = rospy.Subscriber("/mdp_plan_exec/current_policy_mode", NavRoute, self.policies_callback)
         
         #self.menu_handler = MenuHandler()
         self.edge_cont = edge_controllers(self._point_set)
         self.vert_cont = vertex_controllers(self._point_set)
         self.node_cont = waypoint_controllers(self._point_set)
         self.edge_std = edges_std_marker(self._point_set)
+        self.policies = policies_marker(self._point_set)
         
         self._update_everything()
       
@@ -73,6 +77,8 @@ class TopologicalMapVis(object):
         self.map_edges = edges_marker(self.topo_map)
         self.node_zone = vertices_marker(self.topo_map)
         self.edge_std.update_map(self._point_set)
+        self.policies.update_map(self._point_set)
+        
         
         self.reset_update()
 
@@ -133,6 +139,8 @@ class TopologicalMapVis(object):
             self.map_zone_pub.publish(self.node_zone.node_zone)
             if not self.edge_std.updating :
                 self.map_edge_std_pub.publish(self.edge_std.map_edges)
+            if not self.policies.updating :            
+                self.policies_pub.publish(self.policies.map_edges)
         
         if not self._killall_timers :
             t = Timer(2.0, self.timer_callback)
@@ -141,6 +149,8 @@ class TopologicalMapVis(object):
     def route_callback(self, msg) :
         self.edge_std.received_route(msg)
         
+    def policies_callback(self, msg) :
+        self.policies.received_route(msg)
         
     def _on_node_shutdown(self):
         self._killall_timers=True
