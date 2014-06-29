@@ -23,7 +23,7 @@ class MonitoredNavigation(ActionServerWrapper):
         self.mon_nav_sm=self.nav_sm.get_children()["MONITORED_NAV"]
         self.low_nav_sm=self.mon_nav_sm.get_children()["NAV_SM"]
         
-        self.sis = IntrospectionServer('task_executor', self.nav_sm, '/MON_NAV')
+        self.sis = IntrospectionServer('monitored_navigation_sm', self.nav_sm, '/MON_NAV')
         self.sis.start()
         
         ActionServerWrapper.__init__(self,
