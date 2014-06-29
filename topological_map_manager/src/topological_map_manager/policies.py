@@ -49,8 +49,8 @@ class policies_marker(object):
         for m in self.map_edges.markers:
             m.id = idn
             idn += 1
-
         self.updating=False
+        print "All Done"
 
 
     def create_edge(self, point1, point2):
