@@ -7,7 +7,7 @@ import actionlib
 from dynamic_reconfigure.server import Server
 from monitored_navigation.cfg import NavFailTresholdsConfig
 
-from smach_ros import ActionServerWrapper
+from smach_ros import ActionServerWrapper, IntrospectionServer
 from move_base_msgs.msg import MoveBaseAction
 
 from  monitored_navigation.navigation import HighLevelNav
@@ -22,6 +22,9 @@ class MonitoredNavigation(ActionServerWrapper):
         self.nav_sm = HighLevelNav()
         self.mon_nav_sm=self.nav_sm.get_children()["MONITORED_NAV"]
         self.low_nav_sm=self.mon_nav_sm.get_children()["NAV_SM"]
+        
+        self.sis = IntrospectionServer('task_executor', self.nav_sm, '/MON_NAV')
+        self.sis.start()
         
         ActionServerWrapper.__init__(self,
                         'monitored_navigation', MonitoredNavigationAction, self.nav_sm,
