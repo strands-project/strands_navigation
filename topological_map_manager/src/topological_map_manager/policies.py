@@ -34,8 +34,10 @@ class policies_marker(object):
                 
         counter=0
         total = len(self.route_nodes.source)
-        
+
+        print 'updating '+total+' edges'        
         while counter < total :
+            print 'Creating edge '+counter 
             inds = self.topo_map._get_node_index(self.route_nodes.source[counter])
             indt = self.topo_map._get_node_index(self.route_nodes.target[counter])
             point1=Point()
@@ -44,12 +46,15 @@ class policies_marker(object):
             point2= (self.topo_map.nodes[indt]._get_pose()).position
             #val = self.route_nodes.prob[counter]
             self.create_edge(point1, point2)
+            counter+=1
 
         idn = 0
         for m in self.map_edges.markers:
             m.id = idn
             idn += 1
         self.updating=False
+        
+        
         print "All Done"
 
 
