@@ -28,6 +28,7 @@ from topological_map_manager.edge_controller import *
 from topological_map_manager.vertex_controller import *
 from topological_map_manager.edge_std import *
 from topological_map_manager.policies import *
+from topological_map_manager.goto import *
 from strands_navigation_msgs.msg import NavRoute
 
 class TopologicalMapVis(object):
@@ -52,6 +53,9 @@ class TopologicalMapVis(object):
         self.edge_cont = edge_controllers(self._point_set)
         self.vert_cont = vertex_controllers(self._point_set)
         self.node_cont = waypoint_controllers(self._point_set)
+        self.goto_cont = go_to_controllers(self._point_set)
+        
+        
         self.edge_std = edges_std_marker(self._point_set)
         self.policies = policies_marker(self._point_set)
         
@@ -71,7 +75,8 @@ class TopologicalMapVis(object):
         self.node_cont.update_map(self._point_set)
         self.edge_cont.update_map(self._point_set)
         self.vert_cont.update_map(self._point_set)
-        
+        self.goto_cont.update_map(self._point_set)
+
 
         self.wayp_marker = waypoints_markers(self.topo_map)
         self.map_edges = edges_marker(self.topo_map)
@@ -98,26 +103,27 @@ class TopologicalMapVis(object):
         self.in_feedback = self.node_cont.in_feedback | self.in_feedback
         self.in_feedback = self.vert_cont.in_feedback | self.in_feedback
         self.in_feedback = self.edge_cont.in_feedback | self.in_feedback
-
+        self.in_feedback = self.goto_cont.in_feedback | self.in_feedback
 
     def check_update(self) :
         self.update_needed = self.node_cont.update_needed | self.update_needed
         self.update_needed = self.vert_cont.update_needed | self.update_needed
         self.update_needed = self.edge_cont.update_needed | self.update_needed
-    
+        self.update_needed = self.goto_cont.update_needed | self.update_needed
     
     def reset_feedback(self) :
         self.in_feedback=False
         self.node_cont.reset_feedback()
         self.vert_cont.reset_feedback()
         self.edge_cont.reset_feedback()
-
+        self.goto_cont.reset_feedback()
 
     def reset_update(self) :
         self.update_needed=False
         self.node_cont.reset_update()
         self.vert_cont.reset_update()
         self.edge_cont.reset_update()
+        self.goto_cont.reset_update()
 
 
     def timer_callback(self):
