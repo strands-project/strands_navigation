@@ -3,6 +3,7 @@ import math
 import rospy
 import sys
 
+import std_msgs.msg
 from topological_navigation.topological_node import *
 from strands_navigation_msgs.msg import TopologicalNode
 from strands_navigation_msgs.msg import TopologicalMap
@@ -18,9 +19,17 @@ class map_publisher(object):
         self.name = name
         self.nodes = self.loadMap(name)
         self.map_pub = rospy.Publisher('/topological_map', TopologicalMap, latch=True)
+        self.last_updated = rospy.Time.now()
         self.map_pub.publish(self.nodes)
+        rospy.Subscriber('/update_map', std_msgs.msg.Time, self.updateCallback)
 
 
+     
+    def updateCallback(self, msg) :
+#        if msg.data > self.last_updated :
+        self.nodes = self.loadMap(self.name)
+        self.last_updated = rospy.Time.now()
+        self.map_pub.publish(self.nodes)        
 
     def loadMap(self, point_set) :
         msg_store = MessageStoreProxy(collection='topological_maps')

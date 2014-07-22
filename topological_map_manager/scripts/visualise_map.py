@@ -13,6 +13,7 @@ from time import sleep
 from threading import Timer
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
+import std_msgs.msg
 
 from ros_datacentre.message_store import MessageStoreProxy
 
@@ -48,6 +49,9 @@ class TopologicalMapVis(object):
         self.policies_pub = rospy.Publisher('/topological_edges_policies', MarkerArray)
         self.subs = rospy.Subscriber("/top_nodes_std", NavRoute, self.route_callback)
         self.subs3 = rospy.Subscriber("/mdp_plan_exec/current_policy_mode", NavRoute, self.policies_callback)
+
+        
+        self.map_update = rospy.Publisher('/update_map', std_msgs.msg.Time)
         
         #self.menu_handler = MenuHandler()
         self.edge_cont = edge_controllers(self._point_set)
@@ -84,6 +88,7 @@ class TopologicalMapVis(object):
         self.edge_std.update_map(self._point_set)
         self.policies.update_map(self._point_set)
         
+        self.map_update.publish(rospy.Time.now())
         
         self.reset_update()
 
