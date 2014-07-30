@@ -5,6 +5,8 @@ import rospy
 import math
 import tf
 import actionlib
+from threading import Timer
+
 
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
@@ -14,6 +16,7 @@ from interactive_markers.interactive_marker_server import *
 
 from strands_navigation_msgs.msg import TopologicalNode
 from topological_navigation.topological_map import *
+from strands_navigation_msgs.msg import TopologicalMap
 
 import topological_navigation.msg
 
@@ -22,23 +25,19 @@ class go_to_controllers(object):
 
     def __init__(self, map_name) :
         self.in_feedback=False
-        #self.update_needed=False
-        #self.topo_map = topological_map(map_name)
+        #self.timer = Timer(1.0, self.timer_callback)
         self._goto_server = InteractiveMarkerServer(map_name+"_go_to")
-        #self.update_map(map_name)
         self.client = actionlib.SimpleActionClient('topological_navigation', topological_navigation.msg.GotoNodeAction)
         self.client.wait_for_server()
         rospy.loginfo(" ... Init done")
 
 
-    def update_map(self, map_name) :
-
-        self.topo_map = topological_map(map_name)
+    def update_map(self, map_msg) :
+        print "updating goto controllers..."
+        #self.topo_map = topological_map(map_name)
         self._goto_server.clear()
-
-        for i in self.topo_map.nodes :
-            self.create_marker(i.name, i._get_pose(), i.name)
-
+        for i in map_msg.nodes :
+            self.create_marker(i.name, i.pose, i.name)
 
     def makeEmptyMarker(self, dummyBox=True ) :
         int_marker = InteractiveMarker()
@@ -67,7 +66,7 @@ class go_to_controllers(object):
         
         marker = self.makeEmptyMarker()
         marker.name = marker_name
-        #marker.description = marker_description
+        marker.description = marker_name
 
         control = InteractiveMarkerControl()
     
@@ -85,18 +84,10 @@ class go_to_controllers(object):
             self._goto_server.setPose( marker.name, pos )
             self._goto_server.applyChanges()
 
-       
-    def reset_update(self) :
-        self.reset_feedback()
-        self.update_needed=False
-
-
-    def reset_feedback(self) :
-        self.in_feedback=False
 
 
     def feedback_cb(self, feedback):
-        if not self.in_feedback and not self.update_needed :
+        if not self.in_feedback :
             self.in_feedback=True
             print 'GOTO: '+str(feedback.marker_name)
             self.client.cancel_all_goals()
@@ -106,7 +97,12 @@ class go_to_controllers(object):
             # Sends the goal to the action server.
             self.client.send_goal(navgoal)
 #            self.update_needed=True
+            self.timer = Timer(1.0, self.timer_callback)      
+            self.timer.start()
 
+
+    def timer_callback(self) :
+        self.in_feedback = False
     
     def clear():
         self._goto_server.clear()

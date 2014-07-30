@@ -40,6 +40,8 @@ class waypoints_markers(object):
             m.id = idn
             idn += 1
 
+
+
 class edges_marker(object):
     
     def __init__(self, nodes) :
