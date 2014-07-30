@@ -51,9 +51,8 @@ class TopologicalMapVis(object):
         self.map_edge_pub = rospy.Publisher('/topological_edges_array', MarkerArray)
         self.map_edge_std_pub = rospy.Publisher('/topological_edges_deviation', MarkerArray)
         self.policies_pub = rospy.Publisher('/topological_edges_policies', MarkerArray)
-        #self.map_update = rospy.Publisher('/update_map', std_msgs.msg.Time)        
 
-        #self.menu_handler = MenuHandler()
+
         self.edge_cont = edge_controllers(self._point_set)
         self.vert_cont = vertex_controllers(self._point_set)
         self.node_cont = waypoint_controllers(self._point_set)
@@ -64,9 +63,6 @@ class TopologicalMapVis(object):
         self.subs3 = rospy.Subscriber("/mdp_plan_exec/current_policy_mode", NavRoute, self.policies_callback)       
         rospy.Subscriber('/topological_map', TopologicalMap, self.map_callback)
 
-        
-        #self.edge_std = edges_std_marker(self._point_set)
-        #self.policies = policies_marker(self._point_set)
         
         self._update_everything()
         
@@ -92,42 +88,9 @@ class TopologicalMapVis(object):
         self.edge_std.update_map(self._point_set)
         self.policies.update_map(self._point_set) 
        
-        #self.map_update.publish(rospy.Time.now())
-        
-        self.reset_update()
-
-
-        
-    def check_feedback(self) :
-        #self.in_feedback = self.vert_cont.in_feedback | self.in_feedback
-        #self.in_feedback = self.edge_cont.in_feedback | self.in_feedback
-        pass #self.in_feedback = self.in_feedback
-
-    
-    def reset_feedback(self) :
-        self.in_feedback=False
-        #self.vert_cont.reset_feedback()
-        #self.edge_cont.reset_feedback()
-
-    def reset_update(self) :
-        self.update_needed=False
-        #self.vert_cont.reset_update()
-        #self.edge_cont.reset_update()
 
 
     def timer_callback(self):
-#        self.check_feedback()
-#
-#        #print "F: "+str(self.in_feedback)+" U: "+str(self.update_needed)
-#
-#        if self.update_needed and not self.in_feedback :
-#            print "updating ..."
-#            self._delete_everything()
-#            self._update_everything()
-#        else :
-#            if self.in_feedback :
-#                self.reset_feedback()
-#                print "no more feedback ..."
         self.map_pub.publish(self.wayp_marker.map_nodes)
         self.map_edge_pub.publish(self.map_edges.map_edges)
         self.map_zone_pub.publish(self.node_zone.node_zone)
@@ -139,6 +102,7 @@ class TopologicalMapVis(object):
         if not self._killall_timers :
             t = Timer(2.0, self.timer_callback)
             t.start()
+
 
     def route_callback(self, msg) :
         self.edge_std.received_route(msg)
@@ -153,12 +117,6 @@ class TopologicalMapVis(object):
         self.vert_cont.update_map(msg)
         self.edge_cont.update_map(msg)
         
-        del self.map_edges
-        del self.wayp_marker
-        del self.node_zone
-        del self.edge_std
-        
-        del self.topo_map
         self.topo_map = topological_map(msg.name, msg=msg)
 
         self.wayp_marker = waypoints_markers(self.topo_map)
@@ -168,7 +126,6 @@ class TopologicalMapVis(object):
         self.policies = policies_marker(self._point_set)
         self.edge_std.update_map(self._point_set)
         self.policies.update_map(self._point_set)        
-        
         
 
     def _on_node_shutdown(self):
