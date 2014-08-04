@@ -101,7 +101,7 @@ class waypoint_controllers(object):
 
 
     def _marker_feedback(self, feedback):
-        print '+'
+        #print '+'
         self.info = feedback
         self.timer.cancel()
         del self.timer
@@ -110,7 +110,7 @@ class waypoint_controllers(object):
 
 
     def timer_callback(self) :
-        print '*'
+        #print '*'
         self.topo_map.update_node_waypoint(self.info.marker_name, self.info.pose)
         self.map_update.publish(rospy.Time.now())
         

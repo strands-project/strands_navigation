@@ -27,6 +27,7 @@ from topological_map_manager.marker_arrays import *
 from topological_map_manager.node_controller import *
 from topological_map_manager.edge_controller import *
 from topological_map_manager.vertex_controller import *
+from topological_map_manager.node_manager import *
 from topological_map_manager.edge_std import *
 from topological_map_manager.policies import *
 from topological_map_manager.goto import *
@@ -57,6 +58,7 @@ class TopologicalMapVis(object):
         self.vert_cont = vertex_controllers(self._point_set)
         self.node_cont = waypoint_controllers(self._point_set)
         self.goto_cont = go_to_controllers(self._point_set)
+        self.add_rm_node = node_manager(self._point_set)
 
         
         self.subs = rospy.Subscriber("/top_nodes_std", NavRoute, self.route_callback)
@@ -116,7 +118,7 @@ class TopologicalMapVis(object):
         self.node_cont.update_map(msg)
         self.vert_cont.update_map(msg)
         self.edge_cont.update_map(msg)
-        
+        self.add_rm_node.update_map(msg)
         self.topo_map = topological_map(msg.name, msg=msg)
 
         self.wayp_marker = waypoints_markers(self.topo_map)
