@@ -124,7 +124,10 @@ class node_manager(object):
                     print j
                 
                 print "Chosen name!!!!!!"
-                nodname = 'WayPoint%d'%(int(lnames[-1])+1)
+                if lnames:
+                    nodname = 'WayPoint%d'%(int(lnames[-1])+1)
+                else :
+                    nodname = 'WayPoint1'
                 print nodname
                 #self.topo_map = topological_map(pointset)     
                 self.topo_map.add_node(nodname,8.0, pos, 'move_base')
