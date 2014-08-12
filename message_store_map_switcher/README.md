@@ -1,13 +1,13 @@
 # Message Store Map Server
 
-This package provides tools for serving OccupancyGrid maps from the ros_datacentre. 
+This package provides tools for serving OccupancyGrid maps from the mongodb_store. 
 
 ## Running the datacentre
 
-All of the below assumes you have the `ros_datacentre` nodes running. Do this with:
+All of the below assumes you have the `mongodb_store` nodes running. Do this with:
 
 ```bash
-roslaunch ros_datacentre datacentre.launch 
+roslaunch mongodb_store datacentre.launch 
 ```
 
 ## Adding maps to the datacentre
