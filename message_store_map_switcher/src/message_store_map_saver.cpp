@@ -1,4 +1,4 @@
-#include "ros_datacentre/message_store.h"
+#include "mongodb_store/message_store.h"
 #include "map_server/image_loader.h"
 
 #include "ros/ros.h"
@@ -10,7 +10,7 @@
 
 
 
-using namespace ros_datacentre;
+using namespace mongodb_store;
 
 
 
