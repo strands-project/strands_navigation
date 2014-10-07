@@ -3,7 +3,7 @@
 import sys
 import rospy
 
-
+from threading import Timer
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 
@@ -17,17 +17,19 @@ from topological_navigation.topological_map import *
 class vertex_controllers(object):
 
     def __init__(self, map_name) :
-        self.in_feedback=False
-        self.topo_map = topological_map(map_name)
+        #self.in_feedback=False
+        self.timer = Timer(1.0, self.timer_callback)
+        #self.topo_map = topological_map(map_name)
         self._vertex_server = InteractiveMarkerServer(map_name+"_zones")
-        
+        self.map_update = rospy.Publisher('/update_map', std_msgs.msg.Time)
 
 
 
-    def update_map(self, map_name) :
-
-        self.topo_map = topological_map(map_name)
+    def update_map(self, msg) :
+        print "updating vertex controllers..."
+        self.topo_map = topological_map(msg.name, msg=msg)
         self._vertex_server.clear()
+        self._vertex_server.applyChanges()
         
         for node in self.topo_map.nodes :
             node._get_coords()
@@ -94,19 +96,22 @@ class vertex_controllers(object):
 
 
     def _vertex_feedback(self, feedback):
-        self.in_feedback=True
-        vertex_name = feedback.marker_name.rsplit('-', 1)
+        print '-'
+        self.info = feedback
+        self.timer.cancel()
+        del self.timer
+        self.timer = Timer(1.0, self.timer_callback)      
+        self.timer.start()
+
+
+    def timer_callback(self) :
+        print '.'
+        vertex_name = self.info.marker_name.rsplit('-', 1)
         node_name = vertex_name[0]
         vertex_index = int(vertex_name[1])
-        self.topo_map.update_node_vertex(node_name, vertex_index, feedback.pose)
-        self.update_needed=True
+        self.topo_map.update_node_vertex(node_name, vertex_index, self.info.pose)
+        self.map_update.publish(rospy.Time.now())
 
-        
-    def reset_feedback(self) :
-        self.in_feedback=False
-        
-    def reset_update(self) :
-        self.update_needed=False
 
     def clear():
         self._vertex_server.clear()
