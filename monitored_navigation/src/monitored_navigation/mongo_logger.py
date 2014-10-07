@@ -2,7 +2,7 @@ import rospy
 
 
 from strands_navigation_msgs.msg import MonitoredNavEvent
-from ros_datacentre.message_store import MessageStoreProxy
+from mongodb_store.message_store import MessageStoreProxy
 
 
 #string failure #'global_plan_fail, local_plan_fail, bump_fail, stuck_on_carpet

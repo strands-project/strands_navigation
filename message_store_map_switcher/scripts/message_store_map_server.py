@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import rospy
-import ros_datacentre_msgs.srv as dc_srv
-import ros_datacentre.util as dc_util
-from ros_datacentre.message_store import MessageStoreProxy
+import mongodb_store_msgs.srv as dc_srv
+import mongodb_store.util as dc_util
+from mongodb_store.message_store import MessageStoreProxy
 import StringIO
 from optparse import OptionParser
 from nav_msgs.msg import OccupancyGrid

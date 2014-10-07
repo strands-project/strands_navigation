@@ -15,7 +15,7 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 import std_msgs.msg
 
-from ros_datacentre.message_store import MessageStoreProxy
+from mongodb_store.message_store import MessageStoreProxy
 
 from interactive_markers.interactive_marker_server import *
 #from interactive_markers.menu_handler import *
