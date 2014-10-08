@@ -10,12 +10,11 @@ from move_base_msgs.msg import MoveBaseAction
 from strands_navigation_msgs.msg import MonitoredNavigationResult
 import strands_navigation_msgs.msg
 
-from nav_msgs.msg import Path
+#from nav_msgs.msg import Path
 
 from monitor_states import BumperMonitor, StuckOnCarpetMonitor, NavPreemptMonitor
 from recover_states import RecoverNavHelp, RecoverNavBacktrack,  RecoverBumper, RecoverStuckOnCarpet
 
-#from logger import Loggable
 
 
 from scitos_msgs.srv import EnableMotors
@@ -30,32 +29,33 @@ class NavActionState(smach.State):
     def __init__(self):
         
         smach.State.__init__(self,
-                             outcomes=['succeeded', 'preempted','global_plan_failure','local_plan_failure'],
+                             outcomes=['succeeded', 'preempted','planner_failure'],
                              input_keys=['goal','n_nav_fails',],
                              output_keys=['goal','n_nav_fails'],
                              )
         
-        self.global_plan=None
-        self.last_global_plan_time=rospy.Time(0)
-        self.last_new_action_time=rospy.Time(0)
+        #self.global_plan=None
+        #self.last_global_plan_time=rospy.Time(0)
+        self.last_new_action_in = False
         self.last_new_action_server_name=''
         
-        rospy.Subscriber("/move_base/NavfnROS/plan" , Path, self.global_planner_checker_cb)
+        #rospy.Subscriber("/move_base/NavfnROS/plan" , Path, self.global_planner_checker_cb)
         rospy.Subscriber("/monitored_navigation/goal" ,strands_navigation_msgs.msg.MonitoredNavigationActionGoal, self.new_goal_checker_cb)
         
         
         
-    def global_planner_checker_cb(self,msg):
-        self.global_plan=msg
-        self.last_global_plan_time=rospy.get_rostime()
+    #def global_planner_checker_cb(self,msg):
+        #self.global_plan=msg
+        #self.last_global_plan_time=rospy.get_rostime()
         
         
     def new_goal_checker_cb(self,msg):
-        self.last_new_action_time=rospy.get_rostime()
+        self.last_new_action_in = True
         self.last_new_action_server_name=msg.goal.action_server
         
                                                   
     def execute(self, userdata):
+        self.new_action_in = False
         action_server_name=userdata.goal.action_server
         action_client= actionlib.SimpleActionClient(action_server_name, MoveBaseAction)
         action_client.wait_for_server()
@@ -64,13 +64,11 @@ class NavActionState(smach.State):
         while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:   
             status= action_client.get_state()
             if self.preempt_requested():
-                if rospy.get_rostime()-self.last_new_action_time> rospy.Duration(1):
+                if not self.new_action_in or action_server_name == self.last_new_action_server_name:
                     action_client.cancel_all_goals()
-                    self.service_preempt()
-                    return 'preempted'
-                elif action_server_name == self.last_new_action_server_name:
-                    self.service_preempt()
-                    return 'preempted'
+                self.service_preempt()
+                return 'preempted'
+                
             action_client.wait_for_result(rospy.Duration(0.2))
         
         
@@ -79,13 +77,14 @@ class NavActionState(smach.State):
             return 'succeeded'
         elif status==GoalStatus.PREEMPTED:
             return 'preempted'
-        else:            
-            if (rospy.get_rostime()-self.last_global_plan_time < rospy.Duration(1)) and (self.global_plan.poses == []):
-                userdata.n_nav_fails = 0
-                return 'global_plan_failure'
-            else:
-                userdata.n_nav_fails = userdata.n_nav_fails + 1
-                return 'local_plan_failure'
+        else:
+            return 'planner_failure'
+            #if (rospy.get_rostime()-self.last_global_plan_time < rospy.Duration(1)) and (self.global_plan.poses == []):
+                #userdata.n_nav_fails = 0
+                #return 'global_plan_failure'
+            #else:
+                #userdata.n_nav_fails = userdata.n_nav_fails + 1
+                #return 'local_plan_failure'
         
                  
 
@@ -104,9 +103,11 @@ class RecoverableNav(smach.StateMachine):
     def __init__(self):
         smach.StateMachine.__init__(self, 
                                     outcomes=['succeeded',
-                                              'local_plan_failure',
-                                              'global_plan_failure',
-                                              'preempted'],
+                                              'preempted',
+                                              'recovered_with_help',
+                                              'recovered_without_help',
+                                              'not_recovered_with_help',
+                                              'not_recovered_without_help'],
                                     input_keys=['goal'])
 
         self.userdata.n_nav_fails = 0
@@ -117,9 +118,8 @@ class RecoverableNav(smach.StateMachine):
             smach.StateMachine.add('NAVIGATION',
                                    self._nav_action, 
                                    transitions={'succeeded': 'succeeded',
-                                                'local_plan_failure':  'RECOVER_NAVIGATION_BACKTRACK',
-                                                'global_plan_failure':'global_plan_failure',
-                                                'preempted': 'preempted'}
+                                                'preempted': 'preempted',
+                                                'planner_failure':  'RECOVER_NAVIGATION_BACKTRACK'}
                                    )
             smach.StateMachine.add('RECOVER_NAVIGATION_BACKTRACK',
                                    self._recover_nav_backtrack,  
@@ -128,9 +128,11 @@ class RecoverableNav(smach.StateMachine):
                                                 'preempted':'preempted'})
             smach.StateMachine.add('RECOVER_NAVIGATION_HELP',
                                    self._recover_nav_help,  
-                                   transitions={'succeeded': 'NAVIGATION',
-                                                'failure': 'local_plan_failure',
-                                                'preempted':'preempted'} )
+                                   transitions={'preempted':'preempted',
+                                                'recovered_with_help': 'recovered_with_help',
+                                                'recovered_without_help': 'recovered_without_help',
+                                                'not_recovered_with_help':'not_recovered_with_help',
+                                                'not_recovered_without_help':'not_recovered_without_help'} )
             
     def execute(self, userdata=smach.UserData()):
         outcome = smach.StateMachine.execute(self, userdata)   
@@ -155,13 +157,15 @@ class MonitoredRecoverableNav(smach.Concurrence):
                                                   EnableMotors) 
         
         smach.Concurrence.__init__(self,
-                                   outcomes=['bumper_pressed',
-                                             'succeeded',
-                                             'local_plan_failure',
-                                             'global_plan_failure',
+                                   outcomes=['succeeded',
                                              'preempted',
-                                             'stuck_on_carpet'],
-                                   default_outcome='local_plan_failure',
+                                             'bumper_pressed',
+                                             'stuck_on_carpet',
+                                             'recovered_with_help',
+                                             'recovered_without_help',
+                                             'not_recovered_with_help',
+                                             'not_recovered_without_help'],
+                                   default_outcome='not_recovered_without_help',
                                    child_termination_cb=self.child_term_cb,
                                    outcome_cb=self.out_cb,
                                    input_keys=['goal']
@@ -183,9 +187,11 @@ class MonitoredRecoverableNav(smach.Concurrence):
              outcome_map["STUCK_ON_CARPET_MONITOR"] == "invalid" or
              outcome_map["NAV_PREEMPT_MONITOR"] == "invalid" or             
              outcome_map["NAV_SM"] == "succeeded" or
-             outcome_map['NAV_SM'] == "local_plan_failure" or
-             outcome_map['NAV_SM'] == "global_plan_failure" or
-             outcome_map['NAV_SM'] == "preempted"  ):
+             outcome_map['NAV_SM'] == "preempted"  or
+             outcome_map['NAV_SM'] == 'recovered_with_help'  or
+             outcome_map['NAV_SM'] == 'recovered_without_help'  or
+             outcome_map['NAV_SM'] == 'not_recovered_with_help' or
+             outcome_map['NAV_SM'] == 'not_recovered_without_help'):
             return True
         return False
     
@@ -197,13 +203,18 @@ class MonitoredRecoverableNav(smach.Concurrence):
         if outcome_map["NAV_PREEMPT_MONITOR"] == "invalid":
             return "preempted"
         if outcome_map["NAV_SM"] == "succeeded":
-            return "succeeded"
-        if outcome_map["NAV_SM"] == "local_plan_failure":
-            return "local_plan_failure"
-        if outcome_map["NAV_SM"] == "global_plan_failure":
-            return "global_plan_failure"            
+            return "succeeded"         
         if outcome_map["NAV_SM"] == "preempted":
             return "preempted"
+        if outcome_map["NAV_SM"] == 'recovered_with_help':
+            return 'recovered_with_help'  
+        if outcome_map["NAV_SM"] == 'recovered_without_help':
+            return 'recovered_without_help' 
+        if outcome_map["NAV_SM"] == 'not_recovered_with_help':
+            return 'not_recovered_with_help'  
+        if outcome_map["NAV_SM"] == 'not_recovered_without_help':
+            return 'not_recovered_without_help'  
+
 
         
     
@@ -234,10 +245,12 @@ input_keys:	goal_pose		- move_base_msgs.msg/MoveBaseGoal
 class HighLevelNav(smach.StateMachine):
     def __init__(self):
         smach.StateMachine.__init__(self, outcomes=['succeeded',
-                                                    'nav_local_plan_failure',
-                                                    'nav_global_plan_failure',
-                                                    'bumper_failure',
-                                                    'preempted'],
+                                                    'preempted',
+                                                    'recovered_with_help',
+                                                    'recovered_without_help',
+                                                    'not_recovered_with_help',
+                                                    'not_recovered_without_help'
+                                                    ],
                                           input_keys=['goal'],
                                           output_keys=['result'])
         self._monitored_recoverable_nav = MonitoredRecoverableNav()
@@ -251,34 +264,54 @@ class HighLevelNav(smach.StateMachine):
             smach.StateMachine.add('MONITORED_NAV',
                                    self._monitored_recoverable_nav,
                                    transitions={'bumper_pressed': 'RECOVER_BUMPER',
+                                                'stuck_on_carpet':'RECOVER_STUCK_ON_CARPET',
                                                 'succeeded': 'succeeded',
-                                                'local_plan_failure': 'nav_local_plan_failure',
-                                                'global_plan_failure': 'nav_global_plan_failure',
                                                 'preempted':'preempted',
-                                                'stuck_on_carpet':'RECOVER_STUCK_ON_CARPET'})
+                                                'recovered_with_help':'recovered_with_help',
+                                                'recovered_without_help':'recovered_without_help',
+                                                'not_recovered_with_help':'not_recovered_with_help', 
+                                                'not_recovered_without_help':'not_recovered_without_help'})
             smach.StateMachine.add('RECOVER_BUMPER',
                                    self._recover_bumper,
-                                   transitions={'succeeded': 'MONITORED_NAV',
-                                                'preempted':'preempted',
-                                                'failure':'bumper_failure'})
+                                   transitions={'recovered_with_help':'recovered_with_help',
+                                                'recovered_without_help':'MONITORED_NAV',
+                                                'not_recovered_with_help':'not_recovered_with_help', 
+                                                'not_recovered_without_help':'not_recovered_without_help',
+                                                'preempted':'preempted'})
             smach.StateMachine.add('RECOVER_STUCK_ON_CARPET',
                                    self._recover_carpet,
-                                   transitions={'succeeded': 'MONITORED_NAV',
-                                                'failure': 'RECOVER_STUCK_ON_CARPET',
-                                                'preempted' : 'preempted'})                                                
+                                   transitions={'recovered_with_help':'recovered_with_help',
+                                                'recovered_without_help':'MONITORED_NAV',
+                                                'not_recovered_with_help':'not_recovered_with_help', 
+                                                'not_recovered_without_help':'not_recovered_without_help',
+                                                'preempted':'preempted'})                                              
     
     def termination_cb(self,userdata, terminal_states, outcome):
         userdata.result=MonitoredNavigationResult()
+
+        rospy.logwarn("teste" + terminal_states[0])
+        
         if outcome=='succeeded':
-            userdata.result.sm_outcome=MonitoredNavigationResult().SUCCEEDED
-        if outcome=='bumper_failure':
-            userdata.result.sm_outcome=MonitoredNavigationResult().BUMPER_FAILURE
-        if outcome=='nav_local_plan_failure':
-            userdata.result.sm_outcome=MonitoredNavigationResult().LOCAL_PLANNER_FAILURE
-        if outcome=='nav_global_plan_failure':
-            userdata.result.sm_outcome=MonitoredNavigationResult().GLOBAL_PLANNER_FAILURE
+            userdata.result.outcome='succeeded'
         if outcome=='preempted':
-            userdata.result.sm_outcome=MonitoredNavigationResult().PREEMPTED
+            userdata.result.outcome='preempted'
+        if outcome=='recovered_with_help':
+            userdata.result.outcome= terminal_states[0]
+            userdata.result.recovered=True
+            userdata.result.human_iteraction=True
+        if outcome=='recovered_without_help':
+            userdata.result.outcome= terminal_states[0]
+            userdata.result.recovered=True
+            userdata.result.human_iteraction=False
+        if outcome=='not_recovered_with_help':
+            userdata.result.outcome= terminal_states[0]
+            userdata.result.recovered=False
+            userdata.result.human_iteraction=True
+        if outcome=='not_recovered_without_help':
+            userdata.result.outcome= terminal_states[0]
+            userdata.result.recovered=False
+            userdata.result.human_iteraction=False
+
         
     
     
