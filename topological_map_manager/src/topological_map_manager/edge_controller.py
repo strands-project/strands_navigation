@@ -5,7 +5,6 @@ import rospy
 import math
 import tf
 
-
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 
@@ -22,15 +21,18 @@ class edge_controllers(object):
     def __init__(self, map_name) :
         print "init_controller"
         self.in_feedback=False
-        #self.update_needed=False
-        #self.topo_map = topological_map(map_name)
+        
+        self.map_update = rospy.Publisher('/update_map', std_msgs.msg.Time)
         self._edge_server = InteractiveMarkerServer(map_name+"_edges")
-        #self.update_map(map_name)
 
-    def update_map(self, map_name) :
 
-        self.topo_map = topological_map(map_name)
+    def update_map(self, msg) :
+        print "updating edge controllers..."
+        
+        self.topo_map = topological_map(msg.name, msg=msg)
+        
         self._edge_server.clear()
+        self._edge_server.applyChanges()
         
         for node in self.topo_map.nodes :
             for i in node.edges :
@@ -98,23 +100,13 @@ class edge_controllers(object):
             self._edge_server.setPose( marker.name, pose )
             self._edge_server.applyChanges()
 
-       
-    def reset_update(self) :
-        self.reset_feedback()
-        self.update_needed=False
-
-
-    def reset_feedback(self) :
-        self.in_feedback=False
-
 
     def feedback_cb(self, feedback):
-        if not self.in_feedback and not self.update_needed :
-            self.in_feedback=True
-            self.topo_map.remove_edge(feedback.marker_name)
-            self._edge_server.erase(feedback.marker_name)
-            self._edge_server.applyChanges()
-            self.update_needed=True
+        self.topo_map.remove_edge(feedback.marker_name)
+        self._edge_server.erase(feedback.marker_name)
+        self._edge_server.applyChanges()
+        self.map_update.publish(rospy.Time.now())
+        
     
     def clear():
         self._edge_server.clear()

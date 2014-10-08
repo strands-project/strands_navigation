@@ -35,9 +35,9 @@ class policies_marker(object):
         counter=0
         total = len(self.route_nodes.source)
 
-        print 'updating '+str(total)+' edges'        
+        #print 'updating '+str(total)+' edges'        
         while counter < total :
-            print 'Creating edge '+str(counter) 
+            #print 'Creating edge '+str(counter) 
             inds = self.topo_map._get_node_index(self.route_nodes.source[counter])
             indt = self.topo_map._get_node_index(self.route_nodes.target[counter])
             point1=Point()
@@ -79,7 +79,7 @@ class policies_marker(object):
         marker.scale.x = r
         marker.scale.y = 0.15
         marker.scale.z = 0.15
-        marker.color.a = 1
+        marker.color.a = 0.95
         marker.color.r = 0.1
         marker.color.g = 0.1
         marker.color.b = 0.1
@@ -88,9 +88,9 @@ class policies_marker(object):
 
 
     def received_route(self, route):
-        print "Route Received"
+        #print "Route Received"
         if not self.updating :
-            print "Updating Route"
+            #print "Updating Route"
             self.route_nodes = route
             self.clear()
             self.update_map(self.topo_map)
