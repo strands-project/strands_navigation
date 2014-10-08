@@ -25,6 +25,7 @@ add_message_files(
   NavStatus.msg
   NavStatistics.msg
   TopologicalNode.msg
+  TopologicalMap.msg
   MonitoredNavEvent.msg
   NavRoute.msg
 )
