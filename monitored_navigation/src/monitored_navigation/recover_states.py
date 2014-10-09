@@ -185,7 +185,7 @@ class RecoverNavHelp(smach.State):
                              # incoming data from the move_base action state,
                              # because it is not possible for this recovery
                              # behaviour to check if it was succeeded
-                             outcomes=['succeeded', 'failure', 'preempted'],
+                             outcomes=['recovered_with_help', 'recovered_without_help','not_recovered_with_help', 'not_recovered_without_help', 'preempted'],   
                              input_keys=['goal','n_nav_fails'],
                              output_keys=['goal','n_nav_fails'],
                              )
@@ -229,21 +229,19 @@ class RecoverNavHelp(smach.State):
 
        
         rospy.sleep(0.2)
-        self.isRecovered=False
+        self.is_recovered=False
                 
         self.enable_motors(False)    
         # since there is no way to check if the recovery behaviour was
         # successful, we always go back to the move_base action state with
         # 'succeeded' until the number of failures treshold is reached
         if userdata.n_nav_fails < self.MAX_NAV_RECOVERY_ATTEMPTS:
-            #self.get_logger().log_navigation_recovery_attempt(success=True,
-             #                                                 attempts=userdata.n_move_base_fails)
-             
+
              
            
 
             rospy.sleep(0.2)
-            self.isRecovered=False
+            self.is_recovered=False
                 
             self.enable_motors(False)    
             
@@ -317,13 +315,19 @@ class RecoverNavHelp(smach.State):
             self.nav_stat.event_end_time=rospy.get_rostime()
             self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
             monitored_navigation.mongo_logger.add_event(self.nav_stat)
-            return 'succeeded'
+            if self.nav_stat.was_helped:
+                return 'recovered_with_help'
+            else:
+                return 'recovered_without_help'
         else:
             userdata.n_nav_fails=0
             self.nav_stat.event_end_time=rospy.get_rostime()
             self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
             monitored_navigation.mongo_logger.add_event(self.nav_stat)
-            return 'failure'
+            if self.nav_stat.was_helped:
+                return 'not_recovered_with_help'
+            else:
+                return 'not_recovered_without_help'
 
 
             
@@ -348,7 +352,7 @@ class RecoverNavHelp(smach.State):
 class RecoverBumper(smach.State):
     def __init__(self,max_bumper_recovery_attempts=5):
         smach.State.__init__(self,
-                             outcomes=['succeeded', 'failure', 'preempted']
+                             outcomes=['recovered_with_help', 'recovered_without_help','not_recovered_with_help', 'not_recovered_without_help', 'preempted']
                              )
         self.reset_motorstop = rospy.ServiceProxy('reset_motorstop',
                                                   ResetMotorStop)
@@ -366,8 +370,7 @@ class RecoverBumper(smach.State):
         
 
         
-        self.nav_stat=MonitoredNavEvent()
-        self.nav_stat.recover_mechanism='bumper_recovery'
+
  
         
         self.set_nav_thresholds(max_bumper_recovery_attempts)
@@ -386,7 +389,7 @@ class RecoverBumper(smach.State):
         return []
         
     def bumper_monitor_cb(self, msg):
-        self.isRecovered = not msg.bumper_pressed
+        self.is_recovered = not msg.bumper_pressed
 
     # restarts the motors and check to see of they really restarted.
     # Between each failure the waiting time to try and restart the motors
@@ -401,24 +404,23 @@ class RecoverBumper(smach.State):
         self.help_offered_monitor=rospy.Service('/monitored_navigation/help_offered', Empty, self.help_offered)
         self.help_done_monitor=rospy.Service('/monitored_navigation/help_finished', Empty, self.bumper_recovered)
         
-        self.nav_stat.event_start_time=rospy.get_rostime()
-        self.nav_stat.event_start_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+        nav_stat=MonitoredNavEvent(recover_mechanism='bumper_recovery', event_start_time=rospy.get_rostime(), was_helped=False)
+        nav_stat.event_start_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
         status_msg=rospy.wait_for_message("/monitored_navigation/status", GoalStatusArray , timeout=10.0)
-        self.nav_stat.goal_id=status_msg.status_list[0].goal_id
-        self.nav_stat.was_helped=False
+        nav_stat.goal_id=status_msg.status_list[0].goal_id
         
         n_tries=1
         while True:
             
             if self.preempt_requested():
-                self.nav_stat.event_end_time=rospy.get_rostime()
-                self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                self.nav_stat.n_help_requests=n_tries
-                monitored_navigation.mongo_logger.add_event(self.nav_stat)
+                nav_stat.event_end_time=rospy.get_rostime()
+                nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                nav_stat.n_help_requests=n_tries
+                monitored_navigation.mongo_logger.add_event(nav_stat)
                 self.service_preempt()
                 return 'preempted'
             if self.being_helped:
-                self.nav_stat.was_helped=True
+                nav_stat.was_helped=True
                 self.service_msg.interaction_status=AskHelpRequest.BEING_HELPED
                 self.service_msg.interaction_service='help_finished'
                 try:
@@ -434,7 +436,6 @@ class RecoverBumper(smach.State):
                         #self.service_preempt()
                         #return 'preempted'
                     if self.help_finished:
-                        self.being_helped=False
                         break
                     rospy.sleep(1)
                 if not self.help_finished:
@@ -450,13 +451,13 @@ class RecoverBumper(smach.State):
                 self.reset_motorstop()    
                 rospy.sleep(0.1)
                 if self.preempt_requested():
-                    self.nav_stat.event_end_time=rospy.get_rostime()
-                    self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                    self.nav_stat.n_help_requests=n_tries
-                    monitored_navigation.mongo_logger.add_event(self.nav_stat)
+                    nav_stat.event_end_time=rospy.get_rostime()
+                    nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                    nav_stat.n_help_requests=n_tries
+                    monitored_navigation.mongo_logger.add_event(nav_stat)
                     self.service_preempt()
                     return 'preempted'
-                if self.isRecovered:
+                if self.is_recovered:
                     self.help_done_monitor.shutdown()
                     self.help_offered_monitor.shutdown()
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FINISHED
@@ -465,11 +466,11 @@ class RecoverBumper(smach.State):
                         self.ask_help(self.service_msg)
                     except rospy.ServiceException, e:
                         rospy.logwarn("No means of asking for human help available.")
-                        self.nav_stat.event_end_time=rospy.get_rostime()
-                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                        self.nav_stat.n_help_requests=n_tries
-                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
-                    return 'succeeded' 
+                        nav_stat.event_end_time=rospy.get_rostime()
+                        nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(nav_stat)
+                    return 'recovered_with_help' 
                 else:
                     self.service_msg.interaction_status=AskHelpRequest.HELP_FAILED
                     self.service_msg.interaction_service='help_offered'
@@ -485,13 +486,13 @@ class RecoverBumper(smach.State):
                     self.reset_motorstop()
                     rospy.sleep(0.1)
                     if self.preempt_requested():
-                        self.nav_stat.event_end_time=rospy.get_rostime()
-                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                        self.nav_stat.n_help_requests=n_tries
-                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
+                        nav_stat.event_end_time=rospy.get_rostime()
+                        nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(nav_stat)
                         self.service_preempt()
                         return 'preempted'
-                    if self.isRecovered:
+                    if self.is_recovered:
                         self.help_done_monitor.shutdown()
                         self.help_offered_monitor.shutdown()
                         self.service_msg.interaction_status=AskHelpRequest.HELP_FINISHED
@@ -500,18 +501,24 @@ class RecoverBumper(smach.State):
                             self.ask_help(self.service_msg)
                         except rospy.ServiceException, e:
                             rospy.logwarn("No means of asking for human help available.")
-                        self.nav_stat.event_end_time=rospy.get_rostime()
-                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                        self.nav_stat.n_help_requests=n_tries
-                        monitored_navigation.mongo_logger.add_event(self.nav_stat)
-                        return 'succeeded' 
+                        nav_stat.event_end_time=rospy.get_rostime()
+                        nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(nav_stat)
+                        if nav_stat.was_helped:
+                            return 'recovered_with_help'
+                        else:
+                            return 'recovered_without_help'
                     rospy.sleep(1)
                     if n_tries>self.MAX_BUMPER_RECOVERY_ATTEMPTS:
-                        self.nav_stat.event_end_time=rospy.get_rostime()
-                        self.nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                        self.nav_stat.n_help_requests=n_tries
-                        monitored_navigation.mongo_logger.add_event(self.nav_stat)                        
-                        return 'failure'
+                        nav_stat.event_end_time=rospy.get_rostime()
+                        nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                        nav_stat.n_help_requests=n_tries
+                        monitored_navigation.mongo_logger.add_event(nav_stat)                        
+                        if nav_stat.was_helped:
+                            return 'not_recovered_with_help'
+                        else:
+                            return 'not_recovered_without_help'
                 n_tries += 1
             
        
@@ -524,24 +531,8 @@ class RecoverBumper(smach.State):
                     except rospy.ServiceException, e:
                         rospy.logwarn("No means of asking for human help available.")
 	
-    def service_preempt(self):
-        self.service_msg.interaction_status=AskHelpRequest.HELP_FINISHED
-        self.service_msg.interaction_service='none'
-        try:
-            self.ask_help(self.service_msg)
-        except rospy.ServiceException, e:
-            rospy.logwarn("No means of asking for human help available.")
-        self.help_offered_monitor.shutdown()
-        self.help_done_monitor.shutdown()
-        smach.State.service_preempt(self)            
-            
-   
-            
-            
-    def set_nav_thresholds(self, max_bumper_recovery_attempts):
-        if max_bumper_recovery_attempts is not None:
-            self.MAX_BUMPER_RECOVERY_ATTEMPTS = max_bumper_recovery_attempts
-                
+
+
 
     def service_preempt(self):
         self.service_msg.interaction_status=AskHelpRequest.HELP_FINISHED
@@ -556,12 +547,16 @@ class RecoverBumper(smach.State):
                 
                 
                 
+    def set_nav_thresholds(self, max_bumper_recovery_attempts):
+        if max_bumper_recovery_attempts is not None:
+            self.MAX_BUMPER_RECOVERY_ATTEMPTS = max_bumper_recovery_attempts
+                            
                 
                 
 class RecoverStuckOnCarpet(smach.State):
     def __init__(self):
         smach.State.__init__(self,
-            outcomes    = ['succeeded','failure', 'preempted'])
+            outcomes=['recovered_with_help', 'recovered_without_help','not_recovered_with_help', 'not_recovered_without_help', 'preempted'])
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist)
         self._vel_cmd = Twist()
         
@@ -592,6 +587,6 @@ class RecoverStuckOnCarpet(smach.State):
         
         #check if behaviour was successful       
         if True:     
-            return 'succeeded'
+            return 'recovered_without_help'
         else:
-            return 'failure'
+            return 'not_recovered_with_help'

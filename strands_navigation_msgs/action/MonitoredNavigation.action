@@ -1,10 +1,7 @@
 string action_server
 geometry_msgs/PoseStamped target_pose
 ---
-uint8 SUCCEEDED=0
-uint8 BUMPER_FAILURE=1
-uint8 LOCAL_PLANNER_FAILURE=2
-uint8 GLOBAL_PLANNER_FAILURE=3
-uint8 PREEMPTED=4
-uint8 sm_outcome
+string outcome #'succeeded', 'preempted', 'planner_failure', 'monitor1_failure', ..., 'monitorn_failure'
+bool recovered
+bool human_iteraction
 ---
