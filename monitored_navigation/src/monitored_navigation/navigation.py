@@ -29,7 +29,7 @@ class NavActionState(smach.State):
     def __init__(self):
         
         smach.State.__init__(self,
-                             outcomes=['succeeded', 'preempted','planner_failure'],
+                             outcomes=['succeeded', 'preempted','aborted','planner_failure'],
                              input_keys=['goal','n_nav_fails',],
                              output_keys=['goal','n_nav_fails'],
                              )
@@ -50,7 +50,7 @@ class NavActionState(smach.State):
         
         
     def new_goal_checker_cb(self,msg):
-        self.last_new_action_in = True
+        self.new_action_in = True
         self.last_new_action_server_name=msg.goal.action_server
         
                                                   
@@ -58,13 +58,16 @@ class NavActionState(smach.State):
         self.new_action_in = False
         action_server_name=userdata.goal.action_server
         action_client= actionlib.SimpleActionClient(action_server_name, MoveBaseAction)
-        action_client.wait_for_server()
+        server_active = action_client.wait_for_server(rospy.Duration(10))
+        if not server_active:
+            rospy.logwarn("Action server " + action_server_name + " is not active. Aborting...")
+            return "aborted"            
         action_client.send_goal(userdata.goal)
         status= action_client.get_state()
         while status==GoalStatus.PENDING or status==GoalStatus.ACTIVE:   
             status= action_client.get_state()
             if self.preempt_requested():
-                if not self.new_action_in or action_server_name == self.last_new_action_server_name:
+                if (not self.new_action_in) or (action_server_name != self.last_new_action_server_name):
                     action_client.cancel_all_goals()
                 self.service_preempt()
                 return 'preempted'
@@ -119,6 +122,7 @@ class RecoverableNav(smach.StateMachine):
                                    self._nav_action, 
                                    transitions={'succeeded': 'succeeded',
                                                 'preempted': 'preempted',
+                                                'aborted':'not_recovered_without_help',
                                                 'planner_failure':  'RECOVER_NAVIGATION_BACKTRACK'}
                                    )
             smach.StateMachine.add('RECOVER_NAVIGATION_BACKTRACK',
@@ -288,15 +292,13 @@ class HighLevelNav(smach.StateMachine):
     
     def termination_cb(self,userdata, terminal_states, outcome):
         userdata.result=MonitoredNavigationResult()
-
-        rospy.logwarn("teste" + terminal_states[0])
         
         if outcome=='succeeded':
             userdata.result.outcome='succeeded'
         if outcome=='preempted':
             userdata.result.outcome='preempted'
         if outcome=='recovered_with_help':
-            userdata.result.outcome= terminal_states[0]
+            userdata.result.outcome = terminal_states[0]
             userdata.result.recovered=True
             userdata.result.human_iteraction=True
         if outcome=='recovered_without_help':

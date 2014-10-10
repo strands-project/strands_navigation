@@ -28,7 +28,7 @@ class MonitoredNavigation(ActionServerWrapper):
         
         ActionServerWrapper.__init__(self,
                         'monitored_navigation', MonitoredNavigationAction, self.nav_sm,
-                        ['succeeded'], [ 'recovered_with_help', 'recovered_without_help', 'not_recovered_with_help', 'not_recovered_without_help'], ['preempted'],
+                        ['succeeded'], ['recovered_with_help', 'recovered_without_help', 'not_recovered_with_help', 'not_recovered_without_help'], ['preempted'],
                         goal_key = 'goal', result_key='result'
                         )
     

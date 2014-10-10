@@ -510,16 +510,18 @@ class RecoverBumper(smach.State):
                         else:
                             return 'recovered_without_help'
                     rospy.sleep(1)
-                    if n_tries>self.MAX_BUMPER_RECOVERY_ATTEMPTS:
-                        nav_stat.event_end_time=rospy.get_rostime()
-                        nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-                        nav_stat.n_help_requests=n_tries
-                        monitored_navigation.mongo_logger.add_event(nav_stat)                        
-                        if nav_stat.was_helped:
-                            return 'not_recovered_with_help'
-                        else:
-                            return 'not_recovered_without_help'
+                rospy.logwarn("CHEKING NTRIES. MAX=" + str(self.MAX_BUMPER_RECOVERY_ATTEMPTS))
+                if n_tries>self.MAX_BUMPER_RECOVERY_ATTEMPTS:
+                    nav_stat.event_end_time=rospy.get_rostime()
+                    nav_stat.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+                    nav_stat.n_help_requests=n_tries
+                    monitored_navigation.mongo_logger.add_event(nav_stat)                        
+                    if nav_stat.was_helped:
+                        return 'not_recovered_with_help'
+                    else:
+                        return 'not_recovered_without_help'
                 n_tries += 1
+                rospy.logwarn(n_tries)
             
        
             
