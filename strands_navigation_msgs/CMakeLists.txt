@@ -44,6 +44,7 @@ add_action_files(
 	DIRECTORY action 
 	FILES 
 	MonitoredNavigation.action
+	ExecutePolicyMode.action
 )
 
 
