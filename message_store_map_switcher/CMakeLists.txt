@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   map_server  
   nav_msgs
 #  mongodb_store_cpp_client
+  mongodb_store
   message_generation
 )
 
@@ -112,7 +113,7 @@ add_executable(message_store_map_saver src/message_store_map_saver.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cpp mongodb_store_cpp_client)
-add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cpp)
+add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cpp mongodb_store)
 
 # Specify libraries to link a library or executable target against
 target_link_libraries(message_store_map_saver	
