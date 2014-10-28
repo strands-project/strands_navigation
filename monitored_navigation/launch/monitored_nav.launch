@@ -7,16 +7,13 @@
 
     
     <group if="$(arg human_help)">
-        <node name="human_help_manager" pkg="human_help_manager" type="help_manager.py" output="screen"/>    
+        <node name="human_help_manager" pkg="monitored_navigation" type="help_manager.py" output="screen"/>    
         <include file="$(find nav_help_speech)/launch/help_speech.launch"/>
         <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
     </group>
     
-    <node name="nav_monitor" pkg="monitored_navigation" type="nav_monitor.py" output="screen"/>
-
     <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen">
     </node>
 
-  <!--  <node name="log_services" pkg="waypoint_patroller" type="log_services.py"/> -->
 
 </launch>

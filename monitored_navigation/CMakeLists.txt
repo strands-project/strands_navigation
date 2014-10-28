@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   dynamic_reconfigure 
-  scitos_msgs
   strands_navigation_msgs
 )
 
