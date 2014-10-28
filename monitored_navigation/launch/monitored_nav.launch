@@ -7,7 +7,7 @@
 
     
     <group if="$(arg human_help)">
-        <node name="human_help_manager" pkg="monitored_navigation" type="help_manager.py" output="screen"/>    
+        <node name="human_help_manager" pkg="human_help_manager" type="help_manager.py" output="screen"/>    
         <include file="$(find nav_help_speech)/launch/help_speech.launch"/>
         <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
     </group>
