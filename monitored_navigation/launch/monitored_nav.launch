@@ -12,11 +12,8 @@
         <include file="$(find nav_help_screen)/launch/help_screen.launch"/>
     </group>
     
-    <node name="nav_monitor" pkg="monitored_navigation" type="nav_monitor.py" output="screen"/>
-
     <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen">
     </node>
 
-  <!--  <node name="log_services" pkg="waypoint_patroller" type="log_services.py"/> -->
 
 </launch>

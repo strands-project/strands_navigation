@@ -25,6 +25,7 @@ add_message_files(
   NavStatus.msg
   NavStatistics.msg
   TopologicalNode.msg
+  TopologicalMap.msg
   MonitoredNavEvent.msg
   NavRoute.msg
 )
@@ -43,6 +44,7 @@ add_action_files(
 	DIRECTORY action 
 	FILES 
 	MonitoredNavigation.action
+	ExecutePolicyMode.action
 )
 
 

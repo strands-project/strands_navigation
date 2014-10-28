@@ -2,7 +2,6 @@
 
 import sys
 import rospy
-import actionlib
 
 from dynamic_reconfigure.server import Server
 from monitored_navigation.cfg import NavFailTresholdsConfig
@@ -13,87 +12,47 @@ from move_base_msgs.msg import MoveBaseAction
 from  monitored_navigation.navigation import HighLevelNav
 from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavigationActionGoal
 
+#from strands_recovery_behaviours.recover_bumper_no_help import RecoverBumperNoHelp
+#from strands_recovery_behaviours.recover_bumper import RecoverBumper
+#from strands_recovery_behaviours.monitor_bumper import MonitorBumper
+#from strands_recovery_behaviours.monitor_stuck_on_carpet import MonitorStuckOnCarpet
+#from strands_recovery_behaviours.recover_stuck_on_carpet_no_help import RecoverStuckOnCarpetNoHelp
+#from strands_recovery_behaviours.recover_nav_no_help import RecoverNavNoHelp 
+#from strands_recovery_behaviours.recover_nav import RecoverNav
    
 class MonitoredNavigation(ActionServerWrapper):
 
     def __init__(self):
         
         # Create the main state machine
-        self.nav_sm = HighLevelNav()
-        self.mon_nav_sm=self.nav_sm.get_children()["MONITORED_NAV"]
-        self.low_nav_sm=self.mon_nav_sm.get_children()["NAV_SM"]
+        self.high_level_nav = HighLevelNav()
         
-        self.sis = IntrospectionServer('monitored_navigation_sm', self.nav_sm, '/MON_NAV')
+        
+        #TODO: initialize recovery behaviours via yaml file. Add services for changing recoveries at runtime
+        #recover = RecoverBumper()
+        #monitor=MonitorBumper()
+        
+        #self.high_level_nav.add_monitor_recovery_pair(monitor,recover,"bumper")
+        
+        #monitor=MonitorStuckOnCarpet()
+        #recover=RecoverStuckOnCarpetNoHelp()
+        
+        #self.high_level_nav.add_monitor_recovery_pair(monitor,recover,"stuck_on_carpet")
+        
+        
+        #recover=RecoverNav()
+        #self.high_level_nav.set_nav_recovery(recover)
+        
+        self.sis = IntrospectionServer('monitored_navigation_sm', self.high_level_nav.high_level_sm, '/MON_NAV')
         self.sis.start()
         
         ActionServerWrapper.__init__(self,
-                        'monitored_navigation', MonitoredNavigationAction, self.nav_sm,
-                        ['succeeded'], ['nav_local_plan_failure','nav_global_plan_failure', 'bumper_failure'], ['preempted'],
+                        'monitored_navigation', MonitoredNavigationAction, self.high_level_nav.high_level_sm,
+                        ['succeeded'], ['recovered_with_help', 'recovered_without_help', 'not_recovered_with_help', 'not_recovered_without_help'], ['preempted'],
                         goal_key = 'goal', result_key='result'
                         )
     
-        self.current_action=''
-        self.new_action=''
-        
-        self.action_timeout=2000
-        
-        
 
-        self.srv = Server(NavFailTresholdsConfig, self.reconfigure_callback)
-        
-        rospy.Subscriber("/monitored_navigation/goal" , MonitoredNavigationActionGoal, self.new_goal_checker_cb)
-        
-        
-        
-    def check_nav_executing(self):
-        if "MONITORED_NAV" not in  self.nav_sm.get_active_states() or "NAV_SM" not in self.mon_nav_sm.get_active_states() or "NAVIGATION" not in self.low_nav_sm.get_active_states():
-            return False
-        else:
-            return True
-        
-    def new_goal_checker_cb(self,msg):
-        self.last_new_action_time=rospy.get_rostime()
-        self.new_action=msg.goal.action_server
-        
-
-    def preempt_cb(self):
-        wait_time=0
-        if rospy.get_rostime()-self.last_new_action_time < rospy.Duration(1) and not self.current_action == self.new_action:
-            while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < self.action_timeout:
-                rospy.sleep(0.1)
-                wait_time=wait_time+1
-            action_client=actionlib.SimpleActionClient(self.current_action, MoveBaseAction)
-            action_client.cancel_all_goals()
-        ActionServerWrapper.preempt_cb(self)
-        
-    #def preempt_cb(self):
-        #wait_time=0
-        #overwrite_goals=False
-        #if rospy.get_rostime()-self.last_new_action_time < rospy.Duration(1) and not self.current_action == self.new_action:
-            #while self.nav_sm.is_running() and self.check_nav_executing() and wait_time < self.action_timeout:
-                #if self.current_action == self.new_action:
-                    #overwrite_goals = True
-                    #break
-                #rospy.sleep(0.1)
-                #wait_time=wait_time+1
-            #if not overwrite_goals:
-                #action_client=actionlib.SimpleActionClient(self.current_action, MoveBaseAction)
-                #action_client.cancel_all_goals()
-        #ActionServerWrapper.preempt_cb(self)
-        
-        
-    
-    def execute_cb(self,goal):
-        self.current_action=goal.action_server
-        ActionServerWrapper.execute_cb(self,goal)
-        
-
-     
-     
-    def reconfigure_callback(self, config, level):
-        self.nav_sm.set_nav_thresholds(config.max_bumper_recovery_attempts,config.max_nav_recovery_attempts)
-        return config
-    
     
     
     
