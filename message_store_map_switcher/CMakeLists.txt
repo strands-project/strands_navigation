@@ -7,7 +7,6 @@ project(message_store_map_switcher)
 find_package(catkin REQUIRED COMPONENTS
   map_server  
   nav_msgs
-#  mongodb_store_cpp_client
   mongodb_store
   message_generation
 )
