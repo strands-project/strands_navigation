@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.3 (2014-10-29)
+------------------
 * moving human_help_manager service definition to human_help_manager package
 * Contributors: Bruno Lacerda
 

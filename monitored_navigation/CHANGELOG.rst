@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.3 (2014-10-29)
+------------------
 * adding installation of monitored nav launch file
 * edited launch file for new launch structure of the ui's
 * Contributors: Bruno Lacerda
