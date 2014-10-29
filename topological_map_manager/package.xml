@@ -25,8 +25,8 @@
   <build_depend>actionlib_msgs</build_depend>
   <build_depend>strands_navigation_msgs</build_depend>
   <build_depend>topological_navigation</build_depend>
+  <build_depend>mongodb_store</build_depend>
   <build_depend>visualization_msgs</build_depend>
- 
 
 
   <run_depend>rospy</run_depend>

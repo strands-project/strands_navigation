@@ -118,7 +118,7 @@ catkin_package(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 
-install(PROGRAMS scripts/visualise_map.py
+install(PROGRAMS scripts/visualise_map.py scripts/map_publisher.py
          DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
