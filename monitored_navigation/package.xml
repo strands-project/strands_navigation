@@ -61,7 +61,7 @@
   <run_depend>std_srvs</run_depend>
   <run_depend>strands_navigation_msgs</run_depend>
   <run_depend>move_base_msgs</run_depend>
-  
+  <run_depend>python-yaml</run_depend>
   
 
 
