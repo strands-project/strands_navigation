@@ -31,11 +31,11 @@ add_message_files(
 )
 
 # Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  AskHelp.srv
-  Register.srv
-)
+# add_service_files(
+#   FILES
+#   AskHelp.srv
+#   Register.srv
+# )
 
 
 
