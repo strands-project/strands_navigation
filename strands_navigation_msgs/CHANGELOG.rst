@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2014-10-29)
+------------------
 * Removing TopologicalMap.msg as it may create conflicts with other pull requests
 * Adding Missing TopologicalMap.msg and changing maintainer emails, names and Licences for Packages
 * Moving and renaming Execute Policy Action

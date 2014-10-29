@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2014-10-29)
+------------------
 * correcting help manager include
 * Merge branch 'hydro-devel' of https://github.com/strands-project/strands_navigation into hydro-devel
   Conflicts:

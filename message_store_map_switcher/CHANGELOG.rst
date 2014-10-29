@@ -2,8 +2,8 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2014-10-29)
+------------------
 * deleting comment
 * Merge branch 'hydro-devel' of https://github.com/strands-project/strands_navigation into hydro-devel
   Conflicts:
