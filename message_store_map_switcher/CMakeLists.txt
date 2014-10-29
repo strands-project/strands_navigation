@@ -5,15 +5,19 @@ project(message_store_map_switcher)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  mongodb_store
   map_server  
   nav_msgs
-  mongodb_store
   message_generation
 )
 
-## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS system thread program_options filesystem)
 
+# yaml workaround copied from https://github.com/ros-planning/navigation/blob/hydro-devel/map_server/CMakeLists.txt
+find_package(PkgConfig)
+pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
+if(NEW_YAMLCPP_FOUND)
+add_definitions(-DHAVE_NEW_YAMLCPP)
+endif(NEW_YAMLCPP_FOUND)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -111,16 +115,14 @@ add_executable(message_store_map_saver src/message_store_map_saver.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cpp mongodb_store)
+add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cpp)
 
 # Specify libraries to link a library or executable target against
 target_link_libraries(message_store_map_saver	
     SDL
     SDL_image
-    yaml-cpp
-    mongoclient
+  ${NEW_YAMLCPP_LIBRARIES}    
   ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES}
 )
 
 #############
