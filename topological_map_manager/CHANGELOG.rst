@@ -2,8 +2,13 @@
 Changelog for package topological_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.0.1 (2014-10-29)
+Forthcoming
+-----------
+
+0.0.2 (2014-10-29)
 ------------------
+* 0.0.1
+* added changelogs
 * Adding install targets
 * including visualization_msgs in package xml to sort `#83 <https://github.com/strands-project/strands_navigation/issues/83>`_
 * Adding Missing TopologicalMap.msg and changing maintainer emails, names and Licences for Packages
@@ -50,4 +55,4 @@ Changelog for package topological_map_manager
 * trying bug fix
 * Commiting edge array for statistics
 * Adding Topological_map_manager
-* Contributors: Bruno Lacerda, Christian Dondrup, Jaime Pulido Fentanes, Nick Hawes
+* Contributors: Bruno Lacerda, Christian Dondrup, Jaime Pulido Fentanes, Marc Hanheide, Nick Hawes

@@ -2,8 +2,13 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.0.1 (2014-10-29)
+Forthcoming
+-----------
+
+0.0.2 (2014-10-29)
 ------------------
+* 0.0.1
+* added changelogs
 * deleting comment
 * Merge branch 'hydro-devel' of https://github.com/strands-project/strands_navigation into hydro-devel
   Conflicts:
@@ -25,4 +30,4 @@ Changelog for package message_store_map_switcher
 * Added server node.
 * Added saving to db.
 * Added loading of map from file based on map_server code.
-* Contributors: Bruno Lacerda, Jaime Pulido Fentanes, Nick Hawes
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes, Marc Hanheide, Nick Hawes

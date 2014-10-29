@@ -2,8 +2,16 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.0.1 (2014-10-29)
+Forthcoming
+-----------
+* adding installation of monitored nav launch file
+* edited launch file for new launch structure of the ui's
+* Contributors: Bruno Lacerda
+
+0.0.2 (2014-10-29)
 ------------------
+* 0.0.1
+* added changelogs
 * correcting help manager include
 * Merge branch 'hydro-devel' of https://github.com/strands-project/strands_navigation into hydro-devel
   Conflicts:
@@ -52,4 +60,4 @@ Changelog for package monitored_navigation
 * making human help optional
 * adding manager node for human help interfaces - first version
 * first version of monitored navigation
-* Contributors: BFALacerda, Bob, Bruno Lacerda, Chris Burbridge, Jaime Pulido Fentanes, Lars Kunze, Nick Hawes, Nils Bore, strands
+* Contributors: BFALacerda, Bob, Bruno Lacerda, Chris Burbridge, Jaime Pulido Fentanes, Lars Kunze, Marc Hanheide, Nick Hawes, Nils Bore, strands
