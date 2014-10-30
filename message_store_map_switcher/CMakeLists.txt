@@ -10,15 +10,17 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-# yaml workaround copied from https://github.com/ros-planning/navigation/blob/hydro-devel/map_server/CMakeLists.txt
-find_package(PkgConfig)
-pkg_check_modules(YAMLCPP yaml-cpp>=0.3)
+# yaml workaround adapted from https://github.com/ros-planning/navigation/blob/hydro-devel/map_server/CMakeLists.txt
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.3)
 
-if(NOT (YAMLCPP_VERSION LESS_THAN 0.5))
+
+if(NOT (YAMLCPP_VERSION LESS 0.5))
   add_definitions(-DHAVE_NEW_YAMLCPP)
 endif()
 
-
+find_package(SDL REQUIRED)
+find_package(SDL_image REQUIRED)
 
 # Generate services in the 'srv' folder
 add_service_files (
@@ -51,6 +53,9 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${YAMLCPP_INCLUDE_DIRS}
+  ${SDL_INCLUDE_DIRS}
+  ${SDL_image_INCLUDE_DIRS}
 )
 
 # Declare a cpp executable
@@ -62,9 +67,9 @@ add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cp
 
 # Specify libraries to link a library or executable target against
 target_link_libraries(message_store_map_saver	
-    SDL
-    SDL_image
-  ${YAMLCPP_LIBRARIES}    
+  ${SDL_LIBRARIES}
+  ${SDL_image_LIBRARIES}
+  ${YAMLCPP_LIBRARIES}  
   ${catkin_LIBRARIES}
 )
 
