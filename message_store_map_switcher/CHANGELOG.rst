@@ -2,8 +2,8 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.4 (2014-10-30)
+------------------
 * Lowering acceptable yaml version.
 * Robustifying cmake file.
 * Standardising python parts based on catkin docs.
