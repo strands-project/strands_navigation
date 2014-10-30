@@ -2,6 +2,15 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Lowering acceptable yaml version.
+* Robustifying cmake file.
+* Standardising python parts based on catkin docs.
+* Standardising python parts based on catkin docs.
+* Fixed build for Indigo
+* Contributors: Nick Hawes
+
 0.0.3 (2014-10-29)
 ------------------
 

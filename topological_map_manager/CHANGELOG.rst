@@ -2,6 +2,9 @@
 Changelog for package topological_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.3 (2014-10-29)
 ------------------
 
