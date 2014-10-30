@@ -12,10 +12,11 @@ find_package(catkin REQUIRED COMPONENTS
 
 # yaml workaround copied from https://github.com/ros-planning/navigation/blob/hydro-devel/map_server/CMakeLists.txt
 find_package(PkgConfig)
-pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-if(NEW_YAMLCPP_FOUND)
-add_definitions(-DHAVE_NEW_YAMLCPP)
-endif(NEW_YAMLCPP_FOUND)
+pkg_check_modules(YAMLCPP yaml-cpp>=0.3)
+
+if(NOT (YAMLCPP_VERSION LESS_THAN 0.5))
+  add_definitions(-DHAVE_NEW_YAMLCPP)
+endif()
 
 
 
@@ -63,7 +64,7 @@ add_dependencies(message_store_map_saver mongodb_store_msgs_generate_messages_cp
 target_link_libraries(message_store_map_saver	
     SDL
     SDL_image
-  ${NEW_YAMLCPP_LIBRARIES}    
+  ${YAMLCPP_LIBRARIES}    
   ${catkin_LIBRARIES}
 )
 
