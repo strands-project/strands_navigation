@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 # yaml workaround adapted from https://github.com/ros-planning/navigation/blob/hydro-devel/map_server/CMakeLists.txt
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.3)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.2)
 
 
 if(NOT (YAMLCPP_VERSION LESS 0.5))
