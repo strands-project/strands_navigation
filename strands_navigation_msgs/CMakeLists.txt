@@ -30,12 +30,14 @@ add_message_files(
   NavRoute.msg
 )
 
-# Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   AskHelp.srv
-#   Register.srv
-# )
+#Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  AddMonitorRecoveryPair.srv
+  DelMonitorRecoveryPair.srv
+  SetMonitorRecoveryPairs.srv
+  SetNavRecovery.srv
+)
 
 
 

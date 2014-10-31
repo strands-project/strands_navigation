@@ -1,0 +1,9 @@
+#all vectors should have the same length. monitor_class must be of class monitored_navigation.monitor_state.MonitorState and recovery_class of class monitored_navigation.recover_state_machine.RecoverStateMachine
+string[] names
+string[] packages
+string[] monitor_files
+string[] monitor_classes
+string[] recovery_files
+string[] recovery_classes
+---
+bool success

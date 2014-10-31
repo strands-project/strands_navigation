@@ -129,9 +129,8 @@ class RecoverableNav:
         
     def set_nav_recovery(self,recover_sm):
         if not isinstance(recover_sm,RecoverStateMachine):
-            rospy.logerr("The navigation recovery state machine needs to be an instantiation of the RecoverStateMachine class")
+            rospy.logwarn("The navigation recovery state machine needs to be an instantiation of the RecoverStateMachine class")
             return
-        print "ADDING"
         self.init_nav_sm(recover_sm)
             
   
@@ -148,7 +147,7 @@ input keys:	goal_pose
 class MonitoredRecoverableNav:
     def __init__(self):
         self.recoverable_nav=RecoverableNav()
-        self.monitor_list=[]
+        self.monitor_list={}
         self.monitored_cc=None
         self.init_monitored_cc()
         
@@ -174,29 +173,38 @@ class MonitoredRecoverableNav:
                                    )
         with self.monitored_cc:
             smach.Concurrence.add('NAV_SM', self.recoverable_nav.nav_sm)
-            for monitor in self.monitor_list:
-                smach.Concurrence.add(monitor.name, monitor)
-                self.monitored_cc.register_outcomes([monitor.name+"_fail"])
+            for name, monitor in self.monitor_list.iteritems():
+                smach.Concurrence.add(name, monitor)
+                self.monitored_cc.register_outcomes([name+"_fail"])
                                    
                                    
-    def add_monitor(self, monitor_sm):
+    def add_monitor(self, monitor_sm, name):
         if not isinstance(monitor_sm,MonitorState):
-            rospy.logerr("The navigation recovery state machine needs to be an instantiation of the RecoverStateMachine class")
+            rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class")
             return
-            
-        self.monitor_list.append(monitor_sm)
+        if name in self.monitor_list:
+            rospy.logwarn("There already exists a monitor named " + name)
+            return
+        self.monitor_list[name]=monitor_sm
         self.init_monitored_cc()
         
         
-            
-
-            
+    def del_monitor(self, name):
+        del(self.monitor_list[name])
+        self.init_monitored_cc()
+        
+        
+    def set_monitors(self, monitor_list, name_list):
+        self.monitor_list={}
+        for name, monitor in zip(name_list, monitor_list):
+            self.monitor_list[name]=monitor
+        self.init_monitored_cc()
     
     def child_term_cb(self, outcome_map):
         # decide if this state is done when one or more concurrent inner states 
         # stop
-        for monitor in self.monitor_list:
-            if  outcome_map[monitor.name] == 'invalid':
+        for name, monitor in self.monitor_list.iteritems():
+            if  outcome_map[name] == 'invalid':
                 return True
         if ( outcome_map["NAV_SM"] == "succeeded" or
              outcome_map['NAV_SM'] == "preempted"  or
@@ -208,9 +216,9 @@ class MonitoredRecoverableNav:
         return False
     
     def out_cb(self, outcome_map):
-        for monitor in self.monitor_list:
-            if  outcome_map[monitor.name] == 'invalid':
-                return monitor.name+"_fail"
+        for name, monitor in self.monitor_list.iteritems():
+            if  outcome_map[name] == 'invalid':
+                return name+"_fail"
         if outcome_map["NAV_SM"] == "succeeded":
             return "succeeded"         
         if outcome_map["NAV_SM"] == "preempted":
@@ -254,7 +262,7 @@ input_keys:	goal_pose		- move_base_msgs.msg/MoveBaseGoal
 class HighLevelNav:
     def __init__(self):
         self.monitored_recoverable_nav = MonitoredRecoverableNav()
-        self.recovery_list=[]
+        self.recovery_list={}
         self.high_level_sm=None
         self.init_high_level_sm()
         
@@ -281,9 +289,9 @@ class HighLevelNav:
                                'recovered_without_help':'recovered_without_help',
                                'not_recovered_with_help':'not_recovered_with_help', 
                                'not_recovered_without_help':'not_recovered_without_help'}
-            for recover_sm in self.recovery_list:
-                nav_transitions[recover_sm.name+"_fail"]=recover_sm.name+"_recover"
-                smach.StateMachine.add(recover_sm.name+"_recover",
+            for name, recover_sm in self.recovery_list.iteritems():
+                nav_transitions[name+"_fail"]=name+"_recover"
+                smach.StateMachine.add(name+"_recover",
                                     recover_sm,
                                     transitions={'recovered_with_help':'recovered_with_help',
                                                 'recovered_without_help':'MONITORED_NAV',
@@ -302,26 +310,59 @@ class HighLevelNav:
    
    
     def set_nav_recovery(self,recover_sm):
+        if not isinstance(recover_sm,RecoverStateMachine):
+            rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class")
+            return  False
         self.monitored_recoverable_nav.set_nav_recovery(recover_sm)
         self.init_high_level_sm()
+        return True
         
-        
-    def add_monitor(self,monitor):
-        self.monitored_recoverable_nav.add_monitor(monitor)
-        
-    def add_recovery_sm(self,recover_sm):
+   
+    def add_monitor_recovery_pair(self, monitor,recover_sm, name):
         if not isinstance(recover_sm,RecoverStateMachine):
-            rospy.logerr("The navigation recovery state machine needs to be an instantiation of the RecoverStateMachine class")
-            return  
-        self.recovery_list.append(recover_sm)
-       
-        
-    def add_monitor_recovery_pair(self, monitor,recovery_sm, name):
-        monitor.name=name
-        recovery_sm.name=name
-        self.add_monitor(monitor)
-        self.add_recovery_sm(recovery_sm)
+            rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class")
+            return  False
+        if not isinstance(monitor,MonitorState):
+            rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class")
+            return False
+        if name in self.recovery_list:
+            rospy.logwarn("There already exists a recovery behaviour named " + name)
+            return False
+        self.monitored_recoverable_nav.add_monitor(monitor, name)
+        self.recovery_list[name]=recover_sm
         self.init_high_level_sm()
+        return True
+        
+    def del_monitor_recovery_pair(self, name):
+        if name not in self.recovery_list:
+            rospy.logwarn("There is no recovery state machine with name " + name)
+            return False
+        if name not in self.monitored_recoverable_nav.monitor_list:
+            rospy.logwarn("There is no monitor state with name " + name)
+            return False
+        self.monitored_recoverable_nav.del_monitor(name)
+        del(self.recovery_list[name])
+        self.init_high_level_sm()
+        return True
+        
+    def set_monitor_recovery_pairs(self, monitor_list, recovery_list, name_list):
+        if (len(name_list) != len(monitor_list)) or (len(name_list) != len(recovery_list)):
+            rospy.logwarn("There needs to be a one-to-one correspondence between names, monitors and recoveries.")
+            return  False
+        for monitor in monitor_list:
+            if not isinstance(monitor,MonitorState):
+                rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class")
+                return  False
+        for recovery in recovery_list:
+            if not isinstance(recovery,RecoverStateMachine):
+                rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class")
+                return  False
+        self.monitored_recoverable_nav.set_monitors(monitor_list, name_list)
+        self.recovery_list={}
+        for name, recovery in zip(name_list, recovery_list):
+            self.recovery_list[name]=recovery
+        self.init_high_level_sm()
+        return  True
     
     
 
