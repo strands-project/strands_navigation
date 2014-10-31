@@ -2,6 +2,7 @@
     <arg name="strands_human_help" default="true" />
 	<arg name="machine" default="localhost" />
 	<arg name="user" default="" />
+	<arg name="config_file" default="none"/>
 
 	<machine name="$(arg machine)" address="$(arg machine)" env-loader="/opt/strands/strands_catkin_ws/devel/env.sh" user="$(arg user)" default="true"/>    
 
@@ -10,7 +11,7 @@
         <include file="$(find human_help_manager)/launch/strands_help_nodes.launch"/>   
     </group>
     
-    <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen">
+    <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen" args="$(arg config_file)" >
     </node>
 
 

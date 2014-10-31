@@ -1,0 +1,6 @@
+#recovery_class of class monitored_navigation.recover_state_machine.RecoverStateMachine
+string package
+string recovery_file
+string recovery_class
+---
+bool success

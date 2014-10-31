@@ -6,7 +6,6 @@ import smach
 
 class RecoverStateMachine(smach.StateMachine):
     def __init__(self, input_keys=[], output_keys=[]):
-            self.name=None
             smach.StateMachine.__init__(self, 
                                     outcomes=['succeeded',
                                               'preempted',
