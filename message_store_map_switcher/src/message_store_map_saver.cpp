@@ -7,7 +7,16 @@
 #include <libgen.h>
 #include <fstream>
 
-
+//copied from https://github.com/ros-planning/navigation/blob/hydro-devel/map_server
+#ifdef HAVE_NEW_YAMLCPP
+// The >> operator disappeared in yaml-cpp 0.5, so this function is
+// added to provide support for code written under the yaml-cpp 0.3 API.
+template<typename T>
+void operator >> (const YAML::Node& node, T& i)
+{
+  i = node.as<T>();
+}
+#endif
 
 
 using namespace mongodb_store;
@@ -40,9 +49,15 @@ void loadMapFromFile(ros::NodeHandle & private_nh,
 	  exit(-1);
 	}
 
-	YAML::Parser parser(fin);   
-	YAML::Node doc;
-	parser.GetNextDocument(doc);
+
+#ifdef HAVE_NEW_YAMLCPP
+        // The document loading process changed in yaml-cpp 0.5.
+        YAML::Node doc = YAML::Load(fin);
+#else
+        YAML::Parser parser(fin);
+        YAML::Node doc;
+        parser.GetNextDocument(doc);
+#endif
 	
 	try { 
 	  doc["resolution"] >> res; 

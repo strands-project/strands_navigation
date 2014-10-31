@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>topological_utils</name>
-  <version>0.0.0</version>
+  <version>0.0.4</version>
   <description>The topological_utils package</description>
 
   <maintainer email="jpulidofentanes@lincoln.ac.uk">Jaime Pulido Fentanes</maintainer>
@@ -17,6 +17,7 @@
   <build_depend>rospy</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>geometry_msgs</build_depend>
+  <build_depend>mongodb_store</build_depend>
   <build_depend>visualization_msgs</build_depend>
 
   <run_depend>rospy</run_depend>
