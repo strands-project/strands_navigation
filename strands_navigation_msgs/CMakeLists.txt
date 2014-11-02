@@ -28,6 +28,8 @@ add_message_files(
   TopologicalMap.msg
   MonitoredNavEvent.msg
   NavRoute.msg
+  Edge.msg
+  Vertex.msg
 )
 
 #Generate services in the 'srv' folder
