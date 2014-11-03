@@ -1,0 +1,17 @@
+<!-- Launch file for the default STRANDS monitored navigation state machine, with human help included -->
+<launch>
+    <arg name="strands_human_help" default="true" />
+    <arg name="machine" default="localhost" />
+    <arg name="user" default="" />
+    <arg name="config_file" default="$(find monitored_navigation)/config/strands.yaml"/>
+
+    <machine name="$(arg machine)" address="$(arg machine)" env-loader="/opt/strands/strands_catkin_ws/devel/env.sh" user="$(arg user)" default="true"/>    
+    
+    <group if="$(arg strands_human_help)">
+        <include file="$(find human_help_manager)/launch/strands_help_nodes.launch"/>   
+    </group>
+    
+    <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen" args="$(arg config_file)" ></node>
+
+
+</launch>
