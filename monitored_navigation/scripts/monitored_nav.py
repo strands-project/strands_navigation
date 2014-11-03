@@ -1,11 +1,7 @@
 #! /usr/bin/env python
-
 import sys
 import yaml
 import rospy
-
-from dynamic_reconfigure.server import Server
-from monitored_navigation.cfg import NavFailTresholdsConfig
 
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from move_base_msgs.msg import MoveBaseAction
@@ -184,7 +180,7 @@ if __name__ == '__main__':
     rospy.init_node('monitored_navigation')
     
     if len(sys.argv) < 2:
-        rospy.logwarn("No config yaml file provided. MonitoredNavigation state machine will be initialized without recovery behaviours. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
+        rospy.logwarn("No config yaml file provided. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
         file_name=None
     else:
         file_name=sys.argv[1]

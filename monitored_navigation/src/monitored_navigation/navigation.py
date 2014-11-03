@@ -119,14 +119,8 @@ class RecoverableNav:
                                                 'recovered_without_help': 'recovered_without_help',
                                                 'not_recovered_with_help':'not_recovered_with_help',
                                                 'not_recovered_without_help':'not_recovered_without_help'} )
-                                                
-        
-        #self.nav_sm.register_start_cb(self.start_cb)
-        
-    #def start_cb(self,userdata,active_states):
-        #self.nav_sm.userdata.n_nav_fails=0
-    
-        
+
+ 
     def set_nav_recovery(self,recover_sm):
         if not isinstance(recover_sm,RecoverStateMachine):
             rospy.logwarn("The navigation recovery state machine needs to be an instantiation of the RecoverStateMachine class")
@@ -232,17 +226,6 @@ class MonitoredRecoverableNav:
         if outcome_map["NAV_SM"] == 'not_recovered_without_help':
             return 'not_recovered_without_help'  
 
-
-        
-    
-    
-    
-    #""" 
-    #Set the battery level thresholds.
-    #"""
-    #def set_nav_thresholds(self,max_bumper_recovery_attempts,max_nav_recovery_attempts):
-        #self.recoverable_nav.set_nav_thresholds(max_nav_recovery_attempts)
-    
 
 
 
@@ -390,12 +373,3 @@ class HighLevelNav:
             userdata.result.recovered=False
             userdata.result.human_iteraction=False
 
-        
-    
-    
-    #""" 
-    #Set the battery level thresholds.
-    #"""
-    #def set_nav_thresholds(self, max_bumper_recovery_attempts,max_nav_recovery_attempts):
-        #self.monitored_recoverable_nav.set_nav_thresholds(max_bumper_recovery_attempts,max_nav_recovery_attempts)
-    
