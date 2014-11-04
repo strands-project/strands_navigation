@@ -1,19 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(joy_map_saver)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp rospy sensor_msgs std_msgs message_generation)
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
 
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/groovy/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
 
 #######################################
 ## Declare ROS messages and services ##
@@ -63,16 +53,16 @@ include_directories(include
 # )
 
 ## Declare a cpp executable
- add_executable(ap_map_saver src/ap_map_saver.cpp)
+ add_executable(joy_map_saver src/ap_map_saver.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 
-add_dependencies(ap_map_saver joy_map_saver_gencpp)
+add_dependencies(joy_map_saver joy_map_saver_gencpp)
 
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(ap_map_saver
+ target_link_libraries(joy_map_saver
    ${catkin_LIBRARIES}
    ${scitos_teleop_LIBRARIES}
  )
@@ -81,22 +71,11 @@ add_dependencies(ap_map_saver joy_map_saver_gencpp)
 ## Install ##
 #############
 
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/groovy/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS map_saver map_saver_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ install(TARGETS joy_map_saver
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -106,11 +85,9 @@ add_dependencies(ap_map_saver joy_map_saver_gencpp)
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
