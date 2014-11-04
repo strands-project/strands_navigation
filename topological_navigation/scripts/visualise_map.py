@@ -23,14 +23,14 @@ from visualization_msgs.msg import *
 
 from strands_navigation_msgs.msg import TopologicalNode
 from topological_navigation.topological_map import *
-from topological_map_manager.marker_arrays import *
-from topological_map_manager.node_controller import *
-from topological_map_manager.edge_controller import *
-from topological_map_manager.vertex_controller import *
-from topological_map_manager.node_manager import *
-from topological_map_manager.edge_std import *
-from topological_map_manager.policies import *
-from topological_map_manager.goto import *
+from topological_navigation.marker_arrays import *
+from topological_navigation.node_controller import *
+from topological_navigation.edge_controller import *
+from topological_navigation.vertex_controller import *
+from topological_navigation.node_manager import *
+from topological_navigation.edge_std import *
+from topological_navigation.policies import *
+from topological_navigation.goto import *
 from strands_navigation_msgs.msg import NavRoute
 
 from strands_navigation_msgs.msg import TopologicalMap

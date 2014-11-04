@@ -9,9 +9,6 @@ from strands_navigation_msgs.msg import TopologicalNode
 from strands_navigation_msgs.msg import TopologicalMap
 
 from mongodb_store.message_store import MessageStoreProxy
-#from ros_datacentre.message_store import MessageStoreProxy
-
-
 
 class map_publisher(object):
 
@@ -19,7 +16,7 @@ class map_publisher(object):
     def __init__(self, name) :
         self.name = name
         self.nodes = self.loadMap(name)
-        self.map_pub = rospy.Publisher('/topological_map', TopologicalMap, latch=True)
+        self.map_pub = rospy.Publisher('/topological_map', TopologicalMap, latch=True, queue_size=1)
         self.last_updated = rospy.Time.now()
         self.map_pub.publish(self.nodes)
         rospy.Subscriber('/update_map', std_msgs.msg.Time, self.updateCallback)
@@ -64,11 +61,3 @@ class map_publisher(object):
                 points.nodes.append(b)
                 
             return points
-
-
-
-if __name__ == '__main__' :
-    point_set = sys.argv[1]
-    rospy.init_node("topological_map_publisher")
-    ps = map_publisher(point_set)
-    rospy.spin()
