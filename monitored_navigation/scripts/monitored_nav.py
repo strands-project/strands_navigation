@@ -1,11 +1,7 @@
 #! /usr/bin/env python
-
 import sys
 import yaml
 import rospy
-
-from dynamic_reconfigure.server import Server
-from monitored_navigation.cfg import NavFailTresholdsConfig
 
 from smach_ros import ActionServerWrapper, IntrospectionServer
 from move_base_msgs.msg import MoveBaseAction
@@ -29,7 +25,6 @@ class MonitoredNavigation:
         self.high_level_nav = HighLevelNav()
         
         
-        #TODO: Only allow addition of services if action server is NOT running
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/add_monitor_recovery_pair', AddMonitorRecoveryPair, self.add_monitor_recovery_pair_cb)
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/del_monitor_recovery_pair', DelMonitorRecoveryPair, self.del_monitor_recovery_pair_cb)
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/set_monitor_recovery_pairs', SetMonitorRecoveryPairs, self.set_monitor_recovery_pairs_cb)
@@ -80,6 +75,9 @@ class MonitoredNavigation:
         
         
     def add_monitor_recovery_pair_cb(self, req):
+        if self.as_wrapper.wrapped_container.is_running():
+            rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
+            return False
         monitor=self.create_object(req.package, req.monitor_file, req.monitor_class)
         recovery=self.create_object(req.package, req.recovery_file, req.recovery_class)
         if not isinstance(monitor,MonitorState):
@@ -96,12 +94,18 @@ class MonitoredNavigation:
 
         
     def del_monitor_recovery_pair_cb(self, req):
+        if self.as_wrapper.wrapped_container.is_running():
+            rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
+            return False
         removed=self.high_level_nav.del_monitor_recovery_pair(req.name)
         if removed:
             self.reinit_as()
         return removed
         
     def set_monitor_recovery_pairs_cb(self, req):
+        if self.as_wrapper.wrapped_container.is_running():
+            rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
+            return False
         size=len(req.names)
         if size != len(req.packages):
             rospy.logwarn("Length of names list and packages list does not match. Monitor and recovery behaviours will remain the same.")
@@ -146,6 +150,9 @@ class MonitoredNavigation:
             
 
     def set_nav_recovery_cb(self, req):
+        if self.as_wrapper.wrapped_container.is_running():
+            rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
+            return False
         recovery=self.create_object(req.package, req.recovery_file, req.recovery_class)
         if not isinstance(recovery,RecoverStateMachine):
             rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class. Nav Recovery will not be set.")
@@ -172,8 +179,8 @@ class MonitoredNavigation:
 if __name__ == '__main__':
     rospy.init_node('monitored_navigation')
     
-    if len(sys.argv) < 2 or sys.argv[1]=="none":
-        rospy.logwarn("No config yaml file provided. MonitoredNavigation state machine will be initialized without recovery behaviours. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
+    if len(sys.argv) < 2:
+        rospy.logwarn("No config yaml file provided. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
         file_name=None
     else:
         file_name=sys.argv[1]
