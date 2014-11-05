@@ -16,3 +16,9 @@ monitor_recovery_pairs:
         monitor_class: MonitorStuckOnCarpet
         recovery_file: recover_stuck_on_carpet_no_help
         recovery_class: RecoverStuckOnCarpetNoHelp
+    -   name: pause_nav
+        package: strands_recovery_behaviours
+        monitor_file: monitor_pause
+        monitor_class: MonitorPause
+        recovery_file: pause_state
+        recovery_class: PauseState

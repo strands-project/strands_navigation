@@ -11,6 +11,8 @@
         <include file="$(find human_help_manager)/launch/strands_help_nodes.launch"/>   
     </group>
     
+    <include file="$(find backtrack_behaviour)/launch/backtrack.launch"/>
+    
     <node name="monitored_nav" pkg="monitored_navigation" type="monitored_nav.py" output="screen" args="$(arg config_file)" ></node>
 
 
