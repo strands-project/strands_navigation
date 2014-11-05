@@ -2,8 +2,8 @@
 Changelog for package joy_map_saver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.5 (2014-11-05)
+------------------
 * adding install targets renaming executables
 * bug fix
 * Adding licences and bug fix

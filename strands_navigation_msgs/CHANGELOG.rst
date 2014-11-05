@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.5 (2014-11-05)
+------------------
 * Adding licences and bug fix
 * Removed topological_utils dependency.
 * Moved Vertex and Edge into strands_navigation_msgs.
