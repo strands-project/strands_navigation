@@ -68,17 +68,14 @@ catkin_package(
    scripts/LoadPointSet.py
    scripts/map_collection_change.py
    scripts/map_export.py
-   scripts/menu_test.py
    scripts/node_rm.py
    scripts/rm_map_from_db.py
    scripts/tmap_from_waypoints.py
+   scripts/joy_add_node.py
    scripts/dummy_topological_navigation
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
-install(DIRECTORY launch
-   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-)
 
 
 ## Mark executables and/or libraries for installation
@@ -94,6 +91,14 @@ install(DIRECTORY launch
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
 # )
+
+install(DIRECTORY launch
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY support
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/support
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
