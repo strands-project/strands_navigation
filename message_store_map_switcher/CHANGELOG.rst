@@ -2,6 +2,11 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.5 (2014-11-05)
+------------------
+* Adding licences and bug fix
+* Contributors: Jaime Pulido Fentanes
+
 0.0.4 (2014-10-30)
 ------------------
 * Lowering acceptable yaml version.

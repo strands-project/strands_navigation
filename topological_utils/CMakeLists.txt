@@ -8,24 +8,6 @@ find_package(catkin REQUIRED rospy roscpp std_msgs geometry_msgs message_generat
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   Edge.msg
-   Vertex.msg
- )
-
-
-## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs
-   geometry_msgs
- )
 
 
 ###################################
@@ -86,10 +68,11 @@ catkin_package(
    scripts/LoadPointSet.py
    scripts/map_collection_change.py
    scripts/map_export.py
-   scripts/menu_test.py
    scripts/node_rm.py
    scripts/rm_map_from_db.py
    scripts/tmap_from_waypoints.py
+   scripts/joy_add_node.py
+   scripts/dummy_topological_navigation
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
@@ -108,6 +91,14 @@ catkin_package(
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
 # )
+
+install(DIRECTORY launch
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY support
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/support
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES

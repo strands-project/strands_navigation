@@ -2,6 +2,17 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.5 (2014-11-05)
+------------------
+* Adding licences and bug fix
+* Removed topological_utils dependency.
+* Moved Vertex and Edge into strands_navigation_msgs.
+  Basic test for travel_time_tester passes.
+* Merge topological_navigation and topological_map_manager packages.
+  Added the EstimateTravelTime service to provide a clean way of getting travel times of the topological map.
+* added service definitions for adding and removing monitor and help states to the overall monitored nav state machine
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes, Nick Hawes
+
 0.0.4 (2014-10-30)
 ------------------
 

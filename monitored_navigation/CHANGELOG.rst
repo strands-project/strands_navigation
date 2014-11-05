@@ -2,6 +2,25 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.5 (2014-11-05)
+------------------
+* Adding licences and bug fix
+* edited readme
+* code cleaning
+* created strands-specific launch file
+* monitors and recoveries can only be added when action server is not running
+  Signed-off-by: Bruno Lacerda <b.lacerda@cs.bham.ac.uk>
+* edit readme (to be extended later)
+* added service definitions for adding and removing monitor and help states to the overall monitored nav state machine
+* Merge branch 'hydro-devel' of https://github.com/strands-project/strands_navigation into hydro-devel
+* added strands specific config yaml
+* monitor and recovery states are now defined via a config yaml file.
+* Merge branch 'target' into hydro-devel
+  Conflicts:
+  monitored_navigation/CMakeLists.txt
+* adding monitored nav launch to targets
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes
+
 0.0.4 (2014-10-30)
 ------------------
 
