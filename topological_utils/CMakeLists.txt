@@ -76,6 +76,11 @@ catkin_package(
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
+# Mark other files for installation (e.g. launch and bag files, etc.)
+install(
+  DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 
 ## Mark executables and/or libraries for installation
@@ -93,11 +98,11 @@ catkin_package(
 # )
 
 install(DIRECTORY launch
-   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 install(DIRECTORY support
-   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/support
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
