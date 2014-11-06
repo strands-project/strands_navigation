@@ -2,6 +2,12 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add backtrack action server launch to monitored navigation launch
+* update strands config to add a monitored nav pause monitor
+* Contributors: Bruno Lacerda
+
 0.0.5 (2014-11-05)
 ------------------
 * Adding licences and bug fix
