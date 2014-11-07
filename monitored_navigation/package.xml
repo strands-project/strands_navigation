@@ -61,7 +61,7 @@
   <run_depend>strands_navigation_msgs</run_depend>
   <run_depend>move_base_msgs</run_depend>
   <run_depend>python-yaml</run_depend>
-  
+  <run_depend>human_help_manager</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
