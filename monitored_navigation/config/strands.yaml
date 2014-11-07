@@ -22,3 +22,12 @@ monitor_recovery_pairs:
         monitor_class: MonitorPause
         recovery_file: pause_state
         recovery_class: PauseState
+human_help:
+    -   name: speech
+        package: strands_human_help
+        helper_file: help_speech
+        helper_class: HelpSpeech
+    -   name: screen
+        package: strands_human_help
+        helper_file: help_screen
+        helper_class: HelpScreen
