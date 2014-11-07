@@ -82,7 +82,6 @@ class MonitoredNavigation:
     
     def add_helper_cb(self, req):
         helper=self.create_object(req.package, req.helper_file, req.helper_class)
-        print helper
         if not isinstance(helper,UIHelper):
             rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Helper with name " + req.name + " will not be added.")
             return False
