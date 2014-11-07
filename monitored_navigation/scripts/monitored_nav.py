@@ -38,27 +38,8 @@ class MonitoredNavigation:
         
         
         if file_name is not None:
-            stream = open(file_name, 'r')
-            yaml_config=yaml.load(stream)
-            recovery_dict=yaml_config["nav_recovery"]
-            recovery=self.create_object(recovery_dict["package"], recovery_dict["recovery_file"], recovery_dict["recovery_class"])
-            if isinstance(recovery,RecoverStateMachine):
-                self.high_level_nav.set_nav_recovery(recovery)
-            else:
-                rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class. Nav Recovery will not be added to state machine.")
+            self.load_yaml_config(file_name)
             
-
-
-            monitor_recovery_pairs=yaml_config["monitor_recovery_pairs"]
-            for monitor_recovery_pair in monitor_recovery_pairs:
-                monitor=self.create_object(monitor_recovery_pair["package"], monitor_recovery_pair["monitor_file"], monitor_recovery_pair["monitor_class"])
-                recovery=self.create_object(monitor_recovery_pair["package"], monitor_recovery_pair["recovery_file"], monitor_recovery_pair["recovery_class"])
-                if not isinstance(monitor,MonitorState):
-                    rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class. Monitor/Recovery pair with name " + monitor_recovery_pair["name"] + " will not be added to state machine.")
-                elif not isinstance(recovery,RecoverStateMachine):
-                    rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class. Monitor/Recovery pair with name " + monitor_recovery_pair["name"] + " will not be added to state machine.")
-                else:
-                    self.high_level_nav.add_monitor_recovery_pair(monitor, recovery, monitor_recovery_pair["name"])
         
         if self.smach_viewer:
             self.sis = IntrospectionServer('monitored_navigation_sm', self.high_level_nav.high_level_sm, '/MON_NAV')
@@ -69,6 +50,49 @@ class MonitoredNavigation:
                         goal_key = 'goal', result_key='result'
                         )
         self.as_wrapper.run_server()
+        
+    def load_yaml_config(self, file_name):    
+        stream = open(file_name, 'r')
+        yaml_config=yaml.load(stream)
+        
+        #set nav recovery
+        if "nav_recovery" in yaml_config:
+            recovery_dict=yaml_config["nav_recovery"]
+            recovery=self.create_object(recovery_dict["package"], recovery_dict["recovery_file"], recovery_dict["recovery_class"])
+            if isinstance(recovery,RecoverStateMachine):
+                self.high_level_nav.set_nav_recovery(recovery)
+            else:
+                rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class. Nav Recovery will not be added to state machine.")
+        else:
+            rospy.logwarn("No nav recovery provided.")
+        
+        #set monitor/recovery pairs
+        if "monitor_recovery_pairs" in yaml_config:
+            monitor_recovery_pairs=yaml_config["monitor_recovery_pairs"]
+            for monitor_recovery_pair in monitor_recovery_pairs:
+                monitor=self.create_object(monitor_recovery_pair["package"], monitor_recovery_pair["monitor_file"], monitor_recovery_pair["monitor_class"])
+                recovery=self.create_object(monitor_recovery_pair["package"], monitor_recovery_pair["recovery_file"], monitor_recovery_pair["recovery_class"])
+                if not isinstance(monitor,MonitorState):
+                    rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class. Monitor/Recovery pair with name " + monitor_recovery_pair["name"] + " will not be added to state machine.")
+                elif not isinstance(recovery,RecoverStateMachine):
+                    rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class. Monitor/Recovery pair with name " + monitor_recovery_pair["name"] + " will not be added to state machine.")
+                else:
+                    self.high_level_nav.add_monitor_recovery_pair(monitor, recovery, monitor_recovery_pair["name"])
+        else:
+            rospy.logwarn("No monitor/recovery pairs provided.")
+                
+        #set helpers
+        if "human_help" in yaml_config:
+            helpers=yaml_config["human_help"]
+            for helper_def in helpers:
+                helper=self.create_object(helper_def["package"], helper_def["helper_file"], helper_def["helper_class"])
+                if not isinstance(helper, UIHelper):
+                    rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Helper with name " + helper["name"] + " will not be added.")
+                else:
+                    self.human_help.add_helper(helper, helper_def["name"])
+        else:
+            rospy.logwarn("No interfaces for human help provided.")
+        
 
     def create_object(self, package, filename, class_name):
         try:
