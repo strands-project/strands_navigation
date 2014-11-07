@@ -6,7 +6,7 @@
 
     <arg name="config_file" default="$(find monitored_navigation)/config/strands.yaml"/>
 
-    <machine name="$(arg machine)" address="$(arg machine)" env-loader="$(env ROS_ENV_LOADER)" user="$(arg user)" default="true"/>    
+    <machine name="$(arg machine)" address="$(arg machine)" env-loader="$(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true"/>    
     
     <group if="$(arg strands_human_help)">
         <include file="$(find human_help_manager)/launch/strands_help_nodes.launch"/>   
