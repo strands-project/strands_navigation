@@ -1,0 +1,7 @@
+#helper_class must be of class monitored_navigation.ui_helper.UIHelper
+string name
+string package
+string helper_file
+string helper_class
+---
+bool success

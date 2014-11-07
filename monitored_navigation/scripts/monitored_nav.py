@@ -10,9 +10,12 @@ from monitored_navigation.navigation import HighLevelNav
 from monitored_navigation.recover_state_machine import RecoverStateMachine
 from monitored_navigation.monitor_state import MonitorState
 
+from monitored_navigation.help_manager import HelpManager
+from monitored_navigation.ui_helper import UIHelper
+
 from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavigationActionGoal
 
-from strands_navigation_msgs.srv import AddMonitorRecoveryPair, DelMonitorRecoveryPair, SetMonitorRecoveryPairs, SetNavRecovery
+from strands_navigation_msgs.srv import AddMonitorRecoveryPair, DelMonitorRecoveryPair, SetMonitorRecoveryPairs, SetNavRecovery, AddHelper, DelHelper, SetHelpers
 
    
 class MonitoredNavigation:
@@ -22,13 +25,17 @@ class MonitoredNavigation:
         self.smach_viewer=smach_viewer
         
         # Create the main state machine
-        self.high_level_nav = HighLevelNav()
-        
-        
+        self.high_level_nav = HighLevelNav()        
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/add_monitor_recovery_pair', AddMonitorRecoveryPair, self.add_monitor_recovery_pair_cb)
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/del_monitor_recovery_pair', DelMonitorRecoveryPair, self.del_monitor_recovery_pair_cb)
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/set_monitor_recovery_pairs', SetMonitorRecoveryPairs, self.set_monitor_recovery_pairs_cb)
         self.add_monitor_recovery_pair_srv=rospy.Service('/monitored_navigation/set_nav_recovery', SetNavRecovery, self.set_nav_recovery_cb)
+        
+        self.human_help=HelpManager()
+        self.add_helper_srv=rospy.Service('/monitored_navigation/add_helper', AddHelper, self.add_helper_cb)
+        self.del_helper_srv=rospy.Service('/monitored_navigation/del_helper', DelHelper, self.del_helper_cb)
+        self.set_helperd_srv=rospy.Service('/monitored_navigation/set_helpers', SetHelpers, self.set_helpers_cb)
+        
         
         if file_name is not None:
             stream = open(file_name, 'r')
@@ -72,8 +79,48 @@ class MonitoredNavigation:
             rospy.logwarn("Import error: " + str(e))
             return None
 
+    
+    def add_helper_cb(self, req):
+        helper=self.create_object(req.package, req.helper_file, req.helper_class)
+        print helper
+        if not isinstance(helper,UIHelper):
+            rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Helper with name " + req.name + " will not be added.")
+            return False
+        return self.human_help.add_helper(helper, req.name)
         
+    def del_helper_cb(self, req):
+        return self.human_help.del_helper(req.name)
         
+    def set_helpers_cb(self, req):
+        size=len(req.names)
+        if size != len(req.packages):
+            rospy.logwarn("Length of names list and packages list does not match. Human help interfaces will remain the same.")
+            return False
+        if size != len(req.helper_files):
+            rospy.logwarn("Length of names list and helper files list does not match. Human help interfaces will remain the same.")
+            return False
+        if size != len(req.helper_classes):
+            rospy.logwarn("Length of names list and helper classes list does not match.  Human help interfaces will remain the same.")
+            return False
+        succeeded=True
+        name_list=[]
+        helper_list=[]
+        for name, package, helper_file, helper_class in zip(req.names, req.packages, req.helper_files, req.helper_classes):
+            helper=self.create_object(package, helper_file, helper_class)
+            if not isinstance(helper, UIHelper):
+                rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Human help interface with name " + name + " will not be added.")
+                succeeded=False
+            else:
+                if name in name_list:
+                    rospy.logwarn("There is already a human help interface with name " + name + " to be added. Skipping...")
+                    succeeded=False
+                else:
+                    name_list.append(name)
+                    helper_list.append(helper)
+        added=self.human_help.set_helpers(helper_list, name_list)
+        return succeeded and added
+    
+ 
     def add_monitor_recovery_pair_cb(self, req):
         if self.as_wrapper.wrapped_container.is_running():
             rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")

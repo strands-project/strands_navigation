@@ -39,6 +39,10 @@ add_service_files(
   DelMonitorRecoveryPair.srv
   SetMonitorRecoveryPairs.srv
   SetNavRecovery.srv
+  AddHelper.srv
+  DelHelper.srv
+  SetHelpers.srv
+  AskHelp.srv
   EstimateTravelTime.srv
 )
 
