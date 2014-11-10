@@ -1,0 +1,5 @@
+int32 n
+float32 inflation_radius
+geometry_msgs/Polygon roi
+---
+geometry_msgs/PoseArray goals

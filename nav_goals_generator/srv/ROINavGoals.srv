@@ -1,0 +1,14 @@
+geometry_msgs/PoseArray goals
+geometry_msgs/Polygon roi
+float32 coverage_total  # a value between 0 and 1.0, e.g. 0.95 (meaning that
+                          # at least 95% of the ROI is covered through views)
+float32 coverage_avg  # a value above 1.0, e.g. 2.0 (meaning that each
+                            # voxel is on average covered by 2 views)
+---
+geometry_msgs/PoseArray sorted_goals
+float32[] weights
+int32 coverage_idx # index of the goals where the coverage requirements are met  
+float32 coverage_total  # a value between 0 and 1.0, e.g. 0.95 (meaning that
+                            # at least 95% of the ROI is covered through views)
+float32 coverage_avg  # a value above 1.0, e.g. 2.0 (meaning that each
+                            # voxel is on average covered by 2 views)
