@@ -1,0 +1,10 @@
+uint8 ASKING_HELP=0
+uint8 BEING_HELPED=1
+uint8 HELP_FINISHED=2
+uint8 HELP_FAILED=3
+uint8 interaction_status #current interaction state, from the constants above
+string failed_component #string identifying the failed component.
+int8 n_fails #number of consecutive fails
+string interaction_service #service that should be called when the human interacts back (e.g., by pressing a button on the screen)
+---
+string[] helpers #list of helpers
