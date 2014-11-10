@@ -1,0 +1,6 @@
+string obj_desc
+string obj_list
+geometry_msgs/PoseArray goals
+---
+geometry_msgs/PoseArray sorted_goals
+float32[] weights
