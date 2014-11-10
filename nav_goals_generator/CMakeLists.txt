@@ -4,7 +4,6 @@ project(nav_goals_generator)
 find_package(catkin REQUIRED COMPONENTS 
     geometry_msgs
     message_generation
-    nav_goals_msgs 
     nav_msgs 
     rospy
     tf
@@ -29,7 +28,6 @@ catkin_package(
   CATKIN_DEPENDS 
     geometry_msgs
     message_generation
-    nav_goals_msgs 
     nav_msgs 
     rospy
     tf

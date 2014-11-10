@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-#import roslib; roslib.load_manifest('nav_goals_generator')
+# import roslib; roslib.load_manifest('nav_goals_generator')
 import rospy
 import tf
 
-from nav_goals_msgs.srv import *
+# from nav_goals_msgs.srv import *
 from geometry_msgs.msg import PoseArray
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point32

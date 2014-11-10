@@ -14,7 +14,6 @@
 
   <build_depend>geometry_msgs</build_depend>
   <build_depend>message_generation</build_depend>
-  <build_depend>nav_goals_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>tf</build_depend>
@@ -23,7 +22,6 @@
 
   <run_depend>geometry_msgs</run_depend>
   <run_depend>message_generation</run_depend>
-  <run_depend>nav_goals_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>tf</run_depend>
