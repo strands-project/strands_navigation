@@ -4,7 +4,8 @@
     <arg name="machine" default="localhost" />
     <arg name="user" default="" />
 
-    <machine name="$(arg machine)" address="$(arg machine)" env-loader="/opt/strands/strands_catkin_ws/devel/env.sh" user="$(arg user)" default="true"/>
+    <machine name="$(arg machine)" address="$(arg machine)" env-loader="(optenv
+ROS_ENV_LOADER)" user="$(arg user)" default="true"/>
 
 	<node pkg="nav_goals_generator" type="nav_goals_generator.py" name="nav_goals_generator" output="screen">
         <param name="map_frame" value="$(arg map)"/>
