@@ -10,20 +10,15 @@ class UIHelper:
         self.previous_interaction=None
         
     def process_help_request(self,req):
-        if not self.previous_interaction == req.interaction_status:
-            if req.failed_component==AskHelpRequest.NAVIGATION:
-                failed_component="navigation"
-            elif req.failed_component==AskHelpRequest.BUMPER:
-                failed_component="bumper"
-                
+        if not self.previous_interaction == req.interaction_status:                
             if req.interaction_status==AskHelpRequest.ASKING_HELP:
-                self.ask_help(failed_component, req.interaction_service,req.n_fails)
+                self.ask_help(req.failed_component, req.interaction_service,req.n_fails)
             elif  req.interaction_status==AskHelpRequest.BEING_HELPED:
-                self.being_helped(failed_component, req.interaction_service,req.n_fails)
+                self.being_helped(req.failed_component, req.interaction_service,req.n_fails)
             elif req.interaction_status==AskHelpRequest.HELP_FINISHED:
-                self.help_finished(failed_component, req.interaction_service,req.n_fails)
+                self.help_finished(req.failed_component, req.interaction_service,req.n_fails)
             elif  req.interaction_status==AskHelpRequest.HELP_FAILED:
-                self.help_failed(failed_component, req.interaction_service,req.n_fails)
+                self.help_failed(req.failed_component, req.interaction_service,req.n_fails)
                 
             self.previous_interaction=req.interaction_status
             
