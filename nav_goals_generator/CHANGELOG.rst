@@ -2,8 +2,8 @@
 Changelog for package nav_goals_generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.7 (2014-11-11)
+------------------
 * changed version number to be the same for all packages
 * fix the new line in the launch file
 * fix the launch file
