@@ -2,8 +2,8 @@
 Changelog for package nav_goals_generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.8 (2014-11-11)
+------------------
 * Fixing import of service
   Fixing `#118 <https://github.com/strands-project/strands_navigation/issues/118>`_
   Had to rename the node due to the old ROS python bug where the cannot have the same name as the package otherwise it cannot find its own messages or services.
