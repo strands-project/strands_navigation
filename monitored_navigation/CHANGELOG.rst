@@ -2,6 +2,14 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.9 (2014-11-12)
+------------------
+* adding monitored_nav to topological_navigation.launch. default is monitored_nav without recovery behaviours
+* Contributors: Bruno Lacerda
+
+0.0.8 (2014-11-11)
+------------------
+
 0.0.6 (2014-11-06)
 ------------------
 * add backtrack action server launch to monitored navigation launch

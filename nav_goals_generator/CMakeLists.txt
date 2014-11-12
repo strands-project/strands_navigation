@@ -40,7 +40,7 @@ include_directories(
 )
 
 install(
-    PROGRAMS scripts/nav_goals_generator.py
+    PROGRAMS scripts/generate_nav_goals.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

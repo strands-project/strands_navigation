@@ -3,7 +3,7 @@
 import rospy
 import tf
 
-# from nav_goals_msgs.srv import *
+from nav_goals_generator.srv import NavGoals, NavGoalsResponse
 from geometry_msgs.msg import PoseArray
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point32
@@ -71,7 +71,7 @@ class NavGoalsGenerator():
 	"A class for generation random poses for the robot"
 
 	def __init__(self):
-            rospy.init_node('nav_goals_generator')
+            rospy.init_node('generate_nav_goals')
             rospy.loginfo("Started nav_goals_generator service")
 
             # subscribing to a map

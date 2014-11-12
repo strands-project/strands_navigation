@@ -51,9 +51,13 @@ class MonitoredNavigation:
                         )
         self.as_wrapper.run_server()
         
-    def load_yaml_config(self, file_name):    
-        stream = open(file_name, 'r')
-        yaml_config=yaml.load(stream)
+    def load_yaml_config(self, file_name):
+        try:
+            stream = open(file_name, 'r')
+            yaml_config=yaml.load(stream)
+        except Exception, e:
+            rospy.logwarn("Error loading yaml config. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
+            return
         
         #set nav recovery
         if "nav_recovery" in yaml_config:
@@ -249,8 +253,13 @@ class MonitoredNavigation:
 if __name__ == '__main__':
     rospy.init_node('monitored_navigation')
     
-    if len(sys.argv) < 2:
+    filtered_argv=rospy.myargv(argv=sys.argv)
+    
+    if len(filtered_argv)<2:
         rospy.logwarn("No config yaml file provided. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
+        file_name=None
+    elif len(filtered_argv)>2:
+        rospy.logwarn("Too many arguments. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
         file_name=None
     else:
         file_name=sys.argv[1]
