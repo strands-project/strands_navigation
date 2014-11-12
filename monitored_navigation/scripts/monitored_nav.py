@@ -249,7 +249,7 @@ class MonitoredNavigation:
 if __name__ == '__main__':
     rospy.init_node('monitored_navigation')
     
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or "__name:=" in sys.argv[1]:
         rospy.logwarn("No config yaml file provided. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
         file_name=None
     else:
