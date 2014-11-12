@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.9 (2014-11-12)
+------------------
 * adding monitored_nav to topological_navigation.launch. default is monitored_nav without recovery behaviours
 * Contributors: Bruno Lacerda
 
