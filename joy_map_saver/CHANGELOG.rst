@@ -2,6 +2,9 @@
 Changelog for package joy_map_saver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.10 (2014-11-14)
 -------------------
 * mapping launch files
