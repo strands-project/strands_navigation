@@ -2,6 +2,12 @@
 Changelog for package joy_map_saver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* mapping launch files
+* Create README.md
+* Contributors: Jaime Pulido Fentanes
+
 0.0.9 (2014-11-12)
 ------------------
 
