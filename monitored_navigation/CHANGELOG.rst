@@ -2,6 +2,12 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.10 (2014-11-14)
+-------------------
+* replanning when failing
+* checking correctness of monitored_navigation argument
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes
+
 0.0.9 (2014-11-12)
 ------------------
 * adding monitored_nav to topological_navigation.launch. default is monitored_nav without recovery behaviours
