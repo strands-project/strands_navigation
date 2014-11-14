@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.10 (2014-11-14)
+-------------------
 * replanning when failing
 * checking correctness of monitored_navigation argument
 * Contributors: Bruno Lacerda, Jaime Pulido Fentanes

@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.10 (2014-11-14)
+-------------------
 * Adding retries to topological navigation and current edge publisher
 * Contributors: Jaime Pulido Fentanes
 
