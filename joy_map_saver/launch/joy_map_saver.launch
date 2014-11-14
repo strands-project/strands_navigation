@@ -2,6 +2,9 @@
 	<!-- declare arg to be passed in -->
     <arg name="machine" default="localhost"/>
     <arg name="user" default="" />
+
+
+
 	<arg name="map" default="default_map_name"/> 
 	<arg name="delta" default="0.05"/>
 	<arg name="xmin" default="-30.0"/>
@@ -9,7 +12,9 @@
 	<arg name="xmax" default="30.0"/>
 	<arg name="ymax" default="30.0"/>
 
-    <machine name="$(arg machine)" address="$(arg machine)" env-loader="(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true"/>
+
+  <!-- NOW when launching in a remote mode it will need the ROS_ENV_LOADER set if not it will leave it empty -->
+  <machine name="$(arg machine)" address="$(arg machine)" env-loader="$(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true" />
 
 
 	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" >
