@@ -1,0 +1,8 @@
+#config file for adding the service pause monitor and "recovery" to the monitored navigation state machine
+monitor_recovery_pairs:
+    -   name: service_pause_nav
+        package: monitored_navigation
+        monitor_file: monitor_srv_pause
+        monitor_class: MonitorSrvPause
+        recovery_file: pause_srv_state
+        recovery_class: PauseSrvState

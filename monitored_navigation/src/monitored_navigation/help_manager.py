@@ -9,7 +9,7 @@ from ui_helper import UIHelper
 class HelpManager(object):
 
     def __init__(self):
-        self.forward_service=rospy.Service('/monitored_navigation/human_help/manager', AskHelp, self.forward_callback)
+        self.forward_service=rospy.Service('/monitored_navigation/human_help', AskHelp, self.forward_callback)
         self.helpers={}
 
     def add_helper(self, helper, name):

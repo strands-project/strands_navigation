@@ -45,6 +45,7 @@ add_service_files(
   SetHelpers.srv
   AskHelp.srv
   EstimateTravelTime.srv
+  PauseResumeNav.srv
 )
 
 
