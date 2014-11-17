@@ -1,0 +1,14 @@
+<package>
+  <description brief="pose_initialiser">
+
+     pose_initialiser
+
+  </description>
+  <author>Jaime Pulido Fentanes</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/pose_initialiser</url>
+
+</package>
+
+
