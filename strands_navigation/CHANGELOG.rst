@@ -2,6 +2,11 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* including run dependencies on package.xml
+* Contributors: Jaime Pulido Fentanes
+
 0.0.11 (2014-11-14)
 -------------------
 
