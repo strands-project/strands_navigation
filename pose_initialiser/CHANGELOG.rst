@@ -2,8 +2,8 @@
 Changelog for package pose_initialiser
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.13 (2014-11-18)
+-------------------
 * changed version number to the rest of repo
 * * Fixing CMakeLists, Package.xml and License for pose initialiser
   * Fix repeated install launch directory comand in topological utils CMakeLists
