@@ -2,6 +2,9 @@
 Changelog for package pose_initialiser
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.13 (2014-11-18)
 -------------------
 * changed version number to the rest of repo
