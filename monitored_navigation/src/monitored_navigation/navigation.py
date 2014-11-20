@@ -40,6 +40,9 @@ class NavActionState(smach.State):
         action_server_name=userdata.goal.action_server
         action_client= actionlib.SimpleActionClient(action_server_name, MoveBaseAction)
         server_active = action_client.wait_for_server(rospy.Duration(10))
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
         if not server_active:
             rospy.logwarn("Action server " + action_server_name + " is not active. Aborting...")
             return "aborted"
@@ -55,7 +58,10 @@ class NavActionState(smach.State):
                 return 'preempted'
                 
             action_client.wait_for_result(rospy.Duration(0.2))
-        
+            
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
         
         if status == GoalStatus.SUCCEEDED:
             self.n_nav_fails=0

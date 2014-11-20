@@ -22,6 +22,9 @@ class MonitorSrvPause(MonitorState):
         pause_service = rospy.Service('/monitored_navigation/pause_nav', PauseResumeNav, self.pause_service_cb)
         result=MonitorState.execute(self, userdata)
         pause_service.shutdown()
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
         return result
     
     
