@@ -2,6 +2,11 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fixing typo
+* Contributors: Bruno Lacerda
+
 0.0.19 (2014-11-21)
 -------------------
 
