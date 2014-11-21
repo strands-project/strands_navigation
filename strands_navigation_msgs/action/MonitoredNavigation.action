@@ -3,5 +3,5 @@ geometry_msgs/PoseStamped target_pose
 ---
 string outcome #'succeeded', 'preempted', 'planner_failure', 'monitor1_failure', ..., 'monitorn_failure'
 bool recovered
-bool human_iteraction
+bool human_interaction
 ---
