@@ -2,6 +2,13 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* changing logging default back to true (top nav wont log nav recoveries after all)
+* making sure everything preempts
+* only looking at filtered argv
+* Contributors: Bruno Lacerda
+
 0.0.15 (2014-11-19)
 -------------------
 
