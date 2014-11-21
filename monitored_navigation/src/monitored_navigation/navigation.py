@@ -365,17 +365,17 @@ class HighLevelNav:
         if outcome=='recovered_with_help':
             userdata.result.outcome = terminal_states[0]
             userdata.result.recovered=True
-            userdata.result.human_iteraction=True
+            userdata.result.human_interaction=True
         if outcome=='recovered_without_help':
             userdata.result.outcome= terminal_states[0]
             userdata.result.recovered=True
-            userdata.result.human_iteraction=False
+            userdata.result.human_interaction=False
         if outcome=='not_recovered_with_help':
             userdata.result.outcome= terminal_states[0]
             userdata.result.recovered=False
-            userdata.result.human_iteraction=True
+            userdata.result.human_interaction=True
         if outcome=='not_recovered_without_help':
             userdata.result.outcome= terminal_states[0]
             userdata.result.recovered=False
-            userdata.result.human_iteraction=False
+            userdata.result.human_interaction=False
 
