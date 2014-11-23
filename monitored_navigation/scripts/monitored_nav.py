@@ -262,7 +262,7 @@ if __name__ == '__main__':
         rospy.logwarn("Too many arguments. MonitoredNavigation state machine will be initialized without recovery behaviours. To provide a config file do 'rosrun monitored_navigation monitored_nav.py path_to_config_file'. The strands config yaml file is located in monitored_navigation/config/strands.yaml")
         file_name=None
     else:
-        file_name=sys.argv[1]
+        file_name=filtered_argv[1]
 
    
     mon_nav =  MonitoredNavigation(file_name)

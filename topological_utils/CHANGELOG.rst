@@ -2,6 +2,33 @@
 Changelog for package topological_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.20 (2014-11-21)
+-------------------
+* moving scripts here
+* Contributors: Jaime Pulido Fentanes
+
+0.0.19 (2014-11-21)
+-------------------
+
+0.0.18 (2014-11-21)
+-------------------
+
+0.0.17 (2014-11-21)
+-------------------
+
+0.0.16 (2014-11-21)
+-------------------
+
+0.0.15 (2014-11-19)
+-------------------
+* fixing bug in top_map
+* Contributors: Jaime Pulido Fentanes
+
+0.0.14 (2014-11-19)
+-------------------
+* adding new launch files for topological map creation
+* Contributors: Jaime Pulido Fentanes
+
 0.0.12 (2014-11-17)
 -------------------
 
