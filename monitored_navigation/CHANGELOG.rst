@@ -2,6 +2,9 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.20 (2014-11-21)
 -------------------
 * fixing typo
