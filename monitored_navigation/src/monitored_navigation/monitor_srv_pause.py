@@ -13,7 +13,7 @@ class MonitorSrvPause(MonitorState):
         #if is_paused monitors for resume, else monitors for pause
         self.is_paused=is_paused
         
-        self.pub=rospy.Publisher("monitored_navigation/srv_pause_requested", Bool)        
+        self.pub=rospy.Publisher("monitored_navigation/srv_pause_requested", Bool, queue_size=1)        
        
         MonitorState.__init__(self, "/monitored_navigation/srv_pause_requested", Bool,  self.monitor_cb)
         
