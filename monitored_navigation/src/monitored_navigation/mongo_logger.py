@@ -17,7 +17,7 @@ from mongodb_store.message_store import MessageStoreProxy
 class MonitoredNavEventClass:
     def __init__(self):
         self.nav_event=None
-        self.pub=rospy.Publisher('/monitored_navigation/monitored_nav_event', MonitoredNavEvent)
+        self.pub=rospy.Publisher('/monitored_navigation/monitored_nav_event', MonitoredNavEvent, queue_size=1)
         
     def initialize(self, recovery_mechanism):
         self.nav_event=MonitoredNavEvent(recover_mechanism=recovery_mechanism, event_start_time=rospy.get_rostime())
