@@ -2,6 +2,9 @@
 Changelog for package nav_goals_generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.22 (2014-11-26)
 -------------------
 
