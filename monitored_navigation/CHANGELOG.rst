@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.23 (2014-12-17)
+-------------------
 * publishers now created with an explicit queue_size (indigo doesnt like it otherwise)
 * Contributors: Bruno Lacerda
 
