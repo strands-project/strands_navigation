@@ -6,4 +6,7 @@ geometry_msgs/Pose event_start_pose
 time event_end_time
 geometry_msgs/Pose event_end_pose
 actionlib_msgs/GoalID goal_id
+sensor_msgs/Image global_costmap_image
+sensor_msgs/Image local_costmap_image
+sensor_msgs/Image camera_image
 
