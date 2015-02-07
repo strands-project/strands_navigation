@@ -31,6 +31,9 @@ add_message_files(
   Edge.msg
   Vertex.msg
   CurrentEdge.msg
+  TopEdge.msg  
+  TopNode.msg
+  TopMap.msg
 )
 
 #Generate services in the 'srv' folder
