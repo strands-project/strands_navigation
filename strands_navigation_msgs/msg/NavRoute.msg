@@ -1,3 +1,3 @@
 string[] source
-string[] target
+string[] edge_id
 float64[] prob
