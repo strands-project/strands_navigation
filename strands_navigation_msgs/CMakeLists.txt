@@ -31,9 +31,6 @@ add_message_files(
   Edge.msg
   Vertex.msg
   CurrentEdge.msg
-  TopEdge.msg  
-  TopNode.msg
-  TopMap.msg
 )
 
 #Generate services in the 'srv' folder
@@ -49,6 +46,7 @@ add_service_files(
   AskHelp.srv
   EstimateTravelTime.srv
   PauseResumeNav.srv
+  GetTopologicalMap.srv
 )
 
 
