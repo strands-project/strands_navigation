@@ -77,7 +77,7 @@ An example yaml file for the STRANDS-specific configuration can be found [here](
 ### At run-time
 
 Monitors and recovery behaviours can also be added and removed at runtime (only if the monitored navigation action server is *not* running). To do this, the ```monitored_navigation``` node provides the 
-following services, based on the  [DynClassLoaderDef](../strands_navigation_msgs/msg/DynClassLoaderDef.msg) message. The meaning of the request fields in the service definitios are the same as described above for the yaml file:
+following services, based on the  [DynClassLoaderDef](../strands_navigation_msgs/msg/DynClassLoaderDef.msg) message. The meaning of the message fields is the same as described above for the yaml file:
 
 * ``/monitored_navigation/add_monitor_recovery_pair``. Add a monitor/recovery pair. Service definition is [here](../strands_navigation_msgs/srv/AddMonitorRecoveryPair.srv)
 * `` /monitored_navigation/del_monitor_recovery_pair``. Remove a monitor/recovery pair, by name. Service definition is [here](../strands_navigation_msgs/srv/DelMonitorRecoveryPair.srv)
