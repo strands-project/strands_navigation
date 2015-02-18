@@ -40,10 +40,13 @@ add_service_files(
   AddMonitorRecoveryPair.srv
   DelMonitorRecoveryPair.srv
   SetMonitorRecoveryPairs.srv
+  GetMonitorRecoveryPairs.srv
   SetNavRecovery.srv
+  GetNavRecovery.srv
   AddHelper.srv
   DelHelper.srv
   SetHelpers.srv
+  GetHelpers.srv
   AskHelp.srv
   EstimateTravelTime.srv
   PauseResumeNav.srv
