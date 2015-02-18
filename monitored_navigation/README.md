@@ -86,10 +86,10 @@ following services, based on the  [DynClassLoaderDef](../strands_navigation_msgs
 * ``/monitored_navigation/get_monitor_recovery_pairs``. Get current monitor/recovery pairs. Service definition is 
 [here](../strands_navigation_msgs/srv/GetMonitorRecoveryPairs.srv)
 * ``/monitored_navigation/set_nav_recovery``. Set the recovery state machine for navigation. The current recovery for navigation is replaced by the new one. Service definition is [here](../strands_navigation_msgs/srv/SetNavRecovery.srv)
-* ``/monitored_navigation/set_nav_recovery``. Get the current recovery state machine for navigation. The current recovery for navigation is replaced by the new one. Service definition is [here](../strands_navigation_msgs/srv/GetNavRecovery.srv)
+* ``/monitored_navigation/get_nav_recovery``. Get the current recovery state machine for navigation. The current recovery for navigation is replaced by the new one. Service definition is [here](../strands_navigation_msgs/srv/GetNavRecovery.srv)
 * ``/monitored_navigation/add_helper``. Add a human helper interface. Service definition is [here](../strands_navigation_msgs/srv/AddHelper.srv)
 * `` /monitored_navigation/del_helper``. Remove a human helper interface, by name. Service definition is [here](../strands_navigation_msgs/srv/DelHelper.srv)
 * ``/monitored_navigation/set_helpers``. Set a list of human helper interfaces. The ones currently being used are removed. Service definition is 
 [here](../strands_navigation_msgs/srv/SetHelpers.srv)
-* ``/monitored_navigation/set_helpers``. SGt  list of current human helper interfaces. Service definition is 
+* ``/monitored_navigation/get_helpers``. Gett  list of current human helper interfaces. Service definition is 
 [here](../strands_navigation_msgs/srv/GetHelpers.srv)
