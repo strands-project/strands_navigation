@@ -1,3 +1,4 @@
+strands_navigation_msgs/CurrentEdge edge
 string status
 string origin
 string target
@@ -8,3 +9,4 @@ string date_finished
 float64 time_to_waypoint
 float64 operation_time
 string topological_map
+strands_navigation_msgs/MonitoredNavEvent[] mon_events
