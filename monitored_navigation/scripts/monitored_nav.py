@@ -13,7 +13,7 @@ from monitored_navigation.monitor_state import MonitorState
 from monitored_navigation.help_manager import HelpManager
 from monitored_navigation.ui_helper import UIHelper
 
-from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavigationActionGoal
+from strands_navigation_msgs.msg import MonitoredNavigationAction, MonitoredNavigationActionGoal, DynClassLoaderDef
 
 from strands_navigation_msgs.srv import AddMonitorRecoveryPair, DelMonitorRecoveryPair, SetMonitorRecoveryPairs, SetNavRecovery, AddHelper, DelHelper, SetHelpers
 
@@ -62,7 +62,7 @@ class MonitoredNavigation:
         #set nav recovery
         if "nav_recovery" in yaml_config:
             recovery_dict=yaml_config["nav_recovery"]
-            recovery=self.create_object(recovery_dict["package"], recovery_dict["recovery_file"], recovery_dict["recovery_class"])
+            recovery=self.create_object(DynClassLoaderDef(recovery_dict["package"], recovery_dict["recovery_file"], recovery_dict["recovery_class"]))
             if isinstance(recovery,RecoverStateMachine):
                 self.high_level_nav.set_nav_recovery(recovery)
             else:
@@ -74,8 +74,8 @@ class MonitoredNavigation:
         if "monitor_recovery_pairs" in yaml_config:
             monitor_recovery_pairs=yaml_config["monitor_recovery_pairs"]
             for monitor_recovery_pair in monitor_recovery_pairs:
-                monitor=self.create_object(monitor_recovery_pair["package"], monitor_recovery_pair["monitor_file"], monitor_recovery_pair["monitor_class"])
-                recovery=self.create_object(monitor_recovery_pair["package"], monitor_recovery_pair["recovery_file"], monitor_recovery_pair["recovery_class"])
+                monitor=self.create_object(DynClassLoaderDef(monitor_recovery_pair["package"], monitor_recovery_pair["monitor_file"], monitor_recovery_pair["monitor_class"]))
+                recovery=self.create_object(DynClassLoaderDef(monitor_recovery_pair["package"], monitor_recovery_pair["recovery_file"], monitor_recovery_pair["recovery_class"]))
                 if not isinstance(monitor,MonitorState):
                     rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class. Monitor/Recovery pair with name " + monitor_recovery_pair["name"] + " will not be added to state machine.")
                 elif not isinstance(recovery,RecoverStateMachine):
@@ -89,7 +89,7 @@ class MonitoredNavigation:
         if "human_help" in yaml_config:
             helpers=yaml_config["human_help"]
             for helper_def in helpers:
-                helper=self.create_object(helper_def["package"], helper_def["helper_file"], helper_def["helper_class"])
+                helper=self.create_object(DynClassLoaderDef(helper_def["package"], helper_def["helper_file"], helper_def["helper_class"]))
                 if not isinstance(helper, UIHelper):
                     rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Helper with name " + helper["name"] + " will not be added.")
                 else:
@@ -98,7 +98,10 @@ class MonitoredNavigation:
             rospy.logwarn("No interfaces for human help provided.")
         
 
-    def create_object(self, package, filename, class_name):
+    def create_object(self, dyn_class_loader_def):
+        package=dyn_class_loader_def.object_package
+        filename=dyn_class_loader_def.object_file
+        class_name=dyn_class_loader_def.object_class
         try:
             mod = __import__(package+ '.' + filename, fromlist=[class_name])
             klass=getattr(mod, class_name)
@@ -109,7 +112,7 @@ class MonitoredNavigation:
 
     
     def add_helper_cb(self, req):
-        helper=self.create_object(req.package, req.helper_file, req.helper_class)
+        helper=self.create_object(req.ui_helper)
         if not isinstance(helper,UIHelper):
             rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Helper with name " + req.name + " will not be added.")
             return False
@@ -120,20 +123,14 @@ class MonitoredNavigation:
         
     def set_helpers_cb(self, req):
         size=len(req.names)
-        if size != len(req.packages):
-            rospy.logwarn("Length of names list and packages list does not match. Human help interfaces will remain the same.")
-            return False
-        if size != len(req.helper_files):
-            rospy.logwarn("Length of names list and helper files list does not match. Human help interfaces will remain the same.")
-            return False
-        if size != len(req.helper_classes):
-            rospy.logwarn("Length of names list and helper classes list does not match.  Human help interfaces will remain the same.")
+        if size != len(req.ui_helpers):
+            rospy.logwarn("Length of names list and help classes def list does not match. Human help interfaces will remain the same.")
             return False
         succeeded=True
         name_list=[]
         helper_list=[]
-        for name, package, helper_file, helper_class in zip(req.names, req.packages, req.helper_files, req.helper_classes):
-            helper=self.create_object(package, helper_file, helper_class)
+        for name, helper_def  in zip(req.names, req.ui_helpers):
+            helper=self.create_object(helper_def)
             if not isinstance(helper, UIHelper):
                 rospy.logwarn("The helper needs to be an instantiation of the UIHelper class. Human help interface with name " + name + " will not be added.")
                 succeeded=False
@@ -152,8 +149,8 @@ class MonitoredNavigation:
         if self.as_wrapper.wrapped_container.is_running():
             rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
             return False
-        monitor=self.create_object(req.package, req.monitor_file, req.monitor_class)
-        recovery=self.create_object(req.package, req.recovery_file, req.recovery_class)
+        monitor=self.create_object(req.monitor_state)
+        recovery=self.create_object(req.recovery_state_machine)
         if not isinstance(monitor,MonitorState):
             rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class. Monitor/Recovery pair with name " + req.name + " will not be added to state machine.")
             return False
@@ -181,28 +178,19 @@ class MonitoredNavigation:
             rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
             return False
         size=len(req.names)
-        if size != len(req.packages):
-            rospy.logwarn("Length of names list and packages list does not match. Monitor and recovery behaviours will remain the same.")
+        if size != len(req.monitor_states):
+            rospy.logwarn("Length of names list and monitor defs list does not match. Monitor and recovery behaviours will remain the same.")
             return False
-        if size != len(req.monitor_files):
-            rospy.logwarn("Length of names list and monitor files list does not match. Monitor and recovery behaviours will remain the same.")
-            return False
-        if size != len(req.monitor_classes):
-            rospy.logwarn("Length of names list and monitor classes list does not match. Monitor and recovery behaviours will remain the same.")
-            return False
-        if size != len(req.recovery_files):
-            rospy.logwarn("Length of names list and recovery files list does not match. Monitor and recovery behaviours will remain the same.")
-            return False
-        if size != len(req.recovery_classes):
-            rospy.logwarn("Length of names list and recovery classes list does not match. Monitor and recovery behaviours will remain the same.")
+        if size != len(req.recovery_state_machines):
+            rospy.logwarn("Length of names list and recovery sm defs list does not match. Monitor and recovery behaviours will remain the same.")
             return False
         succeeded=True
         name_list=[]
         monitor_list=[]
         recovery_list=[]
-        for name, package, monitor_file, monitor_class, recovery_file, recovery_class in zip(req.names, req.packages, req.monitor_files, req.monitor_classes, req.recovery_files, req.recovery_classes):
-            monitor=self.create_object(package, monitor_file, monitor_class)
-            recovery=self.create_object(package, recovery_file, recovery_class)
+        for name, monitor_def, recovery_def in zip(req.names, req.monitor_states, req.recovery_state_machines):
+            monitor=self.create_object(monitor_def)
+            recovery=self.create_object(recovery_def)
             if not isinstance(monitor,MonitorState):
                 rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class. Monitor/Recovery pair with name " + name + " will not be added to state machine.")
                 succeeded=False
@@ -227,7 +215,7 @@ class MonitoredNavigation:
         if self.as_wrapper.wrapped_container.is_running():
             rospy.logwarn("Cannot edit monitored navigation state machine while it is running. Skipping...")
             return False
-        recovery=self.create_object(req.package, req.recovery_file, req.recovery_class)
+        recovery=self.create_object(req.recovery_state_machine)
         if not isinstance(recovery,RecoverStateMachine):
             rospy.logwarn("The recovery state machine needs to be an instantiation of the RecoverStateMachine class. Nav Recovery will not be set.")
             return False

@@ -31,6 +31,7 @@ add_message_files(
   Edge.msg
   Vertex.msg
   CurrentEdge.msg
+  DynClassLoaderDef.msg
 )
 
 #Generate services in the 'srv' folder

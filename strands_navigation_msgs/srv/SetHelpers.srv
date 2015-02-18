@@ -1,7 +1,5 @@
 #all vectors should have the same length. helper_class must be of class monitored_navigation.ui_helper.UIHelper
 string[] names
-string[] packages
-string[] helper_files
-string[] helper_classes
+strands_navigation_msgs/DynClassLoaderDef[] ui_helpers
 ---
 bool success
