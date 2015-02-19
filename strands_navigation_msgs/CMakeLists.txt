@@ -26,12 +26,12 @@ add_message_files(
   NavStatistics.msg
   TopologicalNode.msg
   TopologicalMap.msg
-  MonitoredNavEvent.msg
   NavRoute.msg
   Edge.msg
   Vertex.msg
   CurrentEdge.msg
   DynClassLoaderDef.msg
+  MonitoredNavEvent.msg
 )
 
 #Generate services in the 'srv' folder
@@ -50,6 +50,7 @@ add_service_files(
   AskHelp.srv
   EstimateTravelTime.srv
   PauseResumeNav.srv
+  GetTopologicalMap.srv
 )
 
 
