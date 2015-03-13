@@ -6,6 +6,7 @@ string map_2d
 bool use_default_recovery
 string[] monitor_recovery_pairs_names
 strands_navigation_msgs/DynClassLoaderDef[] monitor_states
+strands_navigation_msgs/DynClassLoaderDef[] recovery_state_machines
 bool use_default_nav_recovery
 strands_navigation_msgs/DynClassLoaderDef nav_recovery
 bool use_default_helpers
