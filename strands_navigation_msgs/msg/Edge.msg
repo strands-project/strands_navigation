@@ -3,12 +3,5 @@ string node
 string action
 float64 top_vel
 string map_2d
-bool use_default_recovery
-string[] monitor_recovery_pairs_names
-strands_navigation_msgs/DynClassLoaderDef[] monitor_states
-strands_navigation_msgs/DynClassLoaderDef[] recovery_state_machines
-bool use_default_nav_recovery
-strands_navigation_msgs/DynClassLoaderDef nav_recovery
-bool use_default_helpers
-string[] helper_names
-strands_navigation_msgs/DynClassLoaderDef[] ui_helpers
+float inflation_radius
+string recovery_behaviours_config
