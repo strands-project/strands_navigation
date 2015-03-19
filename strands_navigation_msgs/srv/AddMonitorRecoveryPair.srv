@@ -1,9 +1,6 @@
 #monitor_class must be of class monitored_navigation.monitor_state.MonitorState and recovery_class of class monitored_navigation.recover_state_machine.RecoverStateMachine
 string name
-string package
-string monitor_file
-string monitor_class
-string recovery_file
-string recovery_class
+strands_navigation_msgs/DynClassLoaderDef monitor_state
+strands_navigation_msgs/DynClassLoaderDef recover_state_machine
 ---
 bool success

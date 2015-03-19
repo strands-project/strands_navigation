@@ -10,23 +10,27 @@ from mongodb_store.message_store import MessageStoreProxy
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 1 :
+    if len(sys.argv) < 2 :
         print "usage: insert_map input_file.txt"
 	sys.exit(2)
 
     filename=str(sys.argv[1])
-    #dataset_name=str(sys.argv[2])
-    #map_name=str(sys.argv[3])
 
     msg_store = MessageStoreProxy(collection='topological_maps')
 
-    json_data=open(filename, 'rb').read()
+    print "loading %s"%filename
+    yaml_data=open(filename, "r")
     
-    data = json.loads(json_data)
+    data = yaml.load(yaml_data)
+    
+    print "printing vlaa"
+
     
     for i in data:
-        meta = i['meta']
-        msgv = dc_util.dictionary_to_message(i['node'], TopologicalNode)
+        meta = i[1]
+        print i[0]
+        msgv = dc_util.dictionary_to_message(i[0], TopologicalNode)
+        #print msgv, meta
         msg_store.insert(msgv,meta)
         #mongodb_store.util.store_message(points_db,p,val)
 

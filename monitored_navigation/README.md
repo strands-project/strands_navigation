@@ -77,14 +77,19 @@ An example yaml file for the STRANDS-specific configuration can be found [here](
 ### At run-time
 
 Monitors and recovery behaviours can also be added and removed at runtime (only if the monitored navigation action server is *not* running). To do this, the ```monitored_navigation``` node provides the 
-following services. The meaning of the request fields in the service definitios are the same as described above for the yaml file:
+following services, based on the  [DynClassLoaderDef](../strands_navigation_msgs/msg/DynClassLoaderDef.msg) message. The meaning of the message fields is the same as described above for the yaml file:
 
 * ``/monitored_navigation/add_monitor_recovery_pair``. Add a monitor/recovery pair. Service definition is [here](../strands_navigation_msgs/srv/AddMonitorRecoveryPair.srv)
 * `` /monitored_navigation/del_monitor_recovery_pair``. Remove a monitor/recovery pair, by name. Service definition is [here](../strands_navigation_msgs/srv/DelMonitorRecoveryPair.srv)
 * ``/monitored_navigation/set_monitor_recovery_pairs``. Set a list of monitor/recovery pairs. The ones currently being used are removed. Service definition is 
 [here](../strands_navigation_msgs/srv/SetMonitorRecoveryPairs.srv)
+* ``/monitored_navigation/get_monitor_recovery_pairs``. Get current monitor/recovery pairs. Service definition is 
+[here](../strands_navigation_msgs/srv/GetMonitorRecoveryPairs.srv)
 * ``/monitored_navigation/set_nav_recovery``. Set the recovery state machine for navigation. The current recovery for navigation is replaced by the new one. Service definition is [here](../strands_navigation_msgs/srv/SetNavRecovery.srv)
+* ``/monitored_navigation/get_nav_recovery``. Get the current recovery state machine for navigation. Service definition is [here](../strands_navigation_msgs/srv/GetNavRecovery.srv)
 * ``/monitored_navigation/add_helper``. Add a human helper interface. Service definition is [here](../strands_navigation_msgs/srv/AddHelper.srv)
 * `` /monitored_navigation/del_helper``. Remove a human helper interface, by name. Service definition is [here](../strands_navigation_msgs/srv/DelHelper.srv)
 * ``/monitored_navigation/set_helpers``. Set a list of human helper interfaces. The ones currently being used are removed. Service definition is 
 [here](../strands_navigation_msgs/srv/SetHelpers.srv)
+* ``/monitored_navigation/get_helpers``. Gett  list of current human helper interfaces. Service definition is 
+[here](../strands_navigation_msgs/srv/GetHelpers.srv)

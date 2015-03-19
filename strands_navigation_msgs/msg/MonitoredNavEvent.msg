@@ -1,3 +1,4 @@
+string edge_id
 string recover_mechanism #bumper_recovery, backtrack_recovery, nav_help_recovery
 bool was_helped
 int8 n_help_requests
