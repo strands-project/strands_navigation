@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.27 (2015-03-19)
+-------------------
 * Adding topological map editor launch file,
   replacing map_publisher with map manager,
   adding add_node service

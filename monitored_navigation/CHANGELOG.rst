@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.27 (2015-03-19)
+-------------------
 * Update README.md
 * Update README.md
 * Update README.md
