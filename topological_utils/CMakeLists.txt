@@ -20,6 +20,14 @@ catkin_python_setup()
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
+add_service_files(
+    FILES
+    NodeMetadata.srv
+)
+generate_messages(
+DEPENDENCIES
+    std_msgs 
+)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES topological_utils
@@ -40,6 +48,8 @@ catkin_package(
 #   src/${PROJECT_NAME}/topological_utils.cpp
 # )
 
+
+
 ## Declare a cpp executable
 # add_executable(topological_utils_node src/topological_utils_node.cpp)
 
@@ -59,6 +69,7 @@ catkin_package(
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
 
+
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  install(PROGRAMS
@@ -75,7 +86,7 @@ catkin_package(
    scripts/tmap_from_waypoints.py
    scripts/joy_add_node.py
    scripts/topological_map_update.py
-   scripts/dummy_topological_navigation
+   scripts/dummy_topological_navigation.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

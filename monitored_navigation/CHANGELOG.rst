@@ -2,6 +2,18 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.26 (2015-03-18)
+-------------------
+
+0.0.25 (2015-03-18)
+-------------------
+
+0.0.24 (2015-03-17)
+-------------------
+* adding launch and config dirs to install targets
+* explicit queue size for pub
+* Contributors: Bruno Lacerda
+
 0.0.23 (2014-12-17)
 -------------------
 * publishers now created with an explicit queue_size (indigo doesnt like it otherwise)
