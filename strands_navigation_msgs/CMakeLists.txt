@@ -51,6 +51,7 @@ add_service_files(
   EstimateTravelTime.srv
   PauseResumeNav.srv
   GetTopologicalMap.srv
+  AddNode.srv
 )
 
 
