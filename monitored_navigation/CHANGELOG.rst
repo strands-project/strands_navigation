@@ -2,6 +2,22 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update README.md
+* Update README.md
+* Update README.md
+* edit mon nav read me
+* added services to get current human helpers and recoveries from mon nav
+* adding message def to dynamically load python objects to the monitored_nav state machine
+* Update README.md
+* Update README.md
+* Update README.md
+* edit mon nav read me
+* added services to get current human helpers and recoveries from mon nav
+* adding message def to dynamically load python objects to the monitored_nav state machine
+* Contributors: Bruno Lacerda
+
 0.0.26 (2015-03-18)
 -------------------
 

@@ -2,6 +2,34 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding topological map editor launch file,
+  replacing map_publisher with map manager,
+  adding add_node service
+* commiting migrate script plus typo fix
+* redefining msgs to include localise by topic and inflation radius and simplifying recovery behaviours definition by setting them in one config string
+* bug fixes
+* Navigation and policy_executor working with new defs
+* turning Message back to one single pose as agreed it will be sorted using the carrot planner
+* added services to get current human helpers and recoveries from mon nav
+* adding message def to dynamically load python objects to the monitored_nav state machine
+* bug fixes
+* committing map creation script
+* Adding Recovery behaviours to edges full definition
+* Adding recovery behaviours to edges
+* Merge branch 'topological-testing' of https://github.com/strands-project/strands_navigation into topological-testing
+* added services to get current human helpers and recoveries from mon nav
+* adding message def to dynamically load python objects to the monitored_nav state machine
+* adding Get Topological Map service
+* adding changes to messages and creating topological testing branch locally
+* removing traversabilty from edge message
+* commiting latest versions of messages
+* switching NavRoute to new def
+* renaming new definitions to old message types
+* new branch created
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes
+
 0.0.26 (2015-03-18)
 -------------------
 
