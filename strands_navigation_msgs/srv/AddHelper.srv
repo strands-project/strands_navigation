@@ -1,7 +1,5 @@
 #helper_class must be of class monitored_navigation.ui_helper.UIHelper
 string name
-string package
-string helper_file
-string helper_class
+strands_navigation_msgs/DynClassLoaderDef ui_helper
 ---
 bool success

@@ -47,6 +47,7 @@ class PolicyExecutionServer(object):
     
     """
     def __init__(self) :
+        
         self.cancelled = False
         self.preempted = False
         #self.aborted = False
@@ -141,9 +142,13 @@ class PolicyExecutionServer(object):
                     # execute_policy
                     if self.current_action in self.move_base_actions and self.current_node in self.current_route.source : 
                         nod_ind = self.current_route.source.index(self.current_node)
-                        next_action = self.find_action(self.current_route.source[nod_ind], self.current_route.target[nod_ind])
+                        next_action, target = self.find_action(self.current_route.source[nod_ind], self.current_route.edge_id[nod_ind])
                         if next_action in self.move_base_actions :
                             self.goal_reached=True
+                        else:
+                            if self.current_node != self.current_target :
+                                #This means that the robot will try to execute the policies again which means navigating to the waypoint
+                                self.goal_failed=True                            
 
 
     """
@@ -222,31 +227,34 @@ class PolicyExecutionServer(object):
         while keep_executing :
 
             if self.current_node in route.source and not self.cancelled :
-                # If there is an action associated to the current node and action server not preempted or aborted
 
+                # If there is an action associated to the current node and action server not preempted or aborted
                 if success :
                     nfails=0
                     nod_ind = route.source.index(self.current_node)
-                    self.current_action = self.find_action(route.source[nod_ind], route.target[nod_ind])
+#                    self.current_action = self.find_action(route.source[nod_ind], route.target[nod_ind])
+                    self.current_action, target = self.find_action(route.source[nod_ind], route.edge_id[nod_ind])
                     if self.current_action != 'none':
                         # There is an edge between these two nodes
-                        print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, route.target[nod_ind])
-                        success=self.navigate_to(self.current_action,route.target[nod_ind])
+                        print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, target)
+                        success=self.navigate_to(self.current_action, target)
                     else:
                         # There is NO edge between these two nodes so abort the execution
                         success = False
                         keep_executing = False
-                        rospy.loginfo("There is NO edge between %s and %s will ABORT policy execution",route.source[nod_ind], route.target[nod_ind])
+                        rospy.loginfo("There is NO edge %s will ABORT policy execution", route.edge_id[nod_ind])
+                        #rospy.loginfo("There is NO edge between %s and %s will ABORT policy execution",route.source[nod_ind], route.target[nod_ind])
                 else :
                     nfails+=1
                     if nfails < self.n_tries :
                         nod_ind = route.source.index(self.current_node)
-                        action = self.find_action(route.source[nod_ind], route.target[nod_ind])
+#                        action = self.find_action(route.source[nod_ind], route.target[nod_ind])
+                        action, target = self.find_action(route.source[nod_ind], route.edge_id[nod_ind])
                         if action != 'none':
                             if action in self.move_base_actions :
                                 self.current_action = action
-                                print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, route.target[nod_ind])
-                                success=self.navigate_to(self.current_action,route.target[nod_ind])
+                                print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, target)
+                                success=self.navigate_to(self.current_action,target)
                             else:                           
                                 print 'Do move_base to %s' %self.current_node#(route.source[0])
                                 self.current_action = 'move_base'
@@ -275,15 +283,16 @@ class PolicyExecutionServer(object):
                             if self.closest_node in route.source :
                                 # Retry using policy from closest node
                                 nod_ind = route.source.index(self.closest_node)
-                                action = self.find_action(route.source[nod_ind], route.target[nod_ind])
+                                #action = self.find_action(route.source[nod_ind], route.target[nod_ind])
+                                action, target = self.find_action(route.source[nod_ind], route.edge_id[nod_ind])
                                 if action != 'none':
                                     if action in self.move_base_actions :
                                         # If closest_node and its target are connected by move_base type action nvigate to target
                                         self.current_action = action
-                                        print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, route.target[nod_ind])
-                                        success=self.navigate_to(self.current_action,route.target[nod_ind])
+                                        print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, target)
+                                        success=self.navigate_to(self.current_action,target)
                                     else:
-                                        # If closest_node and its target are not connected by move_base type action nvigate to closest_node
+                                        # If closest_node and its target are not connected by move_base type action navigate to closest_node
                                         print 'Do move_base to %s' %self.closest_node#(route.source[0])
                                         self.current_action = 'move_base'
                                         success=self.navigate_to(self.current_action,self.closest_node)
@@ -291,7 +300,7 @@ class PolicyExecutionServer(object):
                                     # No edge between Closest Node and its target Abort execution
                                     success = False
                                     keep_executing = False
-                                    rospy.loginfo("There is NO edge between %s and %s will ABORT policy execution",route.source[nod_ind], route.target[nod_ind])
+                                    rospy.loginfo("There is NO edge %s will ABORT policy execution", route.edge_id[nod_ind])
                                     break
                             else :
                                 # Closest node not in route navigate to it (if it suceeds policy execution will be successful)
@@ -305,8 +314,11 @@ class PolicyExecutionServer(object):
                     else :
                         # Current node not in route so policy execution was successful
                         nfails=0
-                        success = True
-                        keep_executing = False
+                        print 'Do move_base to %s' %self.current_node
+                        self.current_action = 'move_base'
+                        success=self.navigate_to(self.current_action,self.current_node)
+                        if success :
+                            keep_executing = False
             rospy.sleep(rospy.Duration.from_sec(0.3))
         self.navigation_activated = False
         return success
@@ -317,21 +329,24 @@ class PolicyExecutionServer(object):
      Find Action
          
     """
-    def find_action(self, source, target):
+#    def find_action(self, source, target):
+    def find_action(self, source, edge_id):
         #print 'Searching for action between: %s -> %s' %(source, target)
         found = False
         action = 'none'
+        target = 'none'
         for i in self.lnodes:
             if i.name == source :
                 for j in i.edges:
-                    if j.node == target:
+                    if j.edge_id == edge_id:
                         action = j.action
+                        target = j.node
                 found = True
         if not found:
             self._feedback.route_status = self.current_node
             self._as.publish_feedback(self._feedback)
             print "source node not found"
-        return action
+        return action,target
 
 
 
@@ -341,11 +356,12 @@ class PolicyExecutionServer(object):
      
     """
     def navigate_to(self, action, node):
+        self.current_target=node
         found = False
         for i in self.lnodes:
             if i.name == node :
                 found = True
-                target_pose = i.pose
+                target_pose = i.pose#[0]
                 break
         
         if found:
@@ -392,10 +408,11 @@ class PolicyExecutionServer(object):
         goal.target_pose.pose = pose
 
         self.goal_reached=False
+        self.goal_failed=False
         self.monNavClient.send_goal(goal)
         status=self.monNavClient.get_state()
         
-        while (status == GoalStatus.ACTIVE or status == GoalStatus.PENDING) and not self.cancelled and not self.goal_reached :
+        while (status == GoalStatus.ACTIVE or status == GoalStatus.PENDING) and not self.cancelled and not self.goal_reached and not self.goal_failed :
             status=self.monNavClient.get_state()
             rospy.sleep(rospy.Duration.from_sec(0.1))
 

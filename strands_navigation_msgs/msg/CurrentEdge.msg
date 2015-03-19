@@ -1,6 +1,4 @@
 std_msgs/Header header
-string origin
-string target
-string action
+string edge_id
 bool active
 bool result
