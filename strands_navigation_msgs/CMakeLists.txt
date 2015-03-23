@@ -52,6 +52,8 @@ add_service_files(
   PauseResumeNav.srv
   GetTopologicalMap.srv
   AddNode.srv
+  AddTag.srv
+  GetTaggedNodes.srv
 )
 
 
