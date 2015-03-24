@@ -1,0 +1,13 @@
+<launch>
+    <arg name="white_list_file"/>
+
+    <arg name="machine" default="localhost" />
+    <arg name="user" default="" />
+
+    <machine name="$(arg machine)" address="$(arg machine)" env-loader="$(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true"/>
+
+    <node pkg="topological_logging_manager" type="logging_manager.py" name="logging_manager" output="screen" respawn="true">
+		<param name="white_list_file" value="$(arg white_list_file)" type="string"/>
+    </node>
+
+</launch>
