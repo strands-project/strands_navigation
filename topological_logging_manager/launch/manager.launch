@@ -1,0 +1,36 @@
+<launch>
+    <arg name="white_list_file"/>
+    <arg name="current_node_topic" default="/current_node"/>
+    <arg name="closest_node_topic" default="/closest_node"/>
+    <arg name="use_closest_node" default="true"/>
+    <arg name="edge_topic" default="/current_edge"/>
+    <arg name="check_topic_rate" default="1"/>
+    <arg name="publishing_rate" default="30"/>
+    <arg name="bool_publisher_topic" default="/logging_manager/log"/>
+    <arg name="bool_stamped_publisher_topic" default="/logging_manager/log_stamped"/>
+
+    <arg name="machine" default="localhost" />
+    <arg name="user" default="" />
+
+    <machine name="$(arg machine)" address="$(arg machine)" env-loader="$(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true"/>
+
+    <node pkg="topological_logging_manager" type="logging_manager.py" name="logging_manager" output="screen" respawn="true" if="$(arg use_closest_node)">
+        <param name="white_list_file" value="$(arg white_list_file)" type="string"/>
+        <param name="node_topic" value="$(arg closest_node_topic)" type="string"/>
+        <param name="edge_topic" value="$(arg edge_topic)" type="string"/>
+        <param name="check_topic_rate" value="$(arg check_topic_rate)" type="double"/>
+        <param name="publishing_rate" value="$(arg publishing_rate)" type="double"/>
+        <param name="bool_publisher_topic" value="$(arg bool_publisher_topic)" type="string"/>
+        <param name="bool_stamped_publisher_topic" value="$(arg bool_stamped_publisher_topic)" type="string"/>
+    </node>
+    <node pkg="topological_logging_manager" type="logging_manager.py" name="logging_manager" output="screen" respawn="true" unless="$(arg use_closest_node)">
+        <param name="white_list_file" value="$(arg white_list_file)" type="string"/>
+        <param name="node_topic" value="$(arg current_node_topic)" type="string"/>
+        <param name="edge_topic" value="$(arg edge_topic)" type="string"/>
+        <param name="check_topic_rate" value="$(arg check_topic_rate)" type="double"/>
+        <param name="publishing_rate" value="$(arg publishing_rate)" type="double"/>
+        <param name="bool_publisher_topic" value="$(arg bool_publisher_topic)" type="string"/>
+        <param name="bool_stamped_publisher_topic" value="$(arg bool_stamped_publisher_topic)" type="string"/>
+    </node>
+
+</launch>
