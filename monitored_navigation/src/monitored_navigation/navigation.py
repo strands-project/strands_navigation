@@ -19,21 +19,18 @@ class NavActionState(smach.State):
         smach.State.__init__(self,
                             outcomes=['succeeded', 'preempted','aborted','planner_failure'],
                             input_keys=['goal'],
-                            output_keys=['n_nav_fails'],
+                            output_keys=['n_fails'],
                             )
         
-        self.last_new_action_in = False
+        self.new_action_in = False
         self.last_new_action_server_name=''
-        
-        self.n_nav_fails=0
+        self.n_fails=0
         
         rospy.Subscriber("/monitored_navigation/goal" ,MonitoredNavigationActionGoal, self.new_goal_checker_cb)
-        
  
     def new_goal_checker_cb(self,msg):
         self.new_action_in = True
         self.last_new_action_server_name=msg.goal.action_server
-        
 
     def execute(self, userdata):
         self.new_action_in = False
@@ -64,16 +61,16 @@ class NavActionState(smach.State):
             return 'preempted'
         
         if status == GoalStatus.SUCCEEDED:
-            self.n_nav_fails=0
-            userdata.n_nav_fails = self.n_nav_fails
+            self.n_fails=0
+            userdata.n_fails = self.n_fails
             return 'succeeded'
         elif status==GoalStatus.PREEMPTED:
-            self.n_nav_fails=0
-            userdata.n_nav_fails = self.n_nav_fails
+            self.n_fails=0
+            userdata.n_fails = self.n_fails
             return 'preempted'
         else:
-            self.n_nav_fails=self.n_nav_fails+1
-            userdata.n_nav_fails = self.n_nav_fails
+            self.n_fails=self.n_fails+1
+            userdata.n_fails = self.n_fails
             return 'planner_failure'
    
 
