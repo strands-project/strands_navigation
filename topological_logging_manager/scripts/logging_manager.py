@@ -74,7 +74,7 @@ class Manager(object):
             self.white_list_edges = ['ALL']
 
         self.node_sub = rospy.Subscriber(
-            rospy.get_param("~node_topic", "/current_node"),
+            rospy.get_param("~node_topic", "/closest_node"),
             String,
             self.node_callback
         )
@@ -90,7 +90,7 @@ class Manager(object):
             queue_size=10
         )
         self.pub_bool_stamped = rospy.Publisher(
-            rospy.get_param("~bool_publisher_topic", "~log_stamped"),
+            rospy.get_param("~bool_stamped_publisher_topic", "~log_stamped"),
             LoggingManager,
             queue_size=10
         )
