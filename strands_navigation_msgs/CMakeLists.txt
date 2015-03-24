@@ -32,6 +32,7 @@ add_message_files(
   CurrentEdge.msg
   DynClassLoaderDef.msg
   MonitoredNavEvent.msg
+  TopologicalRoute.msg
 )
 
 #Generate services in the 'srv' folder
