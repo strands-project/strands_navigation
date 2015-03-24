@@ -54,6 +54,8 @@ add_service_files(
   AddNode.srv
   AddTag.srv
   GetTaggedNodes.srv
+  GetEdgesBetweenNodes.srv
+  AddEdge.srv
 )
 
 
