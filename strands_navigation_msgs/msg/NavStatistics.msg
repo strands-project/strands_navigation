@@ -1,4 +1,4 @@
-strands_navigation_msgs/CurrentEdge edge
+string edge_id
 string status
 string origin
 string target
