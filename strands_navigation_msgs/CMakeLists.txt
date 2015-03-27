@@ -38,6 +38,7 @@ add_message_files(
 #Generate services in the 'srv' folder
 add_service_files(
   FILES
+  AddEdge.srv
   AddMonitorRecoveryPair.srv
   DelMonitorRecoveryPair.srv
   SetMonitorRecoveryPairs.srv
@@ -56,7 +57,7 @@ add_service_files(
   AddTag.srv
   GetTaggedNodes.srv
   GetEdgesBetweenNodes.srv
-  AddEdge.srv
+  PredictEdgeState.srv
 )
 
 

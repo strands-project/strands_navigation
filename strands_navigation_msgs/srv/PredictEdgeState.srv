@@ -1,0 +1,5 @@
+int64 epoch
+---
+string[] edge_ids
+float64[] probs
+float64[] durations
