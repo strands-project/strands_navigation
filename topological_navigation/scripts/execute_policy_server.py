@@ -250,6 +250,7 @@ class PolicyExecutionServer(object):
                     nod_ind = route.source.index(self.current_node)
 #                    self.current_action = self.find_action(route.source[nod_ind], route.target[nod_ind])
                     self.current_action, target = self.find_action(route.source[nod_ind], route.edge_id[nod_ind])
+                    
                     if self.current_action != 'none':
                         # There is an edge between these two nodes
                         print '%s -(%s)-> %s' %(route.source[nod_ind], self.current_action, target)
@@ -383,10 +384,10 @@ class PolicyExecutionServer(object):
         if found:
             self.current_action = action
             
-            edg= self.get_edge_id(route[rindex].name, route[rindex+1].name, action)
-            self.stat=nav_stats(route[rindex].name, route[rindex+1].name, self.topol_map, edg)
+            #self.stat=nav_stats(route[rindex].name, route[rindex+1].name, self.topol_map, edg)
             # Creating Navigation Object
-            self.stat=nav_stats(self.current_node, node, self.topol_map)
+            edg= self.get_edge_id(self.current_node, node, action)
+            self.stat=nav_stats(self.current_node, node, self.topol_map, edg)
             #dt_text=self.stat.get_start_time_str()
 
             result = self.monitored_navigation(target_pose, action)
@@ -404,6 +405,7 @@ class PolicyExecutionServer(object):
                 else :
                     #rospy.loginfo("Fatal fail on %s (%d/%d)" %(dt_text,operation_time,time_to_wp))
                     self.stat.status= "fatal"
+            
             self.publish_stats()
 
         else :
@@ -451,6 +453,7 @@ class PolicyExecutionServer(object):
     """
     def publish_stats(self):
         pubst = NavStatistics()
+        pubst.edge_id = self.stat.edge_id
         pubst.status = self.stat.status
         pubst.origin = self.stat.origin
         pubst.target = self.stat.target
@@ -469,7 +472,7 @@ class PolicyExecutionServer(object):
         meta["date"] = self.stat.date_at_node.strftime('%A, %B %d %Y, at %H:%M:%S hours')
         meta["pointset"] = self.stat.topological_map
 
-        msg_store = MessageStoreProxy()
+        msg_store = MessageStoreProxy(collection='nav_stats')
         msg_store.insert(pubst,meta)
 
 
