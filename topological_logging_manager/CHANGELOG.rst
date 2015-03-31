@@ -2,8 +2,8 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.30 (2015-03-31)
+-------------------
 * fixing issue with topological navigation stats logging in policy execution
 * Being able to easily switch between current and closest node for detection.
 * Using service to look up edges

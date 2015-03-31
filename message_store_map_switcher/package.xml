@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>message_store_map_switcher</name>
-  <version>0.0.29</version>
+  <version>0.0.30</version>
   <description>A package for manipulating and serving maps from the mongodb_store.</description>
 
   <maintainer email="n.a.hawes@cs.bham.ac.uk">Nick Hawes</maintainer>
