@@ -22,6 +22,7 @@ class RecoverState(smach.State):
             self.n_tries=1
             
     def execute(self, userdata):
+        self.was_helped=False
         #This method *cannot* be overriden by the child class
         (is_active, max_recovery_attempts)=rospy.get_param("monitored_navigation/recover_states")[self.name]
         if "n_fails" in self.get_registered_input_keys():
@@ -37,10 +38,12 @@ class RecoverState(smach.State):
             nav_stat.insert()
             return result
         else:
+            rospy.logwarn("Recover state " + self.name + " is not active. Not executing.")
             return "not_active"
         
     def active_execute(self, userdata):
         #this method *needs* to be overriden by the child class
         rospy.logerr("The 'active_execute' method needs to be implemented by class " + self.name + ". This replaces the normal Smach.State 'execute' method.")
         return None
+    
 
