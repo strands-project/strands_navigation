@@ -38,26 +38,28 @@ add_message_files(
 #Generate services in the 'srv' folder
 add_service_files(
   FILES
+  AddContent.srv
   AddEdge.srv
+  AddHelper.srv
+  AddNode.srv
   AddMonitorRecoveryPair.srv
+  AddTag.srv
+  AskHelp.srv
   DelMonitorRecoveryPair.srv
-  SetMonitorRecoveryPairs.srv
+  GetTags.srv
+  GetTaggedNodes.srv
+  GetEdgesBetweenNodes.srv
   GetMonitorRecoveryPairs.srv
   SetNavRecovery.srv
   GetNavRecovery.srv
-  AddHelper.srv
   DelHelper.srv
   SetHelpers.srv
   GetHelpers.srv
-  AskHelp.srv
   EstimateTravelTime.srv
   PauseResumeNav.srv
   GetTopologicalMap.srv
-  AddNode.srv
-  AddTag.srv
-  GetTaggedNodes.srv
-  GetEdgesBetweenNodes.srv
   PredictEdgeState.srv
+  SetMonitorRecoveryPairs.srv
 )
 
 
