@@ -47,21 +47,27 @@ class MonitoredNavEventClass:
                 self.nav_event.local_costmap_image=costmap_images.local_costmap_image
                 self.nav_event.camera_image=costmap_images.camera_image
             except Exception, e:
-                rospy.logwarn("Error while getting costmap images for monitored nav event logging.")
+                rospy.logwarn("Error while getting costmap images for monitored nav event logging: " + str(e))
 
  
     def finalize(self, was_helped, n_tries):
-        self.nav_event.was_helped=was_helped
-        self.nav_event.event_end_time=rospy.get_rostime()
-        self.nav_event.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-        self.nav_event.n_help_requests=n_tries
+        try:
+            self.nav_event.was_helped=was_helped
+            self.nav_event.event_end_time=rospy.get_rostime()
+            self.nav_event.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            self.nav_event.n_help_requests=n_tries
+        except Exception, e:
+            rospy.logwarn("Error finalising mon nav event: " + str(e))
     
     def insert(self):
         log_to_db=rospy.get_param('log_mon_nav_events',True)
-        if log_to_db:
-            message_proxy=MessageStoreProxy(collection='monitored_nav_events')
-            message_proxy.insert(self.nav_event)
-        self.pub.publish(self.nav_event)
+        try:
+            if log_to_db:
+                message_proxy=MessageStoreProxy(collection='monitored_nav_events')
+                message_proxy.insert(self.nav_event)
+            self.pub.publish(self.nav_event)
+        except Exception, e:
+            rospy.logwarn("Error inserting mon nav event in mongo: " + str(e))
 
 
 
