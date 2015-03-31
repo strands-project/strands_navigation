@@ -45,7 +45,10 @@ class MonitoredNavigation:
         self.current_recovery_defs=[]
         self.current_nav_recovery_def=None
         self.current_helper_names=[]
-        self.current_helper_defs=[]        
+        self.current_helper_defs=[]
+        
+        self.created_dyn_defs=[]
+        self.created_dyn_objects=[]
         
         if file_name is not None:
             self.load_yaml_config(file_name)
@@ -118,16 +121,22 @@ class MonitoredNavigation:
         
 
     def create_object(self, dyn_class_loader_def):
-        package=dyn_class_loader_def.object_package
-        filename=dyn_class_loader_def.object_file
-        class_name=dyn_class_loader_def.object_class
-        try:
-            mod = __import__(package+ '.' + filename, fromlist=[class_name])
-            klass=getattr(mod, class_name)
-            return klass()
-        except (ImportError, AttributeError, ValueError), e:
-            rospy.logwarn("Import error: " + str(e))
-            return None
+        if dyn_class_loader_def in self.created_dyn_defs:
+            return self.created_dyn_objects[self.created_dyn_defs.index(dyn_class_loader_def)]
+        else:
+            package=dyn_class_loader_def.object_package
+            filename=dyn_class_loader_def.object_file
+            class_name=dyn_class_loader_def.object_class
+            try:
+                mod = __import__(package+ '.' + filename, fromlist=[class_name])
+                klass=getattr(mod, class_name)
+                class_instance=klass()
+                self.created_dyn_defs.append(dyn_class_loader_def)
+                self.created_dyn_objects.append(class_instance)
+                return class_instance
+            except (ImportError, AttributeError, ValueError), e:
+                rospy.logwarn("Import error: " + str(e))
+                return None
 
     
     def add_helper_cb(self, req):
