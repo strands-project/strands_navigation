@@ -27,6 +27,8 @@ class RecoverState(smach.State):
         (is_active, max_recovery_attempts)=rospy.get_param("monitored_navigation/recover_states")[self.name]
         if "n_fails" in self.get_registered_input_keys():
             self.n_tries=userdata.n_fails
+        else:
+            self.n_tries=1
         if is_active and self.n_tries<=max_recovery_attempts:
             nav_stat=MonitoredNavEventClass()
             if self.n_tries==1:
