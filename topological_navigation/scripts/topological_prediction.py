@@ -63,6 +63,7 @@ class TopologicalNavPred(object):
         
         self.lnodes = []
         self.eids = []
+        self.unknowns = []
         self.map_received =False
 
         rospy.Subscriber('/topological_map', TopologicalMap, self.MapCallback)
@@ -85,7 +86,10 @@ class TopologicalNavPred(object):
         #print self.eids
         
         self.gather_stats()
-        
+
+#        for i in self.unknowns:
+#            print i
+
         rospy.loginfo("All Done ...")
         rospy.spin()
 
@@ -112,13 +116,23 @@ class TopologicalNavPred(object):
             # Prints out the result of executing the action
             ps = self.FremenClient.get_result()  # A FibonacciResult
             #print ps.probabilities[0]
-            prob.append(ps.probabilities[0])
+            if ps.probabilities[0] > 0 :
+                prob.append(ps.probabilities[0])
+            else:
+                prob.append(0.01)
             if ps.probabilities[0] >=0.1:
                 est_dur = rospy.Duration(i["dist"]/ps.probabilities[0])
                 dur.append(est_dur)
             else :
                 est_dur = rospy.Duration(i["dist"]/0.1)
                 dur.append(est_dur)
+
+       
+        for i in self.unknowns:
+            edges_ids.append(i["model_id"])
+            prob.append(0.5)
+            est_dur = rospy.Duration(i["dist"]/0.5)
+            dur.append(est_dur)
 
 
         #print edges_ids, prob, dur
@@ -150,7 +164,10 @@ class TopologicalNavPred(object):
                     val["ori"]=i.name
                     val["dest"]=j.node
                     ddn=get_node(j.node, self.lnodes.nodes)
-                    val["dist"]= node_dist(i,ddn)/j.top_vel
+                    if j.top_vel>= 0.1:
+                        val["dist"]= node_dist(i,ddn)/j.top_vel
+                    else :
+                        val["dist"]= node_dist(i,ddn)/0.1
                     self.eids.append(val)
 
 
@@ -186,6 +203,8 @@ class TopologicalNavPred(object):
                 
             if len(available) > 0 :
                 to_add.append(edge_mod)
+            else :
+                self.unknowns.append(edge_mod)
                 
         self.create_fremen_models(to_add)
 
