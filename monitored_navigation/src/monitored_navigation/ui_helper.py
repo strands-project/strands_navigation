@@ -10,7 +10,7 @@ class UIHelper:
         self.previous_interaction=None
         
     def process_help_request(self,req):
-        if not self.previous_interaction == req.interaction_status:                
+        if not self.previous_interaction == req.interaction_status:
             if req.interaction_status==AskHelpRequest.ASKING_HELP:
                 self.ask_help(req.failed_component, req.interaction_service,req.n_fails)
             elif  req.interaction_status==AskHelpRequest.BEING_HELPED:
