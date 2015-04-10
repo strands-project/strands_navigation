@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.31 (2015-04-10)
+-------------------
 * change mon nav events to allow for more failures to be logged
 * Adding Services:
   * /topological_map_manager/add_content_to_node: adds content to a node

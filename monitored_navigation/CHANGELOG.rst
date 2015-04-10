@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.31 (2015-04-10)
+-------------------
 * set n_tries to 1 when it doesnt come from userdata
 * RecoverState class to allow enable/disable of certain recoveries on the fly
 * extra try/catch statements in the logging
