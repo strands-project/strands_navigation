@@ -2,6 +2,9 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.30 (2015-03-31)
 -------------------
 * fixing issue with topological navigation stats logging in policy execution
