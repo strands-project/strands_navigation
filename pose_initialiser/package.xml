@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>pose_initialiser</name>
-  <version>0.0.30</version>
+  <version>0.0.31</version>
   <description>The pose_initialiser package</description>
 
   <maintainer email="jpulidofentanes@lincoln.ac.uk">Jaime Pulido Fentanes</maintainer>

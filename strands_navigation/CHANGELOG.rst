@@ -2,6 +2,12 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.31 (2015-04-10)
+-------------------
+* Adding topological_logging_manager to meta package
+  Closes `#212 <https://github.com/strands-project/strands_navigation/issues/212>`_
+* Contributors: Christian Dondrup
+
 0.0.29 (2015-03-23)
 -------------------
 

@@ -2,6 +2,15 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.31 (2015-04-10)
+-------------------
+* change mon nav events to allow for more failures to be logged
+* Adding Services:
+  * /topological_map_manager/add_content_to_node: adds content to a node
+  * /topological_map_manager/get_tags: get a list of tags to in the current topological map
+  * /topological_map_manager/rm_tag_from_node: removes a tag from a list of nodes
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes
+
 0.0.29 (2015-03-23)
 -------------------
 
