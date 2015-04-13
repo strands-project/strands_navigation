@@ -235,14 +235,14 @@ class SafetyServer(object):
     def timer_callback(self):
         if self.safety_stop :
             self.set_emergency_stop()
-            if not self.nogo_pre_active :
+            if not self.pre_active :
                 self.update_service_list()
                 self.set_free_run(True)
                 self.start_stop_scheduler(False)
                 self.send_email()
             self.pre_active = True
         else:
-            if self.nogo_pre_active :
+            if self.pre_active :
                 self.update_service_list()
                 self.release_emergency_stop()
                 self.set_free_run(False)
