@@ -3,8 +3,7 @@
 import rospy
 import rosservice
 import actionlib
-#import rosgraph.masterapi
-
+from threading import Timer
 
 from std_msgs.msg import String
 import std_srvs.srv
@@ -17,12 +16,14 @@ import topological_navigation.msg
 class SafetyServer(object):
 
     def __init__(self, name) :
+        rospy.on_shutdown(self._on_node_shutdown)
         #rospy.on_shutdown(self._on_node_shutdown)
         self.closest_node = "Unknown"
         self.stop_services=["/enable_motors", "/emergency_stop", "/task_executor/set_execution_status"]
         self.activate_services=["/enable_motors", "/reset_motorstop", "/task_executor/set_execution_status"]  
         self.info=''
-        
+        self.pre_active = False
+        self.safety_stop = False
 
         #Waiting for Topological Map        
         self._map_received=False
@@ -43,6 +44,13 @@ class SafetyServer(object):
         #This service returns any given map
         self.get_map_srv=rospy.Service('/go_to_safety_point', std_srvs.srv.Empty, self.goto_safety_cb)
 
+        self.safety_stop_srv=rospy.Service('/safety_stop', std_srvs.srv.Empty, self.safety_stop_cb)
+        self.reset_safety_stop_srv=rospy.Service('/reset_safety_stop', std_srvs.srv.Empty, self.reset_safety_stop_cb)
+
+
+        self._killall_timers=False
+        t = Timer(1.0, self.timer_callback)
+        t.start()
 
         rospy.loginfo("All Done ...")
         rospy.spin()
@@ -61,6 +69,13 @@ class SafetyServer(object):
         for i in self.activate_services :
             if i in self.service_names :
                 self.av_activate_services.append(i)
+
+
+    def safety_stop_cb(self):
+        self.safety_stop = True
+
+    def reset_safety_stop_cb(self):
+        self.safety_stop = False
 
     """
      Get Safety_Nodes
@@ -217,7 +232,32 @@ class SafetyServer(object):
         #return client.get_result()  # A FibonacciResult
 
 
+    def timer_callback(self):
+        if self.safety_stop :
+            self.set_emergency_stop()
+            if not self.nogo_pre_active :
+                self.update_service_list()
+                self.set_free_run(True)
+                self.start_stop_scheduler(False)
+                self.send_email()
+            self.pre_active = True
+        else:
+            if self.nogo_pre_active :
+                self.update_service_list()
+                self.release_emergency_stop()
+                self.set_free_run(False)
+                self.start_stop_scheduler(True)            
+            self.pre_active = False
+            
+        if not self._killall_timers :
+            t = Timer(1.0, self.timer_callback)
+            t.start()
+
+
+    def _on_node_shutdown(self):
+        self._killall_timers=True
+
 
 if __name__ == '__main__':
-    rospy.init_node('go_to_safety')
+    rospy.init_node('safety_trigger')
     server = SafetyServer(rospy.get_name())
