@@ -25,9 +25,6 @@ class NoGoServer(object):
         self.stop_services=["/enable_motors", "/emergency_stop", "/task_executor/set_execution_status"]
         self.activate_services=["/enable_motors", "/reset_motorstop", "/task_executor/set_execution_status"]
 
-
-        
-
         #Waiting for Topological Map        
         self._map_received=False
         rospy.Subscriber('/topological_map', TopologicalMap, self.MapCallback)      
@@ -193,8 +190,8 @@ class NoGoServer(object):
         goal = strands_emails.msg.SendEmailGoal()
         
         rospy.loginfo(" ... Init done")
-        goal.text = "Help!!!!!\n I just reached a no go area, please come rescue me!!!! \nthe recommended action:\npush me away from the Nogo area towards a safer zone NOT Down the stairs"
-        goal.to_address = 'pulidofentanes@gmail.com, jpulidofentanes@lincoln.ac.uk'
+        goal.text = "Help!!!!!\n I just reached a NO GO area, please come rescue me!!!! \nthe recommended action:\npush me away from the Nogo area towards a safer zone NOT Down the stairs"
+        goal.to_address = 'henry.strands@hanheide.net'
         goal.subject = 'Robot needs help'
         
         # Sends the goal to the action server.
