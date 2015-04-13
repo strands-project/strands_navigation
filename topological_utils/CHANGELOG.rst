@@ -2,6 +2,19 @@
 Changelog for package topological_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.32 (2015-04-12)
+-------------------
+* fixing bug in insert map that I inserted myself
+* Contributors: Jaime Pulido Fentanes
+
+0.0.31 (2015-04-10)
+-------------------
+* localisation by topic only works if the robot is in the influence zone of the node, migrate script now adds JSON string for localisation on ChargingPoint
+* Fixing issues with topological Prediction
+* second part of previous commit
+* checking sanity on migrate scripts
+* Contributors: Jaime Pulido Fentanes
+
 0.0.29 (2015-03-23)
 -------------------
 * adding install targets
