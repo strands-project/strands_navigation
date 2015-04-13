@@ -71,10 +71,10 @@ class SafetyServer(object):
                 self.av_activate_services.append(i)
 
 
-    def safety_stop_cb(self):
+    def safety_stop_cb(self, req):
         self.safety_stop = True
 
-    def reset_safety_stop_cb(self):
+    def reset_safety_stop_cb(self, req):
         self.safety_stop = False
 
     """
