@@ -118,7 +118,7 @@ class NoGoServer(object):
             self.set_emergency_stop()
             if not self.nogo_pre_active :
                 self.update_service_list()
-                self.set_free_run(True)
+                self.set_free_run(False)
                 self.start_stop_scheduler(False)
                 self.send_email()
             self.nogo_pre_active = True

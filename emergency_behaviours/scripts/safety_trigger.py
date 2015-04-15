@@ -237,7 +237,7 @@ class SafetyServer(object):
             self.set_emergency_stop()
             if not self.pre_active :
                 self.update_service_list()
-                self.set_free_run(True)
+                self.set_free_run(False)
                 self.start_stop_scheduler(False)
                 self.send_email()
             self.pre_active = True
@@ -245,7 +245,7 @@ class SafetyServer(object):
             if self.pre_active :
                 self.update_service_list()
                 self.release_emergency_stop()
-                self.set_free_run(False)
+                self.set_free_run(True)
                 self.start_stop_scheduler(True)            
             self.pre_active = False
             
