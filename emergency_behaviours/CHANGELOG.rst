@@ -2,8 +2,8 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.33 (2015-04-22)
+-------------------
 * bug fix`#2 <https://github.com/strands-project/strands_navigation/issues/2>`_
 * bug fix
 * adding safety stop service
