@@ -2,6 +2,13 @@
 Changelog for package topological_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.34 (2015-05-05)
+-------------------
+* Oops, that was almost embarrassing.
+* Dummy system now sets top map name param.
+* fixing insert yaml
+* Contributors: Jaime Pulido Fentanes, Nick Hawes
+
 0.0.32 (2015-04-12)
 -------------------
 * fixing bug in insert map that I inserted myself
