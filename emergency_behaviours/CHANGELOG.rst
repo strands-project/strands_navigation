@@ -1,9 +1,17 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package topological_logging_manager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package emergency_behaviours
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 0.0.34 (2015-05-05)
 -------------------
+
+0.0.33 (2015-04-22)
+-------------------
+* bug fix`#2 <https://github.com/strands-project/strands_navigation/issues/2>`_
+* bug fix
+* adding safety stop service
+* creating emergency behaviours package
+* Contributors: Jailander
 
 0.0.32 (2015-04-12)
 -------------------
@@ -13,16 +21,6 @@ Changelog for package topological_logging_manager
 
 0.0.30 (2015-03-31)
 -------------------
-* fixing issue with topological navigation stats logging in policy execution
-* Being able to easily switch between current and closest node for detection.
-* Using service to look up edges
-  Added install targets and readme.
-* Finishing basic functionality.
-  Node subscribes to current edge and topic and checks against the white list if it is in it. If so, publish true, false in all other cases.
-  Adding a whitelist that allows all nodes. Triggered by keyword `ALL`. Therefore no node can ever be named `ALL`.
-* First commit of logging manager.
-  No real functionality but allows @lucasb-eyer to work on his node depending on it.
-* Contributors: Christian Dondrup, Jaime Pulido Fentanes
 
 0.0.29 (2015-03-23)
 -------------------

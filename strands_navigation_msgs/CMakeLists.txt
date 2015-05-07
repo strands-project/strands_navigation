@@ -70,6 +70,7 @@ add_action_files(
 	FILES 
 	MonitoredNavigation.action
 	ExecutePolicyMode.action
+	BuildTopPrediction.action
 )
 
 
