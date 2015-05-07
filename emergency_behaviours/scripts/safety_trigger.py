@@ -84,30 +84,30 @@ class SafetyServer(object):
     """
     def goto_safety_cb(self, req):
         self.update_service_list()
-        nodes=self.get_safety_nodes()
+        #nodes=self.get_safety_nodes()
         self.info=''
-        if nodes:
-            print nodes[0]
-            rospy.loginfo("Pause task executor")
-            self.info= self.info + ' Pause task executor\n'
-            self.start_stop_scheduler(False)
-            if not self.go_to_node(nodes[0]):
-                cinfo = "Navigation Failed stuck somewhere close to %s" %self.closest_node
-                rospy.loginfo(cinfo)
-                self.info= self.info + ' ' +cinfo + '\n'
-            else:
-                cinfo = "At %s" %self.closest_node
-                rospy.loginfo(cinfo)
-                self.info= self.info + ' ' +cinfo + '\n'
-            self.info= self.info + ' Set Emergency Stop\n'
-            rospy.loginfo("Set Emergency Stop")
-            self.set_emergency_stop()
-            self.info= self.info + ' Set Free Run\n'
-            rospy.loginfo("Set Free Run")
-            self.set_free_run(True)
-        else :
-            self.info= self.info + ' Can\'t Find any Safety Points no action taken\n'
-            rospy.logerr("Can't Find any Safety Points no action taken")
+        #if nodes:
+        #    print nodes[0]
+        rospy.loginfo("Pause task executor")
+        self.info= self.info + ' Pause task executor\n'
+        self.start_stop_scheduler(False)
+#            if not self.go_to_node(nodes[0]):
+#                cinfo = "Navigation Failed stuck somewhere close to %s" %self.closest_node
+#                rospy.loginfo(cinfo)
+#                self.info= self.info + ' ' +cinfo + '\n'
+#            else:
+        cinfo = "At %s" %self.closest_node
+        rospy.loginfo(cinfo)
+        self.info= self.info + ' ' +cinfo + '\n'
+        self.info= self.info + ' Set Emergency Stop\n'
+        rospy.loginfo("Set Emergency Stop")
+        self.set_emergency_stop()
+        self.info= self.info + ' Set Free Run\n'
+        rospy.loginfo("Set Free Run")
+        self.set_free_run(True)
+#        else :
+#            self.info= self.info + ' Can\'t Find any Safety Points no action taken\n'
+#            rospy.logerr("Can't Find any Safety Points no action taken")
         self.send_email()
         return []
 
