@@ -2,13 +2,21 @@
 	<!-- declare arg to be passed in -->
 	<arg name="machine" default="localhost" />
 	<arg name="user" default="" />
-
+	<arg name="smtp_server" default="localhost:25" />
+	<arg name="from_add" 	default="robot@strands.eu" />
+	<arg name="to_add" 	default="admin@strands.eu" />
+	
+	
 	<machine name="$(arg machine)" address="$(arg machine)" env-loader="$(optenv ROS_ENV_LOADER )" user="$(arg user)" default="true"/>
 
 	<node pkg="strands_emails" name="strands_emails" type="send_emails.py" output="screen">
-	  <param name="from_add" value="henry.strands@hanheide.net" />
+	  <param name="from_add" value="$(arg from_add)" />
+	  <param name="smtp_add" value="$(arg smtp_server)" />
 	</node>
-		
+	
+	<rosparam param="/admin_email" subst_value="True">$(arg to_add)</rosparam> -->
+
+	
 	<node pkg="emergency_behaviours" name="nogo_node_stop" type="nogo_node_stop.py" output="screen"/>
 	<node pkg="emergency_behaviours" name="safety_trigger" type="safety_trigger.py" output="screen"/>
 </launch> 

@@ -11,6 +11,9 @@ import strands_navigation_msgs.srv
 from strands_navigation_msgs.msg import TopologicalMap
 import strands_emails.msg
 import topological_navigation.msg
+from strands_navigation_msgs.msg import MonitoredNavigationAction
+from topological_navigation.msg import GotoNodeAction
+from strands_navigation_msgs.msg import ExecutePolicyModeAction
 
 
 class SafetyServer(object):
@@ -22,8 +25,14 @@ class SafetyServer(object):
         self.stop_services=["/enable_motors", "/emergency_stop", "/task_executor/set_execution_status"]
         self.activate_services=["/enable_motors", "/reset_motorstop", "/task_executor/set_execution_status"]  
         self.info=''
+        self.service_called=''
+        self.monit_nav_cli = False
+        self.top_nav_cli = False
+        self.exec_pol_cli = False
         self.pre_active = False
         self.safety_stop = False
+        self.notificate_to = rospy.get_param("/admin_email",'henry.strands@hanheide.net')
+
 
         #Waiting for Topological Map        
         self._map_received=False
@@ -33,6 +42,7 @@ class SafetyServer(object):
             pass
         rospy.loginfo(" ...done")
 
+        self.create_action_clients()
         self.update_service_list()
         
         
@@ -71,7 +81,37 @@ class SafetyServer(object):
                 self.av_activate_services.append(i)
 
 
+
+    def create_action_clients(self):
+        if not self.monit_nav_cli:
+            rospy.loginfo("Creating monitored navigation client.")
+            self.monNavClient= actionlib.SimpleActionClient('monitored_navigation', MonitoredNavigationAction)
+            self.monit_nav_cli=self.monNavClient.wait_for_server(timeout = rospy.Duration(1))
+            if self.monit_nav_cli:
+                rospy.loginfo(" ...done")
+            else:
+                rospy.logwarn("monitored navigation client could not be created will retry afterwards")
+        if not self.top_nav_cli:
+            rospy.loginfo("Creating topological navigation client.")
+            self.topNavClient = actionlib.SimpleActionClient('topological_navigation', GotoNodeAction)
+            self.top_nav_cli = self.topNavClient.wait_for_server(timeout = rospy.Duration(1))
+            if self.top_nav_cli:
+                rospy.loginfo(" ...done")
+            else:
+                rospy.logwarn("topological navigation client could not be created will retry afterwards")
+        if not self.exec_pol_cli:
+            rospy.loginfo("Creating execute policy client.")
+            self.execPolClient = actionlib.SimpleActionClient('/topological_navigation/execute_policy_mode',ExecutePolicyModeAction)
+            self.exec_pol_cli = self.execPolClient.wait_for_server(timeout = rospy.Duration(1))
+            if self.exec_pol_cli:
+                rospy.loginfo(" ...done")
+            else:
+                rospy.logwarn("execute policy client could not be created will retry afterwards")    
+
+
+
     def safety_stop_cb(self, req):
+        self.service_called='*Safety Stop*'
         self.safety_stop = True
 
     def reset_safety_stop_cb(self, req):
@@ -83,31 +123,34 @@ class SafetyServer(object):
      This function gets the list of No go nodes
     """
     def goto_safety_cb(self, req):
+        self.service_called='*Go to Safety Point*'
         self.update_service_list()
-        nodes=self.get_safety_nodes()
+        #nodes=self.get_safety_nodes()
         self.info=''
-        if nodes:
-            print nodes[0]
-            rospy.loginfo("Pause task executor")
-            self.info= self.info + ' Pause task executor\n'
-            self.start_stop_scheduler(False)
-            if not self.go_to_node(nodes[0]):
-                cinfo = "Navigation Failed stuck somewhere close to %s" %self.closest_node
-                rospy.loginfo(cinfo)
-                self.info= self.info + ' ' +cinfo + '\n'
-            else:
-                cinfo = "At %s" %self.closest_node
-                rospy.loginfo(cinfo)
-                self.info= self.info + ' ' +cinfo + '\n'
-            self.info= self.info + ' Set Emergency Stop\n'
-            rospy.loginfo("Set Emergency Stop")
-            self.set_emergency_stop()
-            self.info= self.info + ' Set Free Run\n'
-            rospy.loginfo("Set Free Run")
-            self.set_free_run(True)
-        else :
-            self.info= self.info + ' Can\'t Find any Safety Points no action taken\n'
-            rospy.logerr("Can't Find any Safety Points no action taken")
+        #if nodes:
+        #    print nodes[0]
+        rospy.loginfo("Pause task executor")
+        self.info= self.info + ' Pause task executor\n'
+        self.start_stop_scheduler(False)
+        self.cancel_all_goals()
+        self.go_to_node(self.closest_node)
+#            if not self.go_to_node(nodes[0]):
+#                cinfo = "Navigation Failed stuck somewhere close to %s" %self.closest_node
+#                rospy.loginfo(cinfo)
+#                self.info= self.info + ' ' +cinfo + '\n'
+#            else:
+        cinfo = "Stop at %s" %self.closest_node
+        rospy.loginfo(cinfo)
+        self.info= self.info + ' ' +cinfo + '\n'
+        self.info= self.info + ' Set Emergency Stop\n'
+        rospy.loginfo("Set Emergency Stop")
+        self.set_emergency_stop()
+        self.info= self.info + ' Set Free Run\n'
+        rospy.loginfo("Set Free Run")
+        self.set_free_run(False)
+#        else :
+#            self.info= self.info + ' Can\'t Find any Safety Points no action taken\n'
+#            rospy.logerr("Can't Find any Safety Points no action taken")
         self.send_email()
         return []
 
@@ -220,16 +263,30 @@ class SafetyServer(object):
         client = actionlib.SimpleActionClient('strands_emails', strands_emails.msg.SendEmailAction)
         client.wait_for_server()
         goal = strands_emails.msg.SendEmailGoal()
-        
-        goal.text = "Hello,\nMy safety behaviour has been triggered I have taken the following actions:\n%s\nI recommend calling an expert to resume Normal operation" %self.info
-        goal.to_address = 'pulidofentanes@gmail.com, jpulidofentanes@lincoln.ac.uk'
+
+        if self.service_called == '*Safety Stop*':
+            ps='I recommend calling an expert to resume Normal operation a */reset_safety_stop* service call is needed'
+        if self.service_called == '*Go to Safety Point*':
+            ps='I recommend calling an expert to assess the situation and resume normal operation if possible'
+
+        goal.text = "Hello,\nMy %s safety behaviour has been triggered I have taken the following actions:\n%s\n%s" %(self.service_called, self.info, ps)
+        goal.to_address = self.notificate_to
         goal.subject = 'Robot Safety Behaviour Triggered'
         
         client.send_goal(goal)
-        print "sending email"
+        self.info = ''
+        #print "sending email"
         
         # Prints out the result of executing the action
         #return client.get_result()  # A FibonacciResult
+
+    def cancel_all_goals(self):
+        if self.top_nav_cli:
+            self.topNavClient.cancel_all_goals()
+        if self.monit_nav_cli:
+            self.monNavClient.cancel_all_goals()
+        if self.exec_pol_cli:
+            self.execPolClient.cancel_all_goals()
 
 
     def timer_callback(self):
@@ -237,15 +294,17 @@ class SafetyServer(object):
             self.set_emergency_stop()
             if not self.pre_active :
                 self.update_service_list()
-                self.set_free_run(True)
+                self.set_free_run(False)
                 self.start_stop_scheduler(False)
+                self.cancel_all_goals()
                 self.send_email()
+                self.create_action_clients()
             self.pre_active = True
         else:
             if self.pre_active :
                 self.update_service_list()
                 self.release_emergency_stop()
-                self.set_free_run(False)
+                self.set_free_run(True)
                 self.start_stop_scheduler(True)            
             self.pre_active = False
             
