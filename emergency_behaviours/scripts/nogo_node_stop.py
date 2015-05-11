@@ -22,6 +22,7 @@ class NoGoServer(object):
        
         rospy.on_shutdown(self._on_node_shutdown)
         self.current_node = "Unknown"
+        self.freerun_count=0
         self.monit_nav_cli = False
         self.top_nav_cli = False
         self.exec_pol_cli = False
@@ -147,17 +148,20 @@ class NoGoServer(object):
             self.set_emergency_stop()
             if not self.nogo_pre_active :
                 self.update_service_list()
-                self.set_free_run(True)
                 self.start_stop_scheduler(False)
                 self.cancel_all_goals()
                 self.send_email()
+                self.freerun_count=0
                 self.create_action_clients()
             self.nogo_pre_active = True
+            if self.freerun_count <3:
+                self.freerun_count+=1
+                self.set_free_run(False)           
         else:
             if self.nogo_pre_active :
                 self.update_service_list()
                 self.release_emergency_stop()
-                self.set_free_run(False)
+                self.set_free_run(True)
                 self.start_stop_scheduler(True)            
             self.nogo_pre_active = False
             

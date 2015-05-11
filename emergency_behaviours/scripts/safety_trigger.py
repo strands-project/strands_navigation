@@ -147,7 +147,7 @@ class SafetyServer(object):
         self.set_emergency_stop()
         self.info= self.info + ' Set Free Run\n'
         rospy.loginfo("Set Free Run")
-        self.set_free_run(True)
+        self.set_free_run(False)
 #        else :
 #            self.info= self.info + ' Can\'t Find any Safety Points no action taken\n'
 #            rospy.logerr("Can't Find any Safety Points no action taken")
