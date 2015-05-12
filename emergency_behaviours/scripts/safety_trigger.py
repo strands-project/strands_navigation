@@ -14,7 +14,7 @@ import topological_navigation.msg
 from strands_navigation_msgs.msg import MonitoredNavigationAction
 from topological_navigation.msg import GotoNodeAction
 from strands_navigation_msgs.msg import ExecutePolicyModeAction
-
+from move_base_msgs.msg import *
 
 class SafetyServer(object):
 
@@ -29,6 +29,7 @@ class SafetyServer(object):
         self.monit_nav_cli = False
         self.top_nav_cli = False
         self.exec_pol_cli = False
+        self.mb_cli = False
         self.pre_active = False
         self.safety_stop = False
         self.notificate_to = rospy.get_param("/admin_email",'henry.strands@hanheide.net')
@@ -106,6 +107,14 @@ class SafetyServer(object):
                 rospy.loginfo(" ...done")
             else:
                 rospy.logwarn("execute policy client could not be created will retry afterwards")    
+        if not self.mb_cli:
+            rospy.loginfo("Creating move base client.")
+            self.moveBaseClient = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+            self.mb_cli = self.moveBaseClient.wait_for_server(timeout = rospy.Duration(1))
+            if self.mb_cli:
+                rospy.loginfo(" ...done")
+            else:
+                rospy.logwarn("Move base client could not be created will retry afterwards")
 
 
 
@@ -283,6 +292,10 @@ class SafetyServer(object):
         if self.monit_nav_cli:
             self.monNavClient.cancel_all_goals()
             self.info= self.info + '\t\t - Cancel Monitored Navigation Goal\n'
+        if self.mb_cli:
+            self.moveBaseClient.cancel_all_goals()
+            self.info= self.info + '\t\t - Cancel Move Base Goal\n'
+
 
 
 
