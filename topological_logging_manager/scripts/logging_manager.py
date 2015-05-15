@@ -132,8 +132,8 @@ class Manager(object):
             if self.alive:
                 if self.current_edge or self.current_node:
                     if type(self.white_list_nodes) == list:
-                        if [x for x in self.white_list_nodes if self.current_node in x or "ALL" in x] \
-                            or [x for x in self.white_list_edges if self.current_edge in x or "ALL" in x]:
+                        if [x for x in self.white_list_nodes if self.current_node == x or "ALL" == x] \
+                            or [x for x in self.white_list_edges if self.current_edge == x or "ALL" == x]:
                                 res.log = True
             else:
                 if not self.current_edge == "none" or self.current_node == "none":
