@@ -2,8 +2,8 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.36 (2015-05-17)
+-------------------
 * Ok, I managed to mess this up :/ this is the tested and working version on Linda
 * cancelling navigation goals on emergencies and making email addresses configurable
 * implementing safety stop at current node

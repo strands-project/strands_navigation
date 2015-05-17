@@ -2,8 +2,8 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.36 (2015-05-17)
+-------------------
 * Don't accept substrings for logging manager
   Closes `#250 <https://github.com/strands-project/strands_navigation/issues/250>`_
   Tested in simulation.
