@@ -30,18 +30,19 @@ from strands_navigation_msgs.srv import *
 
 
 def usage():
-    print "\nFor one image of the current map:"
-    print "\t rosrun topological_utils draw_predicted_map.py"
+    print "\n ---------- Topological Predictions Visualisation Tool ---------------"
+    print "\nFor one image of the current predicted map:"
+    print "\t> rosrun topological_utils draw_predicted_map.py"
     print "\nFor one image of one specific timestamp:"
-    print "\t rosrun topological_utils draw_predicted_map.py -time epoch"
+    print "\t> rosrun topological_utils draw_predicted_map.py -time epoch"
     print "For images in a range use (every two hours):"
-    print "\t rosrun topological_utils draw_predicted_map.py -range from_epoch to_epoch"
-    print "\n\n"
-    #print "For all the stats from a date until now use:"
-    #print "\t rosrun topological_navigation topological_prediction.py -range from_epoch -1"
-    #print "For all the stats until one date:"
-    #print "\t rosrun topological_navigation topological_prediction.py -range 0 to_epoch"
-    #https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    print "\t> rosrun topological_utils draw_predicted_map.py -range from_epoch to_epoch"
+    print "\n\n Other options:"
+    print "\t-rotate <deg> \t\t | rotate the map image by X degrees"
+    print "\t-scale <scale factor> \t\t | scale the map image by X scaling factor"
+    print "\t-tz <time zone> \t\t | create the image labels for a specific time zone" 
+    print "\t\t\t\t | time zone codes wiki https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+        
 
 
 def predict_edges(epoch):
@@ -130,7 +131,10 @@ class DrawMap(object):
         else:
             self.scale=1.0
         
-        
+        if 'node_size' in props:
+            self.node_size = props['node_size']
+        else:
+            self.node_size = 8
         if 'tz' in props:
             self.timezone = pytz.timezone(props['tz'])
         else:
@@ -144,8 +148,6 @@ class DrawMap(object):
             topmapimg = self.draw_top_map(points, map2d.info, map2dimg, est)
             self.save_images(map2dimg, topmapimg)
         else :
-            print "DO THIS"
-            print epoch
             self.epoch = epoch[0]
 
             while self.epoch.secs <= epoch[1].secs:
@@ -200,7 +202,7 @@ class DrawMap(object):
             xval = (int(V1.x/info.resolution))+origin[0]
             yval = origin[1]+(int(V1.y/info.resolution))
             #print xval, yval
-            cv2.circle(topmap_image, (int(xval), int(yval)), 10, (0,0,255,255), -1)
+            cv2.circle(topmap_image, (int(xval), int(yval)), self.node_size, (0,0,255,255), -1)
         
 
         return topmap_image
@@ -222,9 +224,18 @@ class DrawMap(object):
         ts = datetime.fromtimestamp(self.epoch.secs, tz=pytz.UTC).astimezone(self.timezone).strftime('%a %d %b %Y %H:%M:%S (%Z)')        
         height, width, depth = out_image.shape
         font = cv2.FONT_HERSHEY_SIMPLEX
-        size1 = cv2.getTextSize(ts, font, 2, 5)
+        
+        font_size = 1.5
+        not_fitted=True
+        while not_fitted:
+            size1 = cv2.getTextSize(ts, font, font_size, 5)
+            if size1[0][0] > width:
+                font_size-=0.2
+            else:
+                not_fitted=False
+        
         hval = (width-size1[0][0])/2
-        cv2.putText(out_image,ts,(hval, size1[0][1]+10), font, 2,(255,255,255,255),5)
+        cv2.putText(out_image,ts,(hval, size1[0][1]+10), font, font_size,(255,255,255,255),5)
         
         
         size1 = cv2.getTextSize('Predicted Speed (m/s)', font, 1.5, 5)
@@ -310,5 +321,8 @@ if __name__ == '__main__':
         if '-tz' in sys.argv:
             ind = sys.argv.index('-tz')
             props['tz'] = str(sys.argv[ind+1])
+        if '-node_size' in sys.argv:
+            ind = sys.argv.index('-node_size')
+            props['node_size'] = int(sys.argv[ind+1])
     
     server = DrawMap(epochs, props)

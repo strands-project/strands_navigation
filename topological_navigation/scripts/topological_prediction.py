@@ -88,6 +88,9 @@ class TopologicalNavPred(object):
         for i in self.models:
             print i['model_id']
 
+        print "Model 0:"
+        print self.models[0]
+        print "==========================="
         self.predict_srv=rospy.Service('/topological_prediction/predict_edges', strands_navigation_msgs.srv.PredictEdgeState, self.predict_edge_cb)
         self.predict_srv=rospy.Service('/topological_prediction/edge_entropies', strands_navigation_msgs.srv.PredictEdgeState, self.edge_entropies_cb)
         rospy.loginfo("All Done ...")
@@ -358,10 +361,25 @@ class TopologicalNavPred(object):
             # print mid
             #print i["dist"]
             times=[]
+            evtimes=[]
             states=[]
+            evstates=[]
+            nstates=len(i["models"])
+            nbstates=int(round(len(i["models"])*0.8))
+            
             for j in i["models"]:
                 times.append(j["epoch"])
                 states.append(j["st"])
+                evtimes.append(j["epoch"])
+                evstates.append(j["st"])
+            #FILLING BUILD 
+#            for j in range(0,nbstates):
+#                times.append(i["models"][j]["epoch"])
+#                states.append(i["models"][j]["st"])
+#            
+#            for j in range(nbstates,nstates):
+#                evtimes.append(i["models"][j]["epoch"])
+#                evstates.append(i["models"][j]["st"])
             #print times
             #print states
             fremgoal = fremenserver.msg.FremenGoal()
@@ -381,25 +399,27 @@ class TopologicalNavPred(object):
             #print ps
             
             # print "--- EVALUATE ---"
-            frevgoal = fremenserver.msg.FremenGoal()
-            frevgoal.operation = 'evaluate'
-            frevgoal.id = mid
-            frevgoal.times = times
-            frevgoal.states = states
-            frevgoal.order = 5
-            
-            # Sends the goal to the action server.
-            self.FremenClient.send_goal(frevgoal)
-            
-            # Waits for the server to finish performing the action.
-            self.FremenClient.wait_for_result()
-            
-            # Prints out the result of executing the action
-            pse = self.FremenClient.get_result()  # A FibonacciResult
-            # print pse.errors
-            # print "chosen order %d" %pse.errors.index(min(pse.errors))
-            i["order"] = pse.errors.index(min(pse.errors))
-
+            if len(evtimes)>0:
+                frevgoal = fremenserver.msg.FremenGoal()
+                frevgoal.operation = 'evaluate'
+                frevgoal.id = mid
+                frevgoal.times = evtimes
+                frevgoal.states = evstates
+                frevgoal.order = 5
+                
+                # Sends the goal to the action server.
+                self.FremenClient.send_goal(frevgoal)
+                
+                # Waits for the server to finish performing the action.
+                self.FremenClient.wait_for_result()
+                
+                # Prints out the result of executing the action
+                pse = self.FremenClient.get_result()  # A FibonacciResult
+                # print pse.errors
+                # print "chosen order %d" %pse.errors.index(min(pse.errors))
+                i["order"] = pse.errors.index(min(pse.errors))
+            else:
+                i["order"] = 0
 
 
 if __name__ == '__main__':
