@@ -30,18 +30,20 @@ from strands_navigation_msgs.srv import *
 
 
 def usage():
-    print "\nFor one image of the current map:"
-    print "\t rosrun topological_utils draw_predicted_map.py"
+    print "\n ---------- Topological Predictions Visualisation Tool ---------------"
+    print "\nFor one image of the current predicted map:"
+    print "\t> rosrun topological_utils draw_predicted_map.py"
     print "\nFor one image of one specific timestamp:"
-    print "\t rosrun topological_utils draw_predicted_map.py -time epoch"
-    print "For images in a range use (every two hours):"
-    print "\t rosrun topological_utils draw_predicted_map.py -range from_epoch to_epoch"
-    print "\n\n"
-    #print "For all the stats from a date until now use:"
-    #print "\t rosrun topological_navigation topological_prediction.py -range from_epoch -1"
-    #print "For all the stats until one date:"
-    #print "\t rosrun topological_navigation topological_prediction.py -range 0 to_epoch"
-    #https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    print "\t> rosrun topological_utils draw_predicted_map.py -time epoch"
+    print "\nFor images in a range use (every two hours):"
+    print "\t> rosrun topological_utils draw_predicted_map.py -range from_epoch to_epoch"
+    print "\n\n Other options:"
+    print "\t-rotate <deg> \t\t | rotate the map image by X degrees"
+    print "\t-scale <scale factor> \t | scale the map image by X scaling factor"
+    print "\t-tz <time zone> \t | create the image labels for a specific time zone" 
+    print "\t\t\t\t | time zone codes wiki https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+    print "\t-crop <x0 y0 x1 y1> \t | crop the map image (before rotation and scaling)" 
+    print "\t-save_map_image \t | save the map image only (before rotation and scaling), useful for getting cropping coordinates" 
 
 
 def predict_edges(epoch):
@@ -113,6 +115,8 @@ class DrawMap(object):
         self.cmap = cm.jet
         self.colmap = cm.ScalarMappable(norm=self.norm, cmap=self.cmap)
 
+        #self.image_count=0
+
         map2d = self.get2dmap()
         dat= [128 if i < 0 else ((100-i)*2.5) for i in map2d.data]
 
@@ -126,15 +130,26 @@ class DrawMap(object):
             self.rotate=0
 
         if 'scale' in props:
-            self.scale=props['rotate']
+            self.scale=props['scale']
         else:
             self.scale=1.0
         
-        
+        if 'node_size' in props:
+            self.node_size = props['node_size']
+        else:
+            self.node_size = 8
         if 'tz' in props:
             self.timezone = pytz.timezone(props['tz'])
         else:
-            self.timezone = pytz.timezone('GMT')
+            self.timezone = pytz.timezone('GMT')        
+        if 'crop' in props:
+            self.crop = True
+            self.crop_coords= props['crop']
+        else:
+            self.crop = False
+            
+
+        self.save_map_image = props['save_map_image']  
 
         if len(epoch) <2:
             self.epoch = epoch[0]
@@ -144,8 +159,6 @@ class DrawMap(object):
             topmapimg = self.draw_top_map(points, map2d.info, map2dimg, est)
             self.save_images(map2dimg, topmapimg)
         else :
-            print "DO THIS"
-            print epoch
             self.epoch = epoch[0]
 
             while self.epoch.secs <= epoch[1].secs:
@@ -200,7 +213,7 @@ class DrawMap(object):
             xval = (int(V1.x/info.resolution))+origin[0]
             yval = origin[1]+(int(V1.y/info.resolution))
             #print xval, yval
-            cv2.circle(topmap_image, (int(xval), int(yval)), 10, (0,0,255,255), -1)
+            cv2.circle(topmap_image, (int(xval), int(yval)), self.node_size, (0,0,255,255), -1)
         
 
         return topmap_image
@@ -209,8 +222,20 @@ class DrawMap(object):
     def save_images(self, map2dimg, topmapimg):
         topmapimg = cv2.flip(topmapimg, 0)
         print topmapimg.shape
-        topmapimg = rotate_about_center(topmapimg, self.rotate, self.scale)
         
+
+        if self.save_map_image:
+            filename = 'map_only.png'
+            cv2.imwrite(filename,topmapimg)
+
+        if self.crop:
+            #topmapimg = topmapimg[285:485, 165:375] 165,285 375,485        
+            topmapimg = topmapimg[self.crop_coords[1]:self.crop_coords[3], self.crop_coords[0]:self.crop_coords[2]]
+            # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
+
+        topmapimg = rotate_about_center(topmapimg, self.rotate, self.scale)        
+
+
         size = topmapimg.shape[0]+200, topmapimg.shape[1]+200, 3
 
         out_image = np.zeros(size, dtype=np.uint8)
@@ -222,9 +247,18 @@ class DrawMap(object):
         ts = datetime.fromtimestamp(self.epoch.secs, tz=pytz.UTC).astimezone(self.timezone).strftime('%a %d %b %Y %H:%M:%S (%Z)')        
         height, width, depth = out_image.shape
         font = cv2.FONT_HERSHEY_SIMPLEX
-        size1 = cv2.getTextSize(ts, font, 2, 5)
+        
+        font_size = 1.5
+        not_fitted=True
+        while not_fitted:
+            size1 = cv2.getTextSize(ts, font, font_size, 5)
+            if size1[0][0] > width:
+                font_size-=0.2
+            else:
+                not_fitted=False
+        
         hval = (width-size1[0][0])/2
-        cv2.putText(out_image,ts,(hval, size1[0][1]+10), font, 2,(255,255,255,255),5)
+        cv2.putText(out_image,ts,(hval, size1[0][1]+10), font, font_size,(255,255,255,255),5)
         
         
         size1 = cv2.getTextSize('Predicted Speed (m/s)', font, 1.5, 5)
@@ -259,7 +293,11 @@ class DrawMap(object):
         datestr = datetime.fromtimestamp(self.epoch.secs).strftime('%Y-%m-%d_%H-%M-%S')
         filename = 'predmap_'+datestr+'.png'
         cv2.imwrite(filename,out_image)
-
+        
+#        filename2 = 'image_%05d.jpg' %self.image_count
+#        print filename2
+#        cv2.imwrite(filename2,out_image)
+#        self.image_count+=1
 
 
     def get2dmap(self) :
@@ -310,5 +348,16 @@ if __name__ == '__main__':
         if '-tz' in sys.argv:
             ind = sys.argv.index('-tz')
             props['tz'] = str(sys.argv[ind+1])
-    
+        if '-node_size' in sys.argv:
+            ind = sys.argv.index('-node_size')
+            props['node_size'] = int(sys.argv[ind+1])
+        if '-save_map_image' in sys.argv:
+            props['save_map_image'] = True
+        else:
+            props['save_map_image'] = False
+        if '-crop' in sys.argv:
+            ind = sys.argv.index('-crop')
+            props['crop']=[int(sys.argv[ind+1]),int(sys.argv[ind+2]),int(sys.argv[ind+3]),int(sys.argv[ind+4])]
+            
+            
     server = DrawMap(epochs, props)
