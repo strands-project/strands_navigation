@@ -35,14 +35,15 @@ def usage():
     print "\t> rosrun topological_utils draw_predicted_map.py"
     print "\nFor one image of one specific timestamp:"
     print "\t> rosrun topological_utils draw_predicted_map.py -time epoch"
-    print "For images in a range use (every two hours):"
+    print "\nFor images in a range use (every two hours):"
     print "\t> rosrun topological_utils draw_predicted_map.py -range from_epoch to_epoch"
     print "\n\n Other options:"
     print "\t-rotate <deg> \t\t | rotate the map image by X degrees"
-    print "\t-scale <scale factor> \t\t | scale the map image by X scaling factor"
-    print "\t-tz <time zone> \t\t | create the image labels for a specific time zone" 
+    print "\t-scale <scale factor> \t | scale the map image by X scaling factor"
+    print "\t-tz <time zone> \t | create the image labels for a specific time zone" 
     print "\t\t\t\t | time zone codes wiki https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
-        
+    print "\t-crop <x0 y0 x1 y1> \t | crop the map image (before rotation and scaling)" 
+    print "\t-save_map_image \t | save the map image only (before rotation and scaling), useful for getting cropping coordinates" 
 
 
 def predict_edges(epoch):
@@ -114,6 +115,8 @@ class DrawMap(object):
         self.cmap = cm.jet
         self.colmap = cm.ScalarMappable(norm=self.norm, cmap=self.cmap)
 
+        #self.image_count=0
+
         map2d = self.get2dmap()
         dat= [128 if i < 0 else ((100-i)*2.5) for i in map2d.data]
 
@@ -127,7 +130,7 @@ class DrawMap(object):
             self.rotate=0
 
         if 'scale' in props:
-            self.scale=props['rotate']
+            self.scale=props['scale']
         else:
             self.scale=1.0
         
@@ -138,7 +141,15 @@ class DrawMap(object):
         if 'tz' in props:
             self.timezone = pytz.timezone(props['tz'])
         else:
-            self.timezone = pytz.timezone('GMT')
+            self.timezone = pytz.timezone('GMT')        
+        if 'crop' in props:
+            self.crop = True
+            self.crop_coords= props['crop']
+        else:
+            self.crop = False
+            
+
+        self.save_map_image = props['save_map_image']  
 
         if len(epoch) <2:
             self.epoch = epoch[0]
@@ -211,8 +222,20 @@ class DrawMap(object):
     def save_images(self, map2dimg, topmapimg):
         topmapimg = cv2.flip(topmapimg, 0)
         print topmapimg.shape
-        topmapimg = rotate_about_center(topmapimg, self.rotate, self.scale)
         
+
+        if self.save_map_image:
+            filename = 'map_only.png'
+            cv2.imwrite(filename,topmapimg)
+
+        if self.crop:
+            #topmapimg = topmapimg[285:485, 165:375] 165,285 375,485        
+            topmapimg = topmapimg[self.crop_coords[1]:self.crop_coords[3], self.crop_coords[0]:self.crop_coords[2]]
+            # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
+
+        topmapimg = rotate_about_center(topmapimg, self.rotate, self.scale)        
+
+
         size = topmapimg.shape[0]+200, topmapimg.shape[1]+200, 3
 
         out_image = np.zeros(size, dtype=np.uint8)
@@ -270,7 +293,11 @@ class DrawMap(object):
         datestr = datetime.fromtimestamp(self.epoch.secs).strftime('%Y-%m-%d_%H-%M-%S')
         filename = 'predmap_'+datestr+'.png'
         cv2.imwrite(filename,out_image)
-
+        
+#        filename2 = 'image_%05d.jpg' %self.image_count
+#        print filename2
+#        cv2.imwrite(filename2,out_image)
+#        self.image_count+=1
 
 
     def get2dmap(self) :
@@ -324,5 +351,13 @@ if __name__ == '__main__':
         if '-node_size' in sys.argv:
             ind = sys.argv.index('-node_size')
             props['node_size'] = int(sys.argv[ind+1])
-    
+        if '-save_map_image' in sys.argv:
+            props['save_map_image'] = True
+        else:
+            props['save_map_image'] = False
+        if '-crop' in sys.argv:
+            ind = sys.argv.index('-crop')
+            props['crop']=[int(sys.argv[ind+1]),int(sys.argv[ind+2]),int(sys.argv[ind+3]),int(sys.argv[ind+4])]
+            
+            
     server = DrawMap(epochs, props)
