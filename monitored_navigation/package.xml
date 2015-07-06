@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>monitored_navigation</name>
-  <version>0.0.35</version>
+  <version>0.0.36</version>
   <description>The monitored_navigation package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
