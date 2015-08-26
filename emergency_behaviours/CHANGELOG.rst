@@ -2,6 +2,12 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* cancelling move_base too
+* tidying up making sure that navigation goals and free run policy is followed during safety stop
+* Contributors: Jaime Pulido Fentanes
+
 0.0.36 (2015-05-17)
 -------------------
 * Ok, I managed to mess this up :/ this is the tested and working version on Linda

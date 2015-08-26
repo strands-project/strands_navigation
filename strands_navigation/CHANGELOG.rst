@@ -2,6 +2,9 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.36 (2015-05-17)
 -------------------
 
