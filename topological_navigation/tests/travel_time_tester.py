@@ -19,6 +19,9 @@ class TestTravelTimeEstimator(unittest.TestCase):
 
     def test_travel_time_estimator(self):
         
+        # artificially wait to test jenkins here!
+        rospy.sleep(60)
+        
         # create a test topological map
         width = 5 
         height = 5 
