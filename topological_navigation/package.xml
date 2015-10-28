@@ -42,6 +42,7 @@
   <run_depend>fremenserver</run_depend>  
 
   <test_depend>strands_morse</test_depend>
+  <test_depend>scitos_ptu</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
