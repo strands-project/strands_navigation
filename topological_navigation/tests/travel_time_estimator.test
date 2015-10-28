@@ -7,6 +7,7 @@
   <include file="$(find strands_morse)/uol/launch/uol_mht_morse.launch">
     <arg name="env" value="uol_mht_human_nocam_fast" />
   </include>
+  <include file="$(find strands_morse)/uol/launch/uol_mht_nav2d.launch" />
 
   <node name="message_store" pkg="mongodb_store" type="message_store_node.py" output="screen"/>
   
