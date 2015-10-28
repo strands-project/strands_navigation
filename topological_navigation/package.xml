@@ -41,6 +41,7 @@
   <run_depend>dwa_local_planner</run_depend>
   <run_depend>fremenserver</run_depend>  
 
+  <test_depend>strands_morse</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
