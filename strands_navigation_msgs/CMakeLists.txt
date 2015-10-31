@@ -60,6 +60,7 @@ add_service_files(
   GetTopologicalMap.srv
   PredictEdgeState.srv
   SetMonitorRecoveryPairs.srv
+  RmvNode.srv
 )
 
 
