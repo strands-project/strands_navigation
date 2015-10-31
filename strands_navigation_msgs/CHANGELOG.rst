@@ -2,6 +2,11 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.37 (2015-08-26)
+-------------------
+* Added window range to action message. If this is left blank in the goal the behaviour is as before
+* Contributors: Nick Hawes
+
 0.0.36 (2015-05-17)
 -------------------
 
