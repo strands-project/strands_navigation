@@ -58,6 +58,7 @@ class VisualiseMap(object):
         self.node_cont = WaypointControllers()
 
         if not self._edit_mode :
+            print "NO EDIT MODE"
             rospy.loginfo("Go To Controllers ...")
             self.goto_cont = go_to_controllers()
 
