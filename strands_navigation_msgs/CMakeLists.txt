@@ -49,6 +49,8 @@ add_service_files(
   GetTags.srv
   GetTaggedNodes.srv
   GetEdgesBetweenNodes.srv
+  GetRouteBetween.srv
+  GetRouteTo.srv
   GetMonitorRecoveryPairs.srv
   SetNavRecovery.srv
   GetNavRecovery.srv

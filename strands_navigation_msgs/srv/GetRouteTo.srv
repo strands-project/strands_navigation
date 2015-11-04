@@ -1,0 +1,3 @@
+string goal
+---
+strands_navigation_msgs/NavRoute route
