@@ -53,7 +53,6 @@
   <build_depend>geometry_msgs</build_depend>
   <build_depend>movebase_state_service</build_depend>
   <build_depend>mongodb_store</build_depend>
-  <build_depend>mongo_logger</build_depend>
 
   <run_depend>actionlib</run_depend>
   <run_depend>actionlib_msgs</run_depend>
@@ -68,7 +67,6 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>movebase_state_service</run_depend>
   <run_depend>mongodb_store</run_depend>
-  <run_depend>mongo_logger</run_depend>
   <!-- <run_depend>human_help_manager</run_depend> -->
 
 
