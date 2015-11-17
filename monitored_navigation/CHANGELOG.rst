@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.38 (2015-11-17)
+-------------------
 * Got too carried away with the dependencies... removing the faulty one.
 * Adding missing dependencies to monitored navigation package.xml
 * Revert "Adding first version of topological test scenarios"

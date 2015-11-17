@@ -2,8 +2,8 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.38 (2015-11-17)
+-------------------
 * Adding graceful_fail results to run service
 * Adding load an run service for topo nav testing
 * Revert "Adding first version of topological test scenarios"
