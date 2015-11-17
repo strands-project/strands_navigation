@@ -2,6 +2,9 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.37 (2015-08-26)
 -------------------
 

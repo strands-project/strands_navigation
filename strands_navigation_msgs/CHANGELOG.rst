@@ -2,6 +2,17 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding graceful_fail results to run service
+* Adding load an run service for topo nav testing
+* Revert "Adding first version of topological test scenarios"
+* Adding graceful_fail results to run service
+* Adding load an run service for topo nav testing
+* adding simple policy generation based on A*
+* creating move base testing branch
+* Contributors: Christian Dondrup, Jaime Pulido Fentanes
+
 0.0.37 (2015-08-26)
 -------------------
 * Added window range to action message. If this is left blank in the goal the behaviour is as before
