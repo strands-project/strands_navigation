@@ -1,5 +1,6 @@
 ---
 bool nav_success
+bool nav_timeout
 bool graceful_fail
 bool human_success
 float64 min_distance_to_human
