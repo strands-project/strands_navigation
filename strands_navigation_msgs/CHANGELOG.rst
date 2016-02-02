@@ -2,6 +2,12 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.39 (2016-01-28)
+-------------------
+* Impossible tests now require the navigation to fail on its own accord
+  Currently, the impossible tests, i.e., blocking the way or the final node, require that the graceful death attempt is successful, meaning that the robot is able to navigate back to start after the navigation to end failed. With this PR, a new field for the service is added, giving feedback if the navigation timed out or if it failed on its own accord. Impossible tests are therefore only passed, if the navigation failed without timing out and if graceful death was successful.
+* Contributors: Christian Dondrup
+
 0.0.38 (2015-11-17)
 -------------------
 * Adding graceful_fail results to run service

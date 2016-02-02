@@ -2,6 +2,9 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.39 (2016-01-28)
+-------------------
+
 0.0.38 (2015-11-17)
 -------------------
 * Got too carried away with the dependencies... removing the faulty one.
