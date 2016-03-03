@@ -2,6 +2,9 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.40 (2016-02-07)
 -------------------
 
