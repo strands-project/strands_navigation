@@ -2,6 +2,9 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.41 (2016-03-03)
 -------------------
 
