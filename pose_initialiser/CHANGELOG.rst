@@ -2,6 +2,9 @@
 Changelog for package pose_initialiser
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.41 (2016-03-03)
 -------------------
 
