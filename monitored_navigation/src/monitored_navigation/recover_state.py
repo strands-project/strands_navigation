@@ -6,7 +6,7 @@ from mongo_logger import MonitoredNavEventClass
 #Not all RecoverStateMachine states need to be subclasses of this one, but if you want to log stuff and/or activate/deactivate the 
 #recover behaviour being implemented by the state, you should implement a subclass of this.
 class RecoverState(smach.State):
-    def __init__(self, name, outcomes=[], input_keys=[], output_keys=[], io_keys=[], is_active=True, max_recovery_attempts=0):
+    def __init__(self, name, outcomes=[], input_keys=[], output_keys=[], io_keys=[], is_active=True, max_recovery_attempts=1):
             outcomes.append("not_active")
             smach.State.__init__(self,
                                  outcomes=outcomes,
@@ -17,8 +17,9 @@ class RecoverState(smach.State):
             self.name=name
             self.was_helped=False #in case of being a ask help instate, is true if a human interacted with the robot
             current_params=rospy.get_param("/monitored_navigation/recover_states", {}) #dict of the form {name: (is_active, max_recovery_attempts)}
-            current_params[name]=(is_active, max_recovery_attempts)
-            rospy.set_param("monitored_navigation/recover_states", current_params)
+            if not current_params.has_key(name):
+                current_params[name]=(is_active, max_recovery_attempts)
+                rospy.set_param("monitored_navigation/recover_states", current_params)
             self.n_tries=1
             
     def execute(self, userdata):
