@@ -63,6 +63,7 @@ add_service_files(
   PredictEdgeState.srv
   SetMonitorRecoveryPairs.srv
   RmvNode.srv
+  LocalisePose.srv
   LoadTopoNavTestScenario.srv
   RunTopoNavTestScenario.srv
 )
