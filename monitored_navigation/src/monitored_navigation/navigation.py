@@ -96,7 +96,8 @@ class RecoverableNav:
                                               'recovered_without_help',
                                               'not_recovered_with_help',
                                               'not_recovered_without_help'],
-                                    input_keys=['goal'])
+                                    input_keys=['goal'],
+                                    output_keys=[])
         
         with self.nav_sm:
             if recover_sm is None:
@@ -166,15 +167,16 @@ class MonitoredRecoverableNav:
                                    default_outcome='not_recovered_without_help',
                                    child_termination_cb=self.child_term_cb,
                                    outcome_cb=self.out_cb,
-                                   input_keys=['goal']
+                                   input_keys=['goal', 'n_fails'],
+                                   output_keys=['n_fails']
                                    )
         with self.monitored_cc:
             smach.Concurrence.add('NAV_SM', self.recoverable_nav.nav_sm)
             for name, monitor in self.monitor_list.iteritems():
                 smach.Concurrence.add(name, monitor)
                 self.monitored_cc.register_outcomes([name+"_fail"])
-                                   
-                                   
+        
+
     def add_monitor(self, monitor_sm, name):
         if not isinstance(monitor_sm,MonitorState):
             rospy.logwarn("The monitor state needs to be an instantiation of the MonitorState class")
@@ -288,9 +290,9 @@ class HighLevelNav:
             smach.StateMachine.add('MONITORED_NAV',
                                    self.monitored_recoverable_nav.monitored_cc,
                                    transitions=nav_transitions)
-                                   
+                        
         self.high_level_sm.set_initial_state(["MONITORED_NAV"], userdata=smach.UserData())
-                                   
+        self.high_level_sm.register_start_cb(self.start_cb)
         self.high_level_sm.register_termination_cb(self.termination_cb, cb_args=[])
             
    
@@ -350,7 +352,8 @@ class HighLevelNav:
         self.init_high_level_sm()
         return  True
     
-    
+    def start_cb(self, userdata, initial_states):
+        self.high_level_sm.userdata.n_fails=0
 
     def termination_cb(self,userdata, terminal_states, outcome):
         userdata.result=MonitoredNavigationResult()
