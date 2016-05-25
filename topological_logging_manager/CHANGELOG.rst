@@ -2,6 +2,14 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* 0.0.42
+* updated changelogs
+* 0.0.41
+* updated changelogs
+* Contributors: Jenkins
+
 0.0.42 (2016-03-21)
 -------------------
 

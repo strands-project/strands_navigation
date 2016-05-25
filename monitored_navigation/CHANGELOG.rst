@@ -2,6 +2,16 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* allowing for userdata between monitor and recover states
+* 0.0.42
+* updated changelogs
+* 0.0.41
+* updated changelogs
+* allowing setting of max bumper recoveries param at startup
+* Contributors: Bruno Lacerda, Jenkins
+
 0.0.42 (2016-03-21)
 -------------------
 

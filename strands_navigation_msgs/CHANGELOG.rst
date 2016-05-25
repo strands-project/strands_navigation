@@ -2,6 +2,16 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* 0.0.42
+* updated changelogs
+* 0.0.41
+* updated changelogs
+* Adding localise_pose service which returns the node and closest node for a pose.
+  And fixing conflicts
+* Contributors: Jaime Pulido Fentanes, Jenkins
+
 0.0.42 (2016-03-21)
 -------------------
 
