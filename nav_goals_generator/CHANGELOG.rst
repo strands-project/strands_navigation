@@ -2,8 +2,8 @@
 Changelog for package nav_goals_generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.43 (2016-05-25)
+-------------------
 * 0.0.42
 * updated changelogs
 * 0.0.41

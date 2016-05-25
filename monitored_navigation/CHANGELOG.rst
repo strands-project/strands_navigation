@@ -2,8 +2,8 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.43 (2016-05-25)
+-------------------
 * allowing for userdata between monitor and recover states
 * 0.0.42
 * updated changelogs
