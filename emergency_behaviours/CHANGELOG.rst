@@ -2,6 +2,9 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.44 (2016-05-30)
 -------------------
 
