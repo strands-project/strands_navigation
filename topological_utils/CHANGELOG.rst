@@ -2,6 +2,11 @@
 Changelog for package topological_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2016-06-09)
+------------------
+* More sensible starting point
+* Contributors: Nick Hawes
+
 0.0.45 (2016-06-06)
 -------------------
 
