@@ -45,6 +45,8 @@
   <run_depend>topological_navigation</run_depend>
   <run_depend>topological_utils</run_depend>
   <run_depend>topological_logging_manager</run_depend>
+  <run_depend>emergency_behaviours</run_depend>
+
 
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
