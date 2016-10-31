@@ -2,8 +2,8 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2016-10-31)
+------------------
 * adding emergency behaviours as a dependency (`#328 <https://github.com/strands-project/strands_navigation/issues/328>`_)
 * Contributors: Jaime Pulido Fentanes
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>emergency_behaviours</name>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <description>The emergency_behaviours package</description>
 
   <maintainer email="jpulidofentanes@lincoln.ac.uk">Jaime Pulido Fentanes</maintainer>
