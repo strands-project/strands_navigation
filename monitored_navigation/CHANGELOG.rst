@@ -2,6 +2,11 @@
 Changelog for package monitored_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use threads to make sure all helpers run at the same time
+* Contributors: Bruno Lacerda
+
 1.0.2 (2016-10-31)
 ------------------
 
