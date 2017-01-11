@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
+from threading import Thread
 
 from strands_navigation_msgs.srv import AskHelp
 from ui_helper import UIHelper
@@ -47,6 +48,7 @@ class HelpManager(object):
  
     def forward_callback(self,req):
         for helper in self.helpers.values():
-            helper.process_help_request(req)
+            t = Thread(target=helper.process_help_request, args = (req, ))
+            t.start()
         return []
  

@@ -11,6 +11,7 @@ class UIHelper:
         
     def process_help_request(self,req):
         if not self.previous_interaction == req.interaction_status:
+            self.previous_interaction=req.interaction_status
             if req.interaction_status==AskHelpRequest.ASKING_HELP:
                 self.ask_help(req.failed_component, req.interaction_service,req.n_fails)
             elif  req.interaction_status==AskHelpRequest.BEING_HELPED:
@@ -19,9 +20,8 @@ class UIHelper:
                 self.help_finished(req.failed_component, req.interaction_service,req.n_fails)
             elif  req.interaction_status==AskHelpRequest.HELP_FAILED:
                 self.help_failed(req.failed_component, req.interaction_service,req.n_fails)
-                
-            self.previous_interaction=req.interaction_status
-            
+    
+    
     def ask_help(self, failed_component, interaction_service, n_fails):
         rospy.logwarn("This should be overriden by the helper.")
         
