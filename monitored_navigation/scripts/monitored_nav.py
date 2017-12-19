@@ -58,7 +58,7 @@ class MonitoredNavigation:
             self.sis = IntrospectionServer('monitored_navigation_sm', self.high_level_nav.high_level_sm, '/MON_NAV')
             self.sis.start()
         
-        self.as_wrapper=ActionServerWrapper('monitored_navigation', MonitoredNavigationAction, self.high_level_nav.high_level_sm,
+        self.as_wrapper=ActionServerWrapper(rospy.get_namespace() + 'monitored_navigation', MonitoredNavigationAction, self.high_level_nav.high_level_sm,
                         ['succeeded'], ['recovered_with_help', 'recovered_without_help', 'not_recovered_with_help', 'not_recovered_without_help'], ['preempted'],
                         goal_key = 'goal', result_key='result'
                         )

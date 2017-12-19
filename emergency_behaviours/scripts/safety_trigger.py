@@ -22,8 +22,8 @@ class SafetyServer(object):
         rospy.on_shutdown(self._on_node_shutdown)
         #rospy.on_shutdown(self._on_node_shutdown)
         self.closest_node = "Unknown"
-        self.stop_services=["/enable_motors", "/emergency_stop", "/task_executor/set_execution_status"]
-        self.activate_services=["/enable_motors", "/reset_motorstop", "/task_executor/set_execution_status"]  
+        self.stop_services=["enable_motors", "emergency_stop", "task_executor/set_execution_status"]
+        self.activate_services=["enable_motors", "reset_motorstop", "task_executor/set_execution_status"]  
         self.info=''
         self.service_called=''
         self.monit_nav_cli = False
@@ -32,12 +32,12 @@ class SafetyServer(object):
         self.mb_cli = False
         self.pre_active = False
         self.safety_stop = False
-        self.notificate_to = rospy.get_param("/admin_email",'henry.strands@hanheide.net')
+        self.notificate_to = rospy.get_param("admin_email",'henry.strands@hanheide.net')
 
 
         #Waiting for Topological Map        
         self._map_received=False
-        rospy.Subscriber('/topological_map', TopologicalMap, self.MapCallback)      
+        rospy.Subscriber('topological_map', TopologicalMap, self.MapCallback)      
         rospy.loginfo("Waiting for Topological map ...")        
         while not self._map_received :
             pass
@@ -49,14 +49,14 @@ class SafetyServer(object):
         
         #Subscribing to Localisation Topics
         rospy.loginfo("Subscribing to Localisation Topics")
-        rospy.Subscriber('/closest_node', String, self.cNodeCallback)
+        rospy.Subscriber('closest_node', String, self.cNodeCallback)
         rospy.loginfo(" ...done")
 
         #This service returns any given map
-        self.get_map_srv=rospy.Service('/go_to_safety_point', std_srvs.srv.Empty, self.goto_safety_cb)
+        self.get_map_srv=rospy.Service('go_to_safety_point', std_srvs.srv.Empty, self.goto_safety_cb)
 
-        self.safety_stop_srv=rospy.Service('/safety_stop', std_srvs.srv.Empty, self.safety_stop_cb)
-        self.reset_safety_stop_srv=rospy.Service('/reset_safety_stop', std_srvs.srv.Empty, self.reset_safety_stop_cb)
+        self.safety_stop_srv=rospy.Service('safety_stop', std_srvs.srv.Empty, self.safety_stop_cb)
+        self.reset_safety_stop_srv=rospy.Service('reset_safety_stop', std_srvs.srv.Empty, self.reset_safety_stop_cb)
 
 
         self._killall_timers=False
@@ -101,7 +101,7 @@ class SafetyServer(object):
                 rospy.logwarn("topological navigation client could not be created will retry afterwards")
         if not self.exec_pol_cli:
             rospy.loginfo("Creating execute policy client.")
-            self.execPolClient = actionlib.SimpleActionClient('/topological_navigation/execute_policy_mode',ExecutePolicyModeAction)
+            self.execPolClient = actionlib.SimpleActionClient('topological_navigation/execute_policy_mode',ExecutePolicyModeAction)
             self.exec_pol_cli = self.execPolClient.wait_for_server(timeout = rospy.Duration(1))
             if self.exec_pol_cli:
                 rospy.loginfo(" ...done")
@@ -154,8 +154,8 @@ class SafetyServer(object):
 
     def get_safety_nodes(self):
         try:
-            rospy.wait_for_service('/topological_localisation/get_nodes_with_tag')
-            get_nodes = rospy.ServiceProxy('/topological_localisation/get_nodes_with_tag', strands_navigation_msgs.srv.GetTaggedNodes)
+            rospy.wait_for_service('topological_localisation/get_nodes_with_tag')
+            get_nodes = rospy.ServiceProxy('/opological_localisation/get_nodes_with_tag', strands_navigation_msgs.srv.GetTaggedNodes)
             resp1 = get_nodes('Safety_Point')
             #print resp1
             return resp1.nodes
@@ -208,8 +208,8 @@ class SafetyServer(object):
             if not val:
                 self.info= self.info + '\t - Set Free Run\n'
             try:
-                rospy.wait_for_service('/enable_motors', timeout=0.5)
-                sfrun = rospy.ServiceProxy('/enable_motors', rosservice.get_service_class_by_name('/enable_motors'))
+                rospy.wait_for_service('enable_motors', timeout=0.5)
+                sfrun = rospy.ServiceProxy('enable_motors', rosservice.get_service_class_by_name('enable_motors'))
                 sfrun(val)
                 #print "Free run %s" %val
             except rospy.ServiceException, e:
@@ -223,10 +223,10 @@ class SafetyServer(object):
         if not val:
             self.info= self.info + '\t - Pause task executor\n'
         
-        if "/task_executor/set_execution_status" in self.av_stop_services:
+        if "task_executor/set_execution_status" in self.av_stop_services:
             try:
-                rospy.wait_for_service('/task_executor/set_execution_status', timeout=0.5)
-                schstop = rospy.ServiceProxy('/task_executor/set_execution_status', rosservice.get_service_class_by_name('/task_executor/set_execution_status'))
+                rospy.wait_for_service('task_executor/set_execution_status', timeout=0.5)
+                schstop = rospy.ServiceProxy('task_executor/set_execution_status', rosservice.get_service_class_by_name('task_executor/set_execution_status'))
                 schstop(val)
                 rospy.loginfo("Schedule Execute %s", val)
             except rospy.ServiceException, e:
@@ -235,11 +235,11 @@ class SafetyServer(object):
             rospy.logwarn('Couldn\'t Find Scheduler Start/Stop service')            
 
     def set_emergency_stop(self):
-        if '/emergency_stop' in self.av_stop_services:
+        if 'emergency_stop' in self.av_stop_services:
             self.info= self.info + '\t - Set Emergency Stop\n'
             try:
-                rospy.wait_for_service('/emergency_stop', timeout=0.5)
-                stop = rospy.ServiceProxy('/emergency_stop', rosservice.get_service_class_by_name('/emergency_stop'))
+                rospy.wait_for_service('emergency_stop', timeout=0.5)
+                stop = rospy.ServiceProxy('emergency_stop', rosservice.get_service_class_by_name('emergency_stop'))
                 stop()
                 # "stop"
             except rospy.ServiceException, e:
@@ -248,10 +248,10 @@ class SafetyServer(object):
             rospy.logwarn('Couldn\'t Find Emergency Stop service')
     
     def release_emergency_stop(self):
-        if '/reset_motorstop' in self.av_activate_services :
+        if 'reset_motorstop' in self.av_activate_services :
             try:
-                rospy.wait_for_service('/reset_motorstop', timeout=0.5)
-                reset = rospy.ServiceProxy('/reset_motorstop', rosservice.get_service_class_by_name('/reset_motorstop'))
+                rospy.wait_for_service('reset_motorstop', timeout=0.5)
+                reset = rospy.ServiceProxy('reset_motorstop', rosservice.get_service_class_by_name('/reset_motorstop'))
                 reset()
                 #print "reset"
             except rospy.ServiceException, e:
