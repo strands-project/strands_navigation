@@ -2,6 +2,11 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated email to new Oxford address
+* Contributors: Nick Hawes
+
 1.0.4 (2017-06-23)
 ------------------
 
