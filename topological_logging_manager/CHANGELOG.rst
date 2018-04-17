@@ -2,8 +2,8 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.5 (2018-04-17)
+------------------
 * Updated email to new Oxford address
 * Contributors: Nick Hawes
 
