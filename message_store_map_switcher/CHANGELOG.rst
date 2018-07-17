@@ -2,8 +2,8 @@
 Changelog for package message_store_map_switcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.6 (2018-07-17)
+------------------
 * new c++11 (`#359 <https://github.com/strands-project/strands_navigation/issues/359>`_)
 * Contributors: Marc Hanheide
 
