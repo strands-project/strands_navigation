@@ -21,24 +21,24 @@ from mongodb_store.message_store import MessageStoreProxy
 class MonitoredNavEventClass:
     def __init__(self):
         self.nav_event=None
-        self.pub=rospy.Publisher('/monitored_navigation/monitored_nav_event', MonitoredNavEvent, queue_size=1)
+        self.pub=rospy.Publisher('monitored_navigation/monitored_nav_event', MonitoredNavEvent, queue_size=1)
         
         got_service=False
         while not got_service:
             try:
-                rospy.wait_for_service('/movebase_state_service', 1)
+                rospy.wait_for_service('movebase_state_service', 1)
                 got_service=True
             except rospy.ROSException,e:
                 rospy.loginfo("Monited nav event logger is waiting for the movebase_state_service")
             if rospy.is_shutdown():
                 return
         
-        self.get_costmaps=rospy.ServiceProxy('/movebase_state_service',  MovebaseStateService)
+        self.get_costmaps=rospy.ServiceProxy('movebase_state_service',  MovebaseStateService)
         
     def initialize(self, recovery_mechanism,log_costmaps=False):
         self.nav_event=MonitoredNavEvent(recover_mechanism=recovery_mechanism, event_start_time=rospy.get_rostime())
-        self.nav_event.event_start_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
-        status_msg=rospy.wait_for_message("/monitored_navigation/status", GoalStatusArray , timeout=10.0)
+        self.nav_event.event_start_pose=rospy.wait_for_message("robot_pose", Pose , timeout=10.0)
+        status_msg=rospy.wait_for_message("monitored_navigation/status", GoalStatusArray , timeout=10.0)
         self.nav_event.goal_id=status_msg.status_list[0].goal_id
         if log_costmaps:
             try:
@@ -54,7 +54,7 @@ class MonitoredNavEventClass:
         try:
             self.nav_event.was_helped=was_helped
             self.nav_event.event_end_time=rospy.get_rostime()
-            self.nav_event.event_end_pose=rospy.wait_for_message("/robot_pose", Pose , timeout=10.0)
+            self.nav_event.event_end_pose=rospy.wait_for_message("robot_pose", Pose , timeout=10.0)
             self.nav_event.n_help_requests=n_tries
         except Exception, e:
             rospy.logwarn("Error finalising mon nav event: " + str(e))
