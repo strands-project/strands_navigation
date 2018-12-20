@@ -62,7 +62,7 @@ int main(int argc, char **argv)
   
 
 
-  ros::Subscriber sub = n.subscribe("/joy", 1000, controlCallback);
+  ros::Subscriber sub = n.subscribe("joy", 1000, controlCallback);
 
   //Check if map name was given as argument to the launch file, and create default map name otherwise
   map_name=std::string(argv[1]);

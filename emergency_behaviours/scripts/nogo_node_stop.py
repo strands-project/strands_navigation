@@ -29,14 +29,14 @@ class NoGoServer(object):
         self.nogo_pre_active = False
         self.nogo_active = False
         self.nogos=[]
-        self.stop_services=["/enable_motors", "/emergency_stop", "/task_executor/set_execution_status"]
-        self.activate_services=["/enable_motors", "/reset_motorstop", "/task_executor/set_execution_status"]
+        self.stop_services=["enable_motors", "emergency_stop", "task_executor/set_execution_status"]
+        self.activate_services=["enable_motors", "reset_motorstop", "task_executor/set_execution_status"]
         self.notificate_to = rospy.get_param("/admin_email",'henry.strands@hanheide.net')
 
 
         #Waiting for Topological Map        
         self._map_received=False
-        rospy.Subscriber('/topological_map', TopologicalMap, self.MapCallback)      
+        rospy.Subscriber('topological_map', TopologicalMap, self.MapCallback)      
         rospy.loginfo("Waiting for Topological map ...")        
         while not self._map_received :
             pass
@@ -50,7 +50,7 @@ class NoGoServer(object):
     
         #Subscribing to Localisation Topics
         rospy.loginfo("Subscribing to Localisation Topics")
-        rospy.Subscriber('/current_node', String, self.currentNodeCallback)
+        rospy.Subscriber('current_node', String, self.currentNodeCallback)
         rospy.loginfo(" ...done")
 
         self.nogos = self.get_no_go_nodes()
@@ -81,7 +81,7 @@ class NoGoServer(object):
                 rospy.logwarn("topological navigation client could not be created will retry afterwards")
         if not self.exec_pol_cli:
             rospy.loginfo("Creating execute policy client.")
-            self.execPolClient = actionlib.SimpleActionClient('/topological_navigation/execute_policy_mode',ExecutePolicyModeAction)
+            self.execPolClient = actionlib.SimpleActionClient('topological_navigation/execute_policy_mode',ExecutePolicyModeAction)
             self.exec_pol_cli = self.execPolClient.wait_for_server(timeout = rospy.Duration(1))
             if self.exec_pol_cli:
                 rospy.loginfo(" ...done")
@@ -173,8 +173,8 @@ class NoGoServer(object):
     def set_free_run(self, val):
         if "/enable_motors" in self.av_stop_services:
             try:
-                rospy.wait_for_service('/enable_motors', timeout=0.5)
-                sfrun = rospy.ServiceProxy('/enable_motors', rosservice.get_service_class_by_name('/enable_motors'))
+                rospy.wait_for_service('enable_motors', timeout=0.5)
+                sfrun = rospy.ServiceProxy('enable_motors', rosservice.get_service_class_by_name('enable_motors'))
                 sfrun(val)
                 #print "Free run %s" %val
             except rospy.ServiceException, e:
@@ -184,10 +184,10 @@ class NoGoServer(object):
 
         
     def start_stop_scheduler(self, val):
-        if "/task_executor/set_execution_status" in self.av_stop_services:
+        if "task_executor/set_execution_status" in self.av_stop_services:
             try:
-                rospy.wait_for_service('/task_executor/set_execution_status', timeout=0.5)
-                schstop = rospy.ServiceProxy('/task_executor/set_execution_status', rosservice.get_service_class_by_name('/task_executor/set_execution_status'))
+                rospy.wait_for_service('task_executor/set_execution_status', timeout=0.5)
+                schstop = rospy.ServiceProxy('task_executor/set_execution_status', rosservice.get_service_class_by_name('task_executor/set_execution_status'))
                 schstop(val)
                 #print "Schedule Execute %s" %val
             except rospy.ServiceException, e:
@@ -196,10 +196,10 @@ class NoGoServer(object):
             rospy.logwarn('Couldn\'t Find Scheduler Start/Stop service')            
 
     def set_emergency_stop(self):
-        if '/emergency_stop' in self.av_stop_services:
+        if 'emergency_stop' in self.av_stop_services:
             try:
-                rospy.wait_for_service('/emergency_stop', timeout=0.5)
-                stop = rospy.ServiceProxy('/emergency_stop', rosservice.get_service_class_by_name('/emergency_stop'))
+                rospy.wait_for_service('emergency_stop', timeout=0.5)
+                stop = rospy.ServiceProxy('emergency_stop', rosservice.get_service_class_by_name('/emergency_stop'))
                 stop()
                 rospy.loginfo("NO GO node stop")
             except rospy.ServiceException, e:
@@ -208,10 +208,10 @@ class NoGoServer(object):
             rospy.logwarn('Couldn\'t Find Emergency Stop service')
     
     def release_emergency_stop(self):
-        if '/reset_motorstop' in self.av_activate_services :
+        if 'reset_motorstop' in self.av_activate_services :
             try:
                 rospy.wait_for_service('/reset_motorstop', timeout=0.5)
-                reset = rospy.ServiceProxy('/reset_motorstop', rosservice.get_service_class_by_name('/reset_motorstop'))
+                reset = rospy.ServiceProxy('reset_motorstop', rosservice.get_service_class_by_name('reset_motorstop'))
                 reset()
                 #print "reset"
             except rospy.ServiceException, e:

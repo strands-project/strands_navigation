@@ -33,7 +33,7 @@ class Manager(object):
         rospy.loginfo("Getting topological map name...")
         self.map_name = None
         self.map_sub = rospy.Subscriber(
-            rospy.get_param("~topo_map_topic", "/topological_map"),
+            rospy.get_param("~topo_map_topic", "topological_map"),
             TopologicalMap,
             self.get_map_name
         )
@@ -74,12 +74,12 @@ class Manager(object):
             self.white_list_edges = ['ALL']
 
         self.node_sub = rospy.Subscriber(
-            rospy.get_param("~node_topic", "/closest_node"),
+            rospy.get_param("~node_topic", rospy.get_namespace() +  "closest_node"),
             String,
             self.node_callback
         )
         self.edge_sub = rospy.Subscriber(
-            rospy.get_param("~edge_topic", "/current_edge"),
+            rospy.get_param("~edge_topic", rospy.get_namespace() + "current_edge"),
             String,
             self.edge_callback
         )

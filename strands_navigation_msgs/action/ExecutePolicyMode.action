@@ -5,4 +5,5 @@ strands_navigation_msgs/NavRoute route
 bool success
 ---
 #feedback
-string route_status
+string current_wp
+uint8 status # interpert using actionlib_msgs/GoalStatus

@@ -1,13 +1,13 @@
 <launch>
     <arg name="white_list_file"/>
-    <arg name="current_node_topic" default="/current_node"/>
-    <arg name="closest_node_topic" default="/closest_node"/>
+    <arg name="current_node_topic" default="current_node"/>
+    <arg name="closest_node_topic" default="closest_node"/>
     <arg name="use_closest_node" default="true"/>
-    <arg name="edge_topic" default="/current_edge"/>
+    <arg name="edge_topic" default="current_edge"/>
     <arg name="check_topic_rate" default="1"/>
     <arg name="publishing_rate" default="30"/>
-    <arg name="bool_publisher_topic" default="/logging_manager/log"/>
-    <arg name="bool_stamped_publisher_topic" default="/logging_manager/log_stamped"/>
+    <arg name="bool_publisher_topic" default="logging_manager/log"/>
+    <arg name="bool_stamped_publisher_topic" default="logging_manager/log_stamped"/>
 
     <arg name="machine" default="localhost" />
     <arg name="user" default="" />
