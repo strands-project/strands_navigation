@@ -71,6 +71,7 @@ add_service_files(
   UpdateNodeName.srv
   UpdateEdge.srv
   UpdateNodeTolerance.srv
+  ReconfAtEdges.srv
 )
 
 
