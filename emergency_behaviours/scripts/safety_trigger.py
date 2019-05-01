@@ -155,7 +155,7 @@ class SafetyServer(object):
     def get_safety_nodes(self):
         try:
             rospy.wait_for_service('topological_localisation/get_nodes_with_tag')
-            get_nodes = rospy.ServiceProxy('/opological_localisation/get_nodes_with_tag', strands_navigation_msgs.srv.GetTaggedNodes)
+            get_nodes = rospy.ServiceProxy('topological_localisation/get_nodes_with_tag', strands_navigation_msgs.srv.GetTaggedNodes)
             resp1 = get_nodes('Safety_Point')
             #print resp1
             return resp1.nodes

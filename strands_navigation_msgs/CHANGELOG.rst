@@ -2,6 +2,20 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.7 (2018-10-26)
+------------------
+
+1.0.6 (2018-07-17)
+------------------
+
+1.0.5 (2018-04-17)
+------------------
+* Merge pull request `#351 <https://github.com/strands-project/strands_navigation/issues/351>`_ from heuristicus/indigo-devel
+  Can now place nodes with RMB to stop automatic edge creation
+* Can now place nodes with RMB to stop automatic edge creation
+  Fix deletion dialogue, edges and tags were swapped
+* Contributors: Michal Staniaszek, Nick Hawes
+
 1.0.4 (2017-06-23)
 ------------------
 * Modifications to topological map tools to accommodate topological map editor (`#345 <https://github.com/strands-project/strands_navigation/issues/345>`_)

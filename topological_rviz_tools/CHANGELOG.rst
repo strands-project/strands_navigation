@@ -2,6 +2,44 @@
 Changelog for package topological_rviz_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.7 (2018-10-26)
+------------------
+* added install for extra dirs (`#365 <https://github.com/strands-project/strands_navigation/issues/365>`_)
+* Merge pull request `#364 <https://github.com/strands-project/strands_navigation/issues/364>`_ from heuristicus/rviz_update
+  Standalone easier to run on strands robots
+* Standalone easier to run on strands robots
+  Would have to run with rviz=false and then run rviz on the main PC if the
+  database is on on of the side PCs. With this change can run the database on the
+  side PC and then run this with launch_db:=false to not have to run rviz
+  separately
+* Contributors: Marc Hanheide, Michal Staniaszek, Nick Hawes
+
+1.0.6 (2018-07-17)
+------------------
+
+1.0.5 (2018-04-17)
+------------------
+* Merge branch 'indigo-devel' of https://github.com/strands-project/strands_navigation into indigo-devel
+* Merge pull request `#353 <https://github.com/strands-project/strands_navigation/issues/353>`_ from heuristicus/rviz_update
+  Topological rviz tools topic names made more descriptive
+* Merge pull request `#351 <https://github.com/strands-project/strands_navigation/issues/351>`_ from heuristicus/indigo-devel
+  Can now place nodes with RMB to stop automatic edge creation
+* more descriptive names for topics displayed in rviz
+* Can now place nodes with RMB to stop automatic edge creation
+  Fix deletion dialogue, edges and tags were swapped
+* Merge pull request `#349 <https://github.com/strands-project/strands_navigation/issues/349>`_ from mudrole1/indigo-devel
+  Adding waiting for the add_node service
+* Adding waiting for services
+* Update topological_edge_tool.cpp
+* Adding waiting for the add_node service
+* Merge pull request `#348 <https://github.com/strands-project/strands_navigation/issues/348>`_ from heuristicus/indigo-devel
+  add standalone flag for when navigation is running
+* Merge pull request `#347 <https://github.com/strands-project/strands_navigation/issues/347>`_ from mudrole1/indigo-devel
+  Update strands_rviz_topmap.launch
+* Update strands_rviz_topmap.launch
+* add standalone flag for when navigation is running
+* Contributors: Bruno Lacerda, Lenka Mudrova, Michal Staniaszek, Nick Hawes
+
 1.0.4 (2017-06-23)
 ------------------
 * set version to 1.0.3 as the rest of repository

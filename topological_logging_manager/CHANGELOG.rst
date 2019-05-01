@@ -2,6 +2,17 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.7 (2018-10-26)
+------------------
+
+1.0.6 (2018-07-17)
+------------------
+
+1.0.5 (2018-04-17)
+------------------
+* Updated email to new Oxford address
+* Contributors: Nick Hawes
+
 1.0.4 (2017-06-23)
 ------------------
 
