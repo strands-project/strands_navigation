@@ -2,6 +2,19 @@
 Changelog for package strands_navigation_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#374 <https://github.com/strands-project/strands_navigation/issues/374>`_ from Jailander/edge-reconf
+  Move base parameters being reconfigured at edges
+* Merge branch 'indigo-devel' of https://github.com/strands-project/strands_navigation into indigo-devel
+* Moving reconf server to strands
+* Merge pull request `#369 <https://github.com/strands-project/strands_navigation/issues/369>`_ from strands-project/ori-indigo-devel
+  Support for multi-robot and different global planners
+* Merge remote-tracking branch 'ori/indigo-devel' into indigo-devel
+  Bringing in changes from ORI for multi-robot and different base planners.
+* correct feedback publishing from topo nav
+* Contributors: Bruno Lacerda, Jaime Pulido Fentanes, Nick Hawes
+
 1.0.7 (2018-10-26)
 ------------------
 

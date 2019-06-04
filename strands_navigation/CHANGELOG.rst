@@ -2,6 +2,11 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'indigo-devel' of https://github.com/strands-project/strands_navigation into indigo-devel
+* Contributors: Bruno Lacerda
+
 1.0.7 (2018-10-26)
 ------------------
 

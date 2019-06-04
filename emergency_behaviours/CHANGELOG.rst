@@ -2,6 +2,18 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'indigo-devel' of https://github.com/strands-project/strands_navigation into indigo-devel
+* Merge pull request `#369 <https://github.com/strands-project/strands_navigation/issues/369>`_ from strands-project/ori-indigo-devel
+  Support for multi-robot and different global planners
+* Fixed typo and maintaining backward compatibility for policy visualisation
+* Merge remote-tracking branch 'ori/indigo-devel' into indigo-devel
+  Bringing in changes from ORI for multi-robot and different base planners.
+* Merge branch 'indigo-devel' of https://github.com/bfalacerda/strands_navigation into indigo-devel
+* update of absolute/relative topic names for multi-robot setup
+* Contributors: Bruno Lacerda, Nick Hawes
+
 1.0.7 (2018-10-26)
 ------------------
 
