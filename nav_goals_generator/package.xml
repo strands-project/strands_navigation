@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>nav_goals_generator</name>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <description>The nav_goals_generator package</description>
 
   <maintainer email="l.kunze@cs.bham.ac.uk">Lars Kunze</maintainer>
