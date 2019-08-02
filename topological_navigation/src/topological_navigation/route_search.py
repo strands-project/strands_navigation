@@ -13,6 +13,7 @@ class NodeToExpand(object):
         self.current_distance = current_distance
         self.dist_to_target = dist_to_target
         self.cost = self.current_distance + self.dist_to_target
+        #print self.name, ":\n", "\tcurrent dist: ", self.current_distance, "\n\tdist_to_target: ", self.dist_to_target, "\n\tcost: ", self.cost
 
     def __repr__(self):
         return "-------\n\t Node: \n\t name:%s \n\t Father:%s \n\t current_distance:%f \n\t distance to target: %f \n\t cost %f \n" %(self.name, self.father, self.current_distance, self.dist_to_target, self.cost)
@@ -50,7 +51,7 @@ class TopologicalRouteSearch(object):
         cen = orig      #currently expanded node
 
         children = get_conected_nodes(cen) #nodes current node is connected to
-        #print children
+        #print "children\n", children
         not_goal=True
         route_found=False
         while not_goal :
@@ -65,12 +66,23 @@ class TopologicalRouteSearch(object):
                 #print "Goal NOT found"
                 for i in children:
                     been_expanded = False
+                    to_be_expanded = False
                     for j in expanded:
+                        # search in expanded
                         if i == j.name:
                             been_expanded = True
-                    for j in to_expand:
-                        if i == j.name:
-                            been_expanded = True
+                            old_expand_node = j
+                            # found it. skip remaining
+                            break
+                    if not been_expanded:
+                        # not in expanded, search in to_expand. can't be in both
+                        for j in to_expand:
+                            if i == j.name:
+                                been_expanded = True
+                                to_be_expanded = True
+                                old_expand_node = j
+                                # found it. skip remaining
+                                break
 
                     if not been_expanded:
                         nnn = get_node(self.top_map, i)
@@ -79,6 +91,19 @@ class TopologicalRouteSearch(object):
                         cnte = NodeToExpand(nnn.name, nte.name, nte.current_distance+cdist, tdist)  #Node to Expand
                         to_expand.append(cnte)
                         to_expand = sorted(to_expand, key=lambda node: node.cost)
+                    else:
+                        nnn = get_node(self.top_map, i)
+                        tdist = get_distance_to_node(goal, nnn)
+                        cdist = get_distance_to_node(cen, nnn)
+                        # update existing NTE with new data if a shorter route to it is found
+                        if nte.current_distance+cdist < old_expand_node.current_distance:
+                            old_expand_node.father = nte.name
+                            old_expand_node.current_distance = nte.current_distance+cdist
+                            old_expand_node.dist_to_target = tdist
+                            old_expand_node.cost = old_expand_node.current_distance + old_expand_node.dist_to_target
+                            if to_be_expanded:
+                                # re-sort to_expand with new costs
+                                to_expand = sorted(to_expand, key=lambda node: node.cost)
 
                 if len(to_expand)>0:
                     nte = to_expand.pop(0)
@@ -113,6 +138,7 @@ class TopologicalRouteSearch(object):
                 route.edge_id.append(edg[0].edge_id)
                 #route.append(r)
 
+            #print route
             return route
         else:
             return None
