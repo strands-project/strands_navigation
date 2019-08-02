@@ -38,7 +38,7 @@
   <!-- Use run_depend for packages you need at runtime: -->
 
   <run_depend>joy_map_saver</run_depend>
-  <run_depend>message_store_map_switcher</run_depend>
+
   <run_depend>monitored_navigation</run_depend>
   <run_depend>nav_goals_generator</run_depend>
   <run_depend>strands_navigation_msgs</run_depend>
