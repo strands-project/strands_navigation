@@ -2,6 +2,9 @@
 Changelog for package emergency_behaviours
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.8 (2019-06-04)
 ------------------
 * Merge branch 'indigo-devel' of https://github.com/strands-project/strands_navigation into indigo-devel
