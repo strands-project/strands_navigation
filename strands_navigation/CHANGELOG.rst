@@ -2,8 +2,8 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2019-11-27)
+------------------
 * Merge branch 'indigo-devel' into fix_route_search
 * Merge pull request `#376 <https://github.com/strands-project/strands_navigation/issues/376>`_ from gpdas/exec_policy_reconf_edge
   enable edge_reconfig for execute_policy_mode server
