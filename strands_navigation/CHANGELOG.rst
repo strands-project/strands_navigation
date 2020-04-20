@@ -2,6 +2,9 @@
 Changelog for package strands_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.0 (2020-04-09)
 ------------------
 

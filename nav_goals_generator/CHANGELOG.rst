@@ -2,6 +2,9 @@
 Changelog for package nav_goals_generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.0 (2020-04-09)
 ------------------
 

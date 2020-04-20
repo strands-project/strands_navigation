@@ -2,6 +2,9 @@
 Changelog for package topological_logging_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.0 (2020-04-09)
 ------------------
 

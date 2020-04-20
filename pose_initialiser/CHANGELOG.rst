@@ -2,6 +2,9 @@
 Changelog for package pose_initialiser
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.0 (2020-04-09)
 ------------------
 
